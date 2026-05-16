@@ -25,8 +25,12 @@ sebagai WebView yang me-load aset HTML/CSS/JS yang di-bundle di dalam APK.
 ## Sumber data
 
 - **Jadwal sholat:** [Aladhan API](https://aladhan.com/prayer-times-api),
-  metode default `20` (Indonesia / KEMENAG). Diambil langsung dari JavaScript;
-  butuh internet pada fetch pertama.
+  metode default `20` (Indonesia / KEMENAG). Aplikasi mengambil **kalender
+  satu bulan penuh** sekaligus dari endpoint `v1/calendar/{tahun}/{bulan}`,
+  cache di `localStorage` selama 32 hari, dan akan refetch otomatis tiap
+  bulan baru. Pre-fetch bulan depan dimulai 5 hari sebelum akhir bulan agar
+  rollover tengah malam mulus. Jadi: **butuh internet hanya 1× per bulan**;
+  selebihnya app bekerja sepenuhnya offline.
 - **Hijriyah:** dihitung di perangkat dengan `Intl.DateTimeFormat`
   (kalender `islamic-umalqura`).
 
