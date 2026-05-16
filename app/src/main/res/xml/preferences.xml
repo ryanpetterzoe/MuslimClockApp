@@ -53,6 +53,15 @@
 
     <PreferenceCategory app:title="@string/cat_appearance">
 
+        <ListPreference
+            app:key="layout"
+            app:title="@string/pref_layout"
+            app:summary="@string/pref_layout_sum"
+            app:entries="@array/layout_entries"
+            app:entryValues="@array/layout_values"
+            app:defaultValue="minimal"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:key="theme_primary"
             app:title="@string/pref_theme_primary"
@@ -74,6 +83,31 @@
             app:key="show_countdown"
             app:title="@string/pref_show_countdown"
             app:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_slideshow">
+
+        <Preference
+            app:key="pick_slides"
+            app:title="@string/pref_pick_slides"
+            app:summary="@string/pref_pick_slides_sum"
+            app:icon="@android:drawable/ic_menu_gallery" />
+
+        <Preference
+            app:key="clear_slides"
+            app:title="@string/pref_clear_slides" />
+
+        <EditTextPreference
+            app:key="slideshow_urls"
+            app:title="@string/pref_slideshow_urls"
+            app:summary="@string/pref_slideshow_urls_sum"
+            app:dialogMessage="@string/pref_slideshow_urls_sum" />
+
+        <EditTextPreference
+            app:key="slide_duration"
+            app:title="@string/pref_slide_duration"
+            app:summary="@string/pref_slide_duration_sum"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_adzan">

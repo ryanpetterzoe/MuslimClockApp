@@ -6,9 +6,9 @@ server**. Versi ini adalah port dari project web
 [`muslimclockweb`](https://github.com/ryanpetterzoe/muslimclockweb), dibungkus
 sebagai WebView yang me-load aset HTML/CSS/JS yang di-bundle di dalam APK.
 
-> **Status:** MVP + Settings native. Hanya layout `minimal` saat ini. Konfigurasi
-> bisa diubah lewat **Pengaturan** (ikon roda gigi, atau tombol MENU di remote
-> Android TV). Layout-layout lain menyusul di PR berikutnya.
+> **Status:** MVP + Settings native + 5 layout. Layout bisa diganti lewat
+> Pengaturan (Tampilan → Tema Tampilan): minimal, mosque, cinema, neon,
+> classic. Layout sisanya menyusul di PR berikutnya.
 
 ## Fitur MVP
 
@@ -25,8 +25,12 @@ sebagai WebView yang me-load aset HTML/CSS/JS yang di-bundle di dalam APK.
 ## Sumber data
 
 - **Jadwal sholat:** [Aladhan API](https://aladhan.com/prayer-times-api),
-  metode default `20` (Indonesia / KEMENAG). Diambil langsung dari JavaScript;
-  butuh internet pada fetch pertama.
+  metode default `20` (Indonesia / KEMENAG). Aplikasi mengambil **kalender
+  satu bulan penuh** sekaligus dari endpoint `v1/calendar/{tahun}/{bulan}`,
+  cache di `localStorage` selama 32 hari, dan akan refetch otomatis tiap
+  bulan baru. Pre-fetch bulan depan dimulai 5 hari sebelum akhir bulan agar
+  rollover tengah malam mulus. Jadi: **butuh internet hanya 1× per bulan**;
+  selebihnya app bekerja sepenuhnya offline.
 - **Hijriyah:** dihitung di perangkat dengan `Intl.DateTimeFormat`
   (kalender `islamic-umalqura`).
 
@@ -91,7 +95,13 @@ Buka aplikasi → klik ikon **roda gigi** di pojok kanan atas, atau tekan tombol
 - **Masjid**: nama, alamat, URL logo (opsional)
 - **Lokasi & Hisab**: latitude, longitude, zona waktu, metode hitung
   (KEMENAG / MWL / Karachi / dll. — sesuai daftar Aladhan)
-- **Tampilan**: warna primary, warna accent, toggle jam analog & countdown
+- **Tampilan**: pilih tema layout (minimal/mosque/cinema/neon/classic),
+  warna primary, warna accent, toggle jam analog &amp; countdown
+- **Slideshow Background**: tombol **Tambah Gambar dari Galeri** (multi-pick
+  dari storage Android — file dicopy ke penyimpanan privat aplikasi); juga
+  bisa paste URL eksternal manual ke field "Daftar URL Gambar". Tombol
+  **Hapus Semua Gambar Tersimpan** untuk membersihkan. Hanya berlaku di
+  layout `minimal` &amp; `cinema`.
 - **Adzan & Iqomah**: pesan, durasi (detik)
 
 Setting tersimpan di `SharedPreferences` lokal dan otomatis aktif saat kembali
@@ -126,12 +136,15 @@ app/src/main/
 ## Roadmap (tidak di MVP)
 
 - ~~Settings screen native Android~~ ✅ done
-- Picker layout (cinema, mosque, neon, classic, ... — total 23 layout dari web)
-- Slideshow gambar/video lokal (pilih file dari storage Android)
+- ~~5 layout populer (minimal, mosque, cinema, neon, classic)~~ ✅ done
+- ~~Slideshow background (URL list, fade transition)~~ ✅ done
+- ~~File picker storage Android (multi-pick gambar dari galeri)~~ ✅ done
+- Port 18 layout sisanya (aurora, festival, frame, galaxy, geometric, kinetic,
+  magazine, marble, polaroid, portrait, showcase, split, stadium, sunset,
+  terminal, theater, window, compact)
 - Running text custom
 - Rotasi ayat Al-Qur'an + terjemahan
 - Jadwal imam mingguan
-- Mode auto-update over-the-air (Aladhan calendar bulan, bukan harian)
 - Skin Android TV native untuk Settings (Leanback Preferences)
 
 ## Lisensi & atribusi
