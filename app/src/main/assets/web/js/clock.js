@@ -263,63 +263,192 @@
         } catch (e) { el.textContent = ''; }
     }
 
-    /* ===== Prayer times via Aladhan ===== */
-    function cacheKey(d) {
+    /* ===== Prayer times via Aladhan =====
+     *
+     * Strategy: fetch the *whole month* with /v1/calendar/{y}/{m} and cache
+     * it locally. We then index into that cache by day-of-month. Effects:
+     *   - 1 network call per month instead of per day
+     *   - Fully offline after the first successful fetch
+     *   - Pre-fetches next month near month-end for a seamless rollover
+     * Falls back to the per-day /v1/timings endpoint if calendar fails,
+     * and to hardcoded approximate times if the network is fully down.
+     */
+    const CALENDAR_TTL_MS = 32 * 24 * 3600 * 1000;     // refresh after 32d
+    const CALENDAR_PREFIX = 'mc_calendar_';
+
+    function calendarKey(year, month1Based) {
         const cfg = state.cfg;
-        const dd = pad(d.getDate()), mm = pad(d.getMonth()+1), yy = d.getFullYear();
-        return `mc_prayer_${cfg.location_lat},${cfg.location_lng},${cfg.calc_method},${dd}-${mm}-${yy}`;
+        return `${CALENDAR_PREFIX}${cfg.location_lat},${cfg.location_lng},` +
+               `${cfg.calc_method},${cfg.timezone},${year}-${pad(month1Based)}`;
+    }
+
+    function pruneOldCalendarCache() {
+        try {
+            const now = Date.now();
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (!k) continue;
+                if (k.startsWith('mc_prayer_')) {
+                    // Drop legacy per-day cache; calendar cache supersedes it.
+                    localStorage.removeItem(k);
+                    continue;
+                }
+                if (!k.startsWith(CALENDAR_PREFIX)) continue;
+                const raw = localStorage.getItem(k);
+                if (!raw) continue;
+                try {
+                    const obj = JSON.parse(raw);
+                    if (!obj || !obj._ts || (now - obj._ts) > 90 * 24 * 3600 * 1000) {
+                        localStorage.removeItem(k);
+                    }
+                } catch (e) { localStorage.removeItem(k); }
+            }
+        } catch (e) { /* localStorage unavailable */ }
+    }
+
+    function readCachedCalendar(year, month1Based) {
+        try {
+            const raw = localStorage.getItem(calendarKey(year, month1Based));
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            if (!obj || !obj._ts || !Array.isArray(obj.days)) return null;
+            if ((Date.now() - obj._ts) > CALENDAR_TTL_MS) return null;
+            return obj.days;     // array of day objects from Aladhan
+        } catch (e) { return null; }
+    }
+
+    function writeCachedCalendar(year, month1Based, days) {
+        try {
+            localStorage.setItem(
+                calendarKey(year, month1Based),
+                JSON.stringify({ _ts: Date.now(), days })
+            );
+        } catch (e) { /* quota */ }
+    }
+
+    /** Pull `Fajr/Sunrise/Dhuhr/Asr/Maghrib/Isha` for the given day from the
+     *  Aladhan calendar array (1-indexed by date.gregorian.day). */
+    function timingsFromCalendar(days, dayOfMonth) {
+        if (!Array.isArray(days)) return null;
+        const entry = days.find(d => {
+            const dn = d && d.date && d.date.gregorian && parseInt(d.date.gregorian.day, 10);
+            return dn === dayOfMonth;
+        }) || days[dayOfMonth - 1];
+        return entry && entry.timings ? entry.timings : null;
+    }
+
+    async function fetchMonthlyCalendar(year, month1Based) {
+        const cfg = state.cfg;
+        const url = `https://api.aladhan.com/v1/calendar/${year}/${month1Based}` +
+                    `?latitude=${encodeURIComponent(cfg.location_lat)}` +
+                    `&longitude=${encodeURIComponent(cfg.location_lng)}` +
+                    `&method=${encodeURIComponent(cfg.calc_method)}` +
+                    `&school=0&timezonestring=${encodeURIComponent(cfg.timezone)}`;
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        if (!data || !Array.isArray(data.data)) {
+            throw new Error('Unexpected calendar payload');
+        }
+        return data.data;     // array of 28..31 day objects
+    }
+
+    async function fetchDailyFallback(now) {
+        const cfg = state.cfg;
+        const dd = pad(now.getDate()), mm = pad(now.getMonth()+1), yy = now.getFullYear();
+        const url = `https://api.aladhan.com/v1/timings/${dd}-${mm}-${yy}` +
+                    `?latitude=${encodeURIComponent(cfg.location_lat)}` +
+                    `&longitude=${encodeURIComponent(cfg.location_lng)}` +
+                    `&method=${encodeURIComponent(cfg.calc_method)}` +
+                    `&school=0&timezonestring=${encodeURIComponent(cfg.timezone)}`;
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        return data && data.data && data.data.timings;
     }
 
     async function loadPrayerTimes() {
-        const cfg = state.cfg;
-        const lat = cfg.location_lat;
-        const lng = cfg.location_lng;
-        const method = cfg.calc_method;
-        const tz = cfg.timezone;
+        pruneOldCalendarCache();
+
         const now = new Date();
-        const dd = pad(now.getDate()), mm = pad(now.getMonth()+1), yy = now.getFullYear();
-        const dParam = `${dd}-${mm}-${yy}`;
-        const ck = cacheKey(now);
+        const year   = now.getFullYear();
+        const month  = now.getMonth() + 1;
+        const dayNum = now.getDate();
 
-        // Cache (valid 6h)
-        try {
-            const raw = localStorage.getItem(ck);
-            if (raw) {
-                const cached = JSON.parse(raw);
-                if (cached && cached._ts && (Date.now() - cached._ts) < 6 * 3600 * 1000) {
-                    state.times = normalizeTimes(cached.timings);
-                    renderTimes();
-                }
-            }
-        } catch (e) { /* ignore */ }
-
-        const url = `https://api.aladhan.com/v1/timings/${dParam}` +
-                    `?latitude=${encodeURIComponent(lat)}` +
-                    `&longitude=${encodeURIComponent(lng)}` +
-                    `&method=${encodeURIComponent(method)}` +
-                    `&school=0&timezonestring=${encodeURIComponent(tz)}`;
-        try {
-            const r = await fetch(url, { cache: 'no-store' });
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            const data = await r.json();
-            const t = data && data.data && data.data.timings;
+        // 1) Show cached entry immediately if we already have this month.
+        let days = readCachedCalendar(year, month);
+        if (days) {
+            const t = timingsFromCalendar(days, dayNum);
             if (t) {
                 state.times = normalizeTimes(t);
                 renderTimes();
-                try {
-                    localStorage.setItem(ck, JSON.stringify({ _ts: Date.now(), timings: t }));
-                } catch (e) { /* quota */ }
-            }
-        } catch (e) {
-            console.warn('Aladhan fetch failed; using cache or fallback:', e);
-            if (!Object.keys(state.times).length) {
-                state.times = normalizeTimes({
-                    Fajr: '04:30', Sunrise: '05:45', Dhuhr: '12:00',
-                    Asr: '15:15', Maghrib: '18:00', Isha: '19:15'
-                });
-                renderTimes();
             }
         }
+
+        // 2) Refresh from network if we don't have a fresh month-cache yet.
+        if (!days) {
+            try {
+                days = await fetchMonthlyCalendar(year, month);
+                writeCachedCalendar(year, month, days);
+                const t = timingsFromCalendar(days, dayNum);
+                if (t) {
+                    state.times = normalizeTimes(t);
+                    renderTimes();
+                }
+            } catch (e) {
+                console.warn('Monthly calendar fetch failed:', e);
+            }
+        }
+
+        // 3) Per-day fallback if we still have nothing on screen.
+        if (!Object.keys(state.times).length) {
+            try {
+                const t = await fetchDailyFallback(now);
+                if (t) {
+                    state.times = normalizeTimes(t);
+                    renderTimes();
+                }
+            } catch (e) {
+                console.warn('Daily fallback failed:', e);
+            }
+        }
+
+        // 4) Final hardcoded fallback so the UI is never blank.
+        if (!Object.keys(state.times).length) {
+            state.times = normalizeTimes({
+                Fajr: '04:30', Sunrise: '05:45', Dhuhr: '12:00',
+                Asr: '15:15', Maghrib: '18:00', Isha: '19:15'
+            });
+            renderTimes();
+        }
+
+        // 5) Opportunistic pre-fetch of next month in the last 5 days, so
+        //    the day-1 rollover at midnight is instant.
+        const lastDay = new Date(year, month, 0).getDate();
+        if (dayNum >= lastDay - 4) {
+            const nm = month === 12 ? 1 : month + 1;
+            const ny = month === 12 ? year + 1 : year;
+            if (!readCachedCalendar(ny, nm)) {
+                fetchMonthlyCalendar(ny, nm)
+                    .then(d => writeCachedCalendar(ny, nm, d))
+                    .catch(err => console.warn('Pre-fetch next month failed:', err));
+            }
+        }
+    }
+
+    /**
+     * Cheap update path: read today's entry from cache without hitting the
+     * network. Called at midnight to swap to the new day.
+     */
+    function refreshFromCacheOnly() {
+        const now = new Date();
+        const days = readCachedCalendar(now.getFullYear(), now.getMonth() + 1);
+        if (!days) return false;
+        const t = timingsFromCalendar(days, now.getDate());
+        if (!t) return false;
+        state.times = normalizeTimes(t);
+        renderTimes();
+        return true;
     }
 
     function normalizeTimes(t) {
@@ -480,13 +609,18 @@
 
         loadHijri();
         loadPrayerTimes();
-        setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
-        // Midnight refresh
+        // Re-validate the calendar cache periodically. Cheap when in-cache,
+        // network only triggers monthly / on miss.
+        setInterval(loadPrayerTimes, 6 * 3600 * 1000);
+
+        // Midnight rollover: swap to today's entry from cache; if cache is
+        // stale or missing (e.g. month rolled over) fall back to a full load.
         setInterval(() => {
             const n = new Date();
             if (n.getHours() === 0 && n.getMinutes() === 0 && n.getSeconds() < 5) {
-                loadPrayerTimes(); loadHijri();
+                if (!refreshFromCacheOnly()) loadPrayerTimes();
+                loadHijri();
             }
         }, 4000);
 
