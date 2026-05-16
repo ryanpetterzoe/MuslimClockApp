@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="stored_slides_count">
+        <item quantity="one">%d gambar tersimpan</item>
+        <item quantity="other">%d gambar tersimpan</item>
+    </plurals>
+</resources>
