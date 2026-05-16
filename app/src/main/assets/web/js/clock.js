@@ -7,6 +7,9 @@
  *
  * The native side calls window.applyConfig(json) whenever Settings change,
  * so theme/text update live and prayer times re-fetch if location changed.
+ *
+ * Layouts are HTML <template>s in index.html. We clone the chosen one into
+ * #layoutHost on init and again whenever the layout setting changes.
  */
 (function () {
     'use strict';
@@ -31,6 +34,7 @@
         iqomah_duration: 600,
         show_analog: true,
         show_countdown: true,
+        layout: 'minimal',
     };
 
     const PRAYER_LABEL_ID = {
@@ -57,12 +61,15 @@
         dhualhijjah: 11, dzulhijjah: 11, zulhijah: 11,
     };
 
+    const SUPPORTED_LAYOUTS = ['minimal', 'mosque', 'cinema', 'neon', 'classic'];
+
     /* ===== State (mutable) ===== */
     const state = {
         cfg: Object.assign({}, DEFAULTS, window.MC_CONFIG || {}),
         times: {},
         adzanActive: false,
         iqomahActive: false,
+        mountedLayout: null,
     };
 
     function loadFromBridge() {
@@ -76,6 +83,36 @@
         } catch (e) {
             console.warn('Bridge getConfig failed:', e);
         }
+    }
+
+    /* ===== Layout mount =====
+     *
+     * Clones <template id="layout-{name}"> into #layoutHost. Used both at
+     * initial render and when the user picks a different layout in Settings.
+     * Falls back to `minimal` for unknown values to keep the screen alive.
+     */
+    function mountLayout(name) {
+        const host = $('#layoutHost');
+        if (!host) return false;
+        const safe = SUPPORTED_LAYOUTS.includes(name) ? name : 'minimal';
+        const tmpl = document.getElementById('layout-' + safe);
+        if (!tmpl) {
+            console.warn('Layout template missing:', safe);
+            return false;
+        }
+        host.innerHTML = '';
+        host.appendChild(tmpl.content.cloneNode(true));
+        state.mountedLayout = safe;
+        // Inject the analog SVG into every [data-analog] slot the layout has.
+        const analogTmpl = document.getElementById('tmpl-analog');
+        if (analogTmpl) {
+            host.querySelectorAll('[data-analog]').forEach(slot => {
+                slot.innerHTML = '';
+                slot.appendChild(analogTmpl.content.cloneNode(true));
+            });
+        }
+        buildAnalogStatic();   // populate ticks/numerals on the freshly cloned SVG
+        return true;
     }
 
     /* ===== Apply config to DOM ===== */
@@ -100,30 +137,33 @@
         const name = cfg.masjid_name || 'Masjid';
         const namePrefixEl = $('#masjidPrefix');
         const nameEl = $('#masjidName');
-        if (namePrefixEl && nameEl) {
-            if (/^Masjid\s+/i.test(name)) {
+        if (nameEl) {
+            if (namePrefixEl && /^Masjid\s+/i.test(name) && namePrefixEl.style.display !== 'none') {
                 namePrefixEl.textContent = 'Masjid';
                 nameEl.textContent = name.replace(/^Masjid\s+/i, '');
             } else {
-                namePrefixEl.textContent = '';
+                if (namePrefixEl && namePrefixEl.style.display !== 'none') {
+                    namePrefixEl.textContent = '';
+                }
                 nameEl.textContent = name;
             }
         }
         const addrEl = $('#masjidAddress');
         if (addrEl) addrEl.textContent = cfg.masjid_address || '';
 
-        // Logo (only initial render — avoids replacing the element repeatedly)
+        // Logo (only when URL provided AND box still in DOM)
         if (cfg.masjid_logo) {
-            const box = document.querySelector('#logoBox');
+            const box = $('#logoBox');
             if (box && !box.dataset.replaced) {
                 box.dataset.replaced = '1';
-                box.innerHTML = '';
                 const img = document.createElement('img');
                 img.src = cfg.masjid_logo;
                 img.alt = 'logo';
-                img.className = 'w-12 h-12 object-contain rounded-xl';
-                img.onerror = () => { img.replaceWith(box); }; // restore on failure
-                box.replaceWith(img);
+                img.className = 'object-contain rounded-xl';
+                img.style.width = box.offsetWidth + 'px' || '48px';
+                img.style.height = box.offsetHeight + 'px' || '48px';
+                img.onerror = () => { /* keep placeholder */ };
+                box.replaceChildren(img);
             }
         }
 
@@ -133,14 +173,14 @@
             if (dl) dl.textContent = "Jum'at";
         }
 
-        // Body data-* attrs (kept for parity with screen.css selectors)
+        // Body data-* attrs (used by adzan overlay countdown)
         document.body.dataset.adzanMsg     = cfg.adzan_message || 'Saatnya Waktu Sholat';
         document.body.dataset.adzanDur     = String(cfg.adzan_duration || 600);
         document.body.dataset.iqomahDur    = String(cfg.iqomah_duration || 600);
         document.body.dataset.showAnalog   = cfg.show_analog    ? '1' : '0';
         document.body.dataset.showCountdown= cfg.show_countdown ? '1' : '0';
 
-        // Toggle modules
+        // Toggle modules — these IDs may or may not exist in any given layout.
         const a = $('#analogWrap'); if (a) a.style.display = cfg.show_analog    ? '' : 'none';
         const p = $('#nextPill');   if (p) p.style.display = cfg.show_countdown ? '' : 'none';
 
@@ -159,7 +199,15 @@
     window.applyConfig = function (newCfg) {
         const prev = state.cfg;
         state.cfg = Object.assign({}, DEFAULTS, newCfg || {});
+
+        // Remount if layout changed (or wasn't mounted yet).
+        const wantedLayout = state.cfg.layout || 'minimal';
+        if (state.mountedLayout !== wantedLayout) {
+            mountLayout(wantedLayout);
+        }
+
         applyConfigToDom();
+        renderTimes();   // refresh card values for new DOM nodes
 
         const locChanged =
             prev.location_lat  !== state.cfg.location_lat  ||
@@ -178,6 +226,8 @@
         const ticks = $('#ticks');
         const nums  = $('#numerals');
         if (!ticks || !nums) return;
+        // Idempotent: only build once per mount.
+        if (ticks.childNodes.length || nums.childNodes.length) return;
         const svgNS = 'http://www.w3.org/2000/svg';
         for (let i = 0; i < 60; i++) {
             const angle = i * 6;
@@ -273,7 +323,7 @@
      * Falls back to the per-day /v1/timings endpoint if calendar fails,
      * and to hardcoded approximate times if the network is fully down.
      */
-    const CALENDAR_TTL_MS = 32 * 24 * 3600 * 1000;     // refresh after 32d
+    const CALENDAR_TTL_MS = 32 * 24 * 3600 * 1000;
     const CALENDAR_PREFIX = 'mc_calendar_';
 
     function calendarKey(year, month1Based) {
@@ -289,7 +339,6 @@
                 const k = localStorage.key(i);
                 if (!k) continue;
                 if (k.startsWith('mc_prayer_')) {
-                    // Drop legacy per-day cache; calendar cache supersedes it.
                     localStorage.removeItem(k);
                     continue;
                 }
@@ -313,7 +362,7 @@
             const obj = JSON.parse(raw);
             if (!obj || !obj._ts || !Array.isArray(obj.days)) return null;
             if ((Date.now() - obj._ts) > CALENDAR_TTL_MS) return null;
-            return obj.days;     // array of day objects from Aladhan
+            return obj.days;
         } catch (e) { return null; }
     }
 
@@ -326,8 +375,6 @@
         } catch (e) { /* quota */ }
     }
 
-    /** Pull `Fajr/Sunrise/Dhuhr/Asr/Maghrib/Isha` for the given day from the
-     *  Aladhan calendar array (1-indexed by date.gregorian.day). */
     function timingsFromCalendar(days, dayOfMonth) {
         if (!Array.isArray(days)) return null;
         const entry = days.find(d => {
@@ -350,7 +397,7 @@
         if (!data || !Array.isArray(data.data)) {
             throw new Error('Unexpected calendar payload');
         }
-        return data.data;     // array of 28..31 day objects
+        return data.data;
     }
 
     async function fetchDailyFallback(now) {
@@ -375,45 +422,32 @@
         const month  = now.getMonth() + 1;
         const dayNum = now.getDate();
 
-        // 1) Show cached entry immediately if we already have this month.
         let days = readCachedCalendar(year, month);
         if (days) {
             const t = timingsFromCalendar(days, dayNum);
-            if (t) {
-                state.times = normalizeTimes(t);
-                renderTimes();
-            }
+            if (t) { state.times = normalizeTimes(t); renderTimes(); }
         }
 
-        // 2) Refresh from network if we don't have a fresh month-cache yet.
         if (!days) {
             try {
                 days = await fetchMonthlyCalendar(year, month);
                 writeCachedCalendar(year, month, days);
                 const t = timingsFromCalendar(days, dayNum);
-                if (t) {
-                    state.times = normalizeTimes(t);
-                    renderTimes();
-                }
+                if (t) { state.times = normalizeTimes(t); renderTimes(); }
             } catch (e) {
                 console.warn('Monthly calendar fetch failed:', e);
             }
         }
 
-        // 3) Per-day fallback if we still have nothing on screen.
         if (!Object.keys(state.times).length) {
             try {
                 const t = await fetchDailyFallback(now);
-                if (t) {
-                    state.times = normalizeTimes(t);
-                    renderTimes();
-                }
+                if (t) { state.times = normalizeTimes(t); renderTimes(); }
             } catch (e) {
                 console.warn('Daily fallback failed:', e);
             }
         }
 
-        // 4) Final hardcoded fallback so the UI is never blank.
         if (!Object.keys(state.times).length) {
             state.times = normalizeTimes({
                 Fajr: '04:30', Sunrise: '05:45', Dhuhr: '12:00',
@@ -422,8 +456,7 @@
             renderTimes();
         }
 
-        // 5) Opportunistic pre-fetch of next month in the last 5 days, so
-        //    the day-1 rollover at midnight is instant.
+        // Pre-fetch next month near end of month for instant rollover.
         const lastDay = new Date(year, month, 0).getDate();
         if (dayNum >= lastDay - 4) {
             const nm = month === 12 ? 1 : month + 1;
@@ -436,10 +469,6 @@
         }
     }
 
-    /**
-     * Cheap update path: read today's entry from cache without hitting the
-     * network. Called at midnight to swap to the new day.
-     */
     function refreshFromCacheOnly() {
         const now = new Date();
         const days = readCachedCalendar(now.getFullYear(), now.getMonth() + 1);
@@ -574,7 +603,7 @@
         let s = seconds;
         const render = () => {
             const m = Math.floor(s / 60), r = s % 60;
-            el.textContent = pad(m) + ':' + pad(r);
+            if (el) el.textContent = pad(m) + ':' + pad(r);
         };
         render();
         const t = setInterval(() => {
@@ -600,22 +629,17 @@
     /* ===== init ===== */
     function init() {
         loadFromBridge();
+        mountLayout(state.cfg.layout || 'minimal');
         applyConfigToDom();
         wireGear();
-        buildAnalogStatic();
         tickDigital();
         setInterval(tickDigital, 1000);
         requestAnimationFrame(tickAnalog);
 
         loadHijri();
         loadPrayerTimes();
-
-        // Re-validate the calendar cache periodically. Cheap when in-cache,
-        // network only triggers monthly / on miss.
         setInterval(loadPrayerTimes, 6 * 3600 * 1000);
 
-        // Midnight rollover: swap to today's entry from cache; if cache is
-        // stale or missing (e.g. month rolled over) fall back to a full load.
         setInterval(() => {
             const n = new Date();
             if (n.getHours() === 0 && n.getMinutes() === 0 && n.getSeconds() < 5) {
@@ -631,7 +655,8 @@
             if (e.key === 'Escape') hideAdzan();
         });
 
-        console.log('[MuslimClock] Android WebView build, bridge=' + !!window.MCAndroid);
+        console.log('[MuslimClock] mounted layout=' + state.mountedLayout +
+                    ', bridge=' + !!window.MCAndroid);
     }
 
     if (document.readyState === 'loading') {

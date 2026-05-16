@@ -49,4 +49,21 @@
         <item>Asia/Singapore</item>
         <item>UTC</item>
     </string-array>
+
+    <!-- Available web-side layouts. Keys must match <template id="layout-{key}">. -->
+    <string-array name="layout_entries">
+        <item>Minimal</item>
+        <item>Mosque (Kubah)</item>
+        <item>Cinema (3 kolom)</item>
+        <item>Neon (Cyber)</item>
+        <item>Classic (Ornamen)</item>
+    </string-array>
+
+    <string-array name="layout_values">
+        <item>minimal</item>
+        <item>mosque</item>
+        <item>cinema</item>
+        <item>neon</item>
+        <item>classic</item>
+    </string-array>
 </resources>

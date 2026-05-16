@@ -6,9 +6,9 @@ server**. Versi ini adalah port dari project web
 [`muslimclockweb`](https://github.com/ryanpetterzoe/muslimclockweb), dibungkus
 sebagai WebView yang me-load aset HTML/CSS/JS yang di-bundle di dalam APK.
 
-> **Status:** MVP + Settings native. Hanya layout `minimal` saat ini. Konfigurasi
-> bisa diubah lewat **Pengaturan** (ikon roda gigi, atau tombol MENU di remote
-> Android TV). Layout-layout lain menyusul di PR berikutnya.
+> **Status:** MVP + Settings native + 5 layout. Layout bisa diganti lewat
+> Pengaturan (Tampilan → Tema Tampilan): minimal, mosque, cinema, neon,
+> classic. Layout sisanya menyusul di PR berikutnya.
 
 ## Fitur MVP
 
@@ -95,7 +95,8 @@ Buka aplikasi → klik ikon **roda gigi** di pojok kanan atas, atau tekan tombol
 - **Masjid**: nama, alamat, URL logo (opsional)
 - **Lokasi & Hisab**: latitude, longitude, zona waktu, metode hitung
   (KEMENAG / MWL / Karachi / dll. — sesuai daftar Aladhan)
-- **Tampilan**: warna primary, warna accent, toggle jam analog & countdown
+- **Tampilan**: pilih tema layout (minimal/mosque/cinema/neon/classic),
+  warna primary, warna accent, toggle jam analog &amp; countdown
 - **Adzan & Iqomah**: pesan, durasi (detik)
 
 Setting tersimpan di `SharedPreferences` lokal dan otomatis aktif saat kembali
@@ -130,7 +131,10 @@ app/src/main/
 ## Roadmap (tidak di MVP)
 
 - ~~Settings screen native Android~~ ✅ done
-- Picker layout (cinema, mosque, neon, classic, ... — total 23 layout dari web)
+- ~~5 layout populer (minimal, mosque, cinema, neon, classic)~~ ✅ done
+- Port 18 layout sisanya (aurora, festival, frame, galaxy, geometric, kinetic,
+  magazine, marble, polaroid, portrait, showcase, split, stadium, sunset,
+  terminal, theater, window, compact)
 - Slideshow gambar/video lokal (pilih file dari storage Android)
 - Running text custom
 - Rotasi ayat Al-Qur'an + terjemahan
