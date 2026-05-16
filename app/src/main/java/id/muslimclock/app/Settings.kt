@@ -32,6 +32,7 @@ object Settings {
     const val K_IQOMAH_DURATION = "iqomah_duration"
     const val K_SHOW_ANALOG    = "show_analog"
     const val K_SHOW_COUNTDOWN = "show_countdown"
+    const val K_LAYOUT         = "layout"
 
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
@@ -60,6 +61,7 @@ object Settings {
             .putString(K_IQOMAH_DURATION,"600")
             .putBoolean(K_SHOW_ANALOG,   true)
             .putBoolean(K_SHOW_COUNTDOWN,true)
+            .putString(K_LAYOUT,         "minimal")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -89,6 +91,7 @@ object Settings {
             put("iqomah_duration", int(K_IQOMAH_DURATION, 600))
             put("show_analog",     p.getBoolean(K_SHOW_ANALOG,    true))
             put("show_countdown",  p.getBoolean(K_SHOW_COUNTDOWN, true))
+            put("layout",          str(K_LAYOUT,                  "minimal"))
             // Modules not yet implemented in MVP — keep keys stable so future
             // PRs can flip these without touching clock.js again.
             put("show_imam",       false)

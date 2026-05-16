@@ -53,6 +53,15 @@
 
     <PreferenceCategory app:title="@string/cat_appearance">
 
+        <ListPreference
+            app:key="layout"
+            app:title="@string/pref_layout"
+            app:summary="@string/pref_layout_sum"
+            app:entries="@array/layout_entries"
+            app:entryValues="@array/layout_values"
+            app:defaultValue="minimal"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:key="theme_primary"
             app:title="@string/pref_theme_primary"
