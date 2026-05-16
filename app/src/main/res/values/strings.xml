@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Muslim Clock</string>
+    <string name="settings_title">Pengaturan</string>
+
+    <string name="cat_masjid">Masjid</string>
+    <string name="cat_location">Lokasi &amp; Hisab</string>
+    <string name="cat_appearance">Tampilan</string>
+    <string name="cat_adzan">Adzan &amp; Iqomah</string>
+
+    <string name="pref_masjid_name">Nama Masjid</string>
+    <string name="pref_masjid_name_sum">Misal: Masjid Al-Hidayah</string>
+    <string name="pref_masjid_address">Alamat</string>
+    <string name="pref_masjid_logo">URL Logo (opsional)</string>
+    <string name="pref_masjid_logo_sum">Kosongkan untuk pakai bulan-bintang default</string>
+
+    <string name="pref_lat">Latitude</string>
+    <string name="pref_lat_sum">Contoh: -6.2 (Jakarta)</string>
+    <string name="pref_lng">Longitude</string>
+    <string name="pref_lng_sum">Contoh: 106.816666 (Jakarta)</string>
+    <string name="pref_timezone">Zona Waktu</string>
+    <string name="pref_calc_method">Metode Perhitungan</string>
+
+    <string name="pref_theme_primary">Warna Utama</string>
+    <string name="pref_theme_primary_sum">Hex, contoh: #0A4EA3</string>
+    <string name="pref_theme_accent">Warna Aksen</string>
+    <string name="pref_theme_accent_sum">Hex, contoh: #F5B301</string>
+    <string name="pref_show_analog">Tampilkan Jam Analog</string>
+    <string name="pref_show_countdown">Tampilkan Hitung Mundur</string>
+
+    <string name="pref_adzan_message">Pesan Adzan</string>
+    <string name="pref_adzan_duration">Durasi Adzan (detik)</string>
+    <string name="pref_adzan_duration_sum">Default 600 = 10 menit</string>
+    <string name="pref_iqomah_duration">Durasi Iqomah (detik)</string>
+    <string name="pref_iqomah_duration_sum">Default 600 = 10 menit</string>
+
+    <string name="hint_settings_remote">Tekan MENU pada remote, atau ketuk ikon roda gigi untuk membuka pengaturan</string>
 </resources>
