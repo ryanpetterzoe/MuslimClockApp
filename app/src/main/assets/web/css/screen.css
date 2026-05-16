@@ -1,0 +1,404 @@
+/* ===== Muslim Clock Web — Display (v7, multi-layout) ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+    font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+}
+.font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
+.font-arabic  { font-family: 'Amiri', 'Traditional Arabic', serif; }
+
+/* ---------- Slideshow fade ---------- */
+.slide {
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+.slide.active { opacity: 1; }
+video.slide { object-fit: cover; width: 100%; height: 100%; }
+
+/* ---------- Marquee ticker ---------- */
+@keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+.marquee {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+.marquee-inner {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: ticker linear infinite;
+    will-change: transform;
+}
+@keyframes tickerRTL {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+}
+.marquee-rtl .marquee-inner {
+    padding-left: 0;
+    padding-right: 100%;
+    animation-name: tickerRTL;
+    direction: rtl;
+}
+
+/* ---------- Glassmorphism utilities ---------- */
+.glass {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.glass-dark {
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.shadow-soft  { box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
+.shadow-deep  { box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3); }
+.shadow-accent{ box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 18px 50px -10px var(--accent-shadow, rgba(245,179,1,0.35)); }
+
+/* ---------- Analog clock (no CSS transition; smoothness via rAF) ---------- */
+#handH, #handM, #handS { transition: none; }
+
+/* ---------- Adzan overlay ---------- */
+#adzanOverlay:not(.hidden) {
+    animation: fadeIn 0.6s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+#adzanOverlay #ovCount { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); }
+}
+
+/* ---------- Prayer card next-highlight (shared) ---------- */
+.prayer.next {
+    position: relative;
+}
+.prayer.next::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--accent);
+    border-radius: 0 4px 4px 0;
+}
+
+/* ---------- Layout-specific helpers ---------- */
+/* Cinema: gradient sidebar */
+.layout-cinema .prayer-col {
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+.layout-cinema .prayer.next {
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.15) 0%,
+        rgba(255,255,255,0.05) 100%);
+}
+.layout-cinema .prayer.next [data-time] { color: var(--accent) !important; }
+
+/* Minimal: prayer cards w/ shadow */
+.layout-minimal .prayer-card {
+    background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    transition: transform .3s ease, border-color .3s ease;
+}
+.layout-minimal .prayer-card.next {
+    border-color: var(--accent);
+    box-shadow: 0 12px 40px -8px var(--accent-shadow);
+    transform: translateY(-3px);
+}
+.layout-minimal .prayer-card.next .label { color: var(--accent); }
+
+/* Mosque: ornament with accent borders */
+.layout-mosque .prayer-grid-cell {
+    background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+.layout-mosque .prayer-grid-cell.next {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent);
+}
+.layout-mosque .prayer-grid-cell.next::after {
+    content: "▼ NEXT";
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 2px;
+}
+.ornament-pattern {
+    background-image:
+      radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--accent) 20%, transparent) 0, transparent 30%),
+      radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--primary) 30%, transparent) 0, transparent 35%),
+      linear-gradient(135deg, #0a0a14 0%, #050514 100%);
+}
+
+/* Floating debug controls */
+#debugBar {
+    position: fixed; bottom: 8px; left: 8px; z-index: 40;
+    display: flex; gap: 6px; align-items: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    user-select: none;
+    opacity: 0.4;
+    transition: opacity .2s;
+}
+#debugBar:hover { opacity: 1; }
+#debugBar button {
+    background: rgba(20,25,40,.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--accent);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+#debugBar button:hover { background: rgba(40,50,70,1); }
+
+/* Hide scrollbars */
+::-webkit-scrollbar { display: none; }
+
+/* ---------- Component visibility toggles ----------
+   Container hide handled by JS reading body data-show-* (in clock.js init).
+   Only minimal CSS rules below for things that are easy to scope. */
+
+
+/* ===================== NEW LAYOUTS NEXT-STATE STYLES ===================== */
+
+/* Aurora */
+.layout-aurora .prayer.next .prayer-pill,
+.layout-aurora .prayer-pill.next {
+    border-color: var(--accent);
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 12px 40px -10px var(--accent);
+}
+
+/* Frame */
+.layout-frame .prayer.next .arch-card,
+.layout-frame .arch-card.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    box-shadow: 0 12px 40px -10px var(--accent);
+}
+.layout-frame .arch-card.next [data-time] { color: var(--accent); }
+
+/* Stadium */
+.layout-stadium .prayer.next .scoreboard-row,
+.layout-stadium .scoreboard-row.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 0 30px -8px var(--accent);
+}
+.layout-stadium .scoreboard-row.next [data-time] { color: var(--accent); }
+
+/* Magazine */
+.layout-magazine .prayer.next .ed-prayer,
+.layout-magazine .ed-prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 25%, transparent), transparent 70%);
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+}
+.layout-magazine .ed-prayer.next [data-time] {
+    color: color-mix(in srgb, var(--primary) 80%, black);
+}
+
+/* ===================== QURAN NEW MODES ===================== */
+
+/* Typewriter cursor blink */
+.quran-cursor {
+    display: inline-block;
+    width: 0.5em;
+    color: var(--accent);
+    animation: quran-cursor-blink 0.9s steps(2) infinite;
+    margin-left: 2px;
+}
+@keyframes quran-cursor-blink { 50% { opacity: 0; } }
+
+/* Subtle shimmer on the fullcard ornament */
+.quran-fullcard {
+    transition: opacity .4s ease;
+}
+.quran-fullcard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    transform: translateX(-100%);
+    animation: quran-shimmer 6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes quran-shimmer {
+    0%, 100% { transform: translateX(-100%); }
+    50%      { transform: translateX(100%); }
+}
+
+/* Slide mode container */
+.quran-slide {
+    transition: transform .55s ease, opacity .45s ease;
+}
+
+/* Long arabic text guard: never break/cut mid-word */
+#quranArab, #quranTrans {
+    overflow-wrap: anywhere;
+}
+
+
+
+/* ===================== SLIDESHOW-CENTRIC LAYOUTS NEXT-STATE ===================== */
+
+/* Theater */
+.layout-theater .prayer.next .float-prayer,
+.layout-theater .float-prayer.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 28%, rgba(0,0,0,0.55)), rgba(0,0,0,0.55));
+    box-shadow: 0 0 30px -6px var(--accent);
+}
+.layout-theater .float-prayer.next [data-time] { color: var(--accent); }
+
+/* Showcase */
+.layout-showcase .prayer.next .ps-card,
+.layout-showcase .ps-card.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    box-shadow: 0 12px 40px -10px var(--accent);
+}
+.layout-showcase .ps-card.next [data-time] { color: var(--accent); }
+
+/* Split */
+.layout-split .prayer.next .pl-row,
+.layout-split .pl-row.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+    border-left: 3px solid var(--accent);
+}
+.layout-split .pl-row.next [data-time] { color: var(--accent); }
+
+/* Polaroid */
+.layout-polaroid .prayer.next .schedule-card,
+.layout-polaroid .schedule-card.next {
+    background: linear-gradient(180deg, #fde68a, #f5b301);
+    box-shadow: 0 8px 24px -4px rgba(245,179,1,0.7), inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+/* Window */
+.layout-window .prayer.next .ring-card,
+.layout-window .ring-card.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    box-shadow: 0 12px 30px -8px var(--accent), inset 0 0 18px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.layout-window .ring-card.next [data-time] { color: var(--accent); }
+
+/* Festival */
+.layout-festival .prayer.next .prayer-pearl,
+.layout-festival .prayer-pearl.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 30%, rgba(0,0,0,0.6)), rgba(0,0,0,0.6));
+    border-color: var(--accent);
+    box-shadow: 0 0 30px var(--accent), inset 0 0 20px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.layout-festival .prayer-pearl.next [data-time] {
+    color: var(--accent);
+    text-shadow: 0 0 12px var(--accent);
+}
+
+/* Portrait */
+.layout-portrait .prayer.next .pr-row,
+.layout-portrait .pr-row.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px -6px var(--accent);
+}
+.layout-portrait .pr-row.next [data-time] { color: var(--accent); }
+
+/* Override universal left bar for layouts that have own highlight */
+.layout-theater .prayer.next::before,
+.layout-showcase .prayer.next::before,
+.layout-polaroid .prayer.next::before,
+.layout-window .prayer.next::before,
+.layout-festival .prayer.next::before,
+.layout-portrait .prayer.next::before {
+/* ===================== EXTRA LAYOUTS NEXT-STATE ===================== */
+
+/* Galaxy */
+.layout-galaxy .prayer.next .planet-card,
+.layout-galaxy .planet-card.next {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 0 40px -8px var(--accent);
+}
+
+/* Geometric */
+.layout-geometric .prayer.next .geo-card,
+.layout-geometric .geo-card.next {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 8px 30px -6px var(--accent);
+}
+.layout-geometric .geo-card.next [data-time] { color: var(--accent); }
+
+/* Kinetic — pill highlight */
+.layout-kinetic .prayer.next .prayer-pill,
+.layout-kinetic .prayer-pill.next {
+    background: #fff;
+    color: var(--primary-dark);
+    transform: scale(1.04);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+}
+.layout-kinetic .prayer.next .prayer-pill .ptime,
+.layout-kinetic .prayer-pill.next .ptime {
+    background: var(--primary-dark);
+    color: var(--accent);
+}
+
+/* Marble — medal highlight */
+.layout-marble .prayer.next .medal,
+.layout-marble .medal.next {
+    background: linear-gradient(180deg, rgba(212,175,55,0.32), rgba(212,175,55,0.06));
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.4), 0 8px 30px -4px #d4af37;
+}
+.layout-marble .medal.next [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 18px #d4af37;
+}
+
+/* Terminal — row highlight */
+.layout-terminal .prayer.next .prayer-row,
+.layout-terminal .prayer-row.next {
+    background: rgba(74, 222, 128, 0.07);
+    border-left: 3px solid var(--accent);
+}
+.layout-terminal .prayer-row.next [data-time] { color: var(--accent); }
+.layout-terminal .prayer-row.next .arrow      { color: var(--accent); }
+
+/* Sunset — cell highlight */
+.layout-sunset .prayer.next .prayer-cell,
+.layout-sunset .prayer-cell.next {
+    background: linear-gradient(180deg, rgba(245,179,1,0.25), transparent);
+}
+.layout-sunset .prayer-cell.next [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 20px #f59e0b;
+}
+
+/* Override the universal .prayer.next ::before bar for layouts that don't suit a left bar */
+.layout-galaxy .prayer.next::before,
+.layout-geometric .prayer.next::before,
+.layout-kinetic .prayer.next::before,
+.layout-marble .prayer.next::before,
+.layout-sunset .prayer.next::before {
+    display: none;
+}
