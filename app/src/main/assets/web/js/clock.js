@@ -240,10 +240,15 @@
      */
     function parseSlideshowUrls(raw) {
         if (!raw) return [];
+        // Accepts http(s), data: (small inline images), and the bundled
+        // `img/...` relative path. Anything starting with javascript: /
+        // vbscript: / etc. is rejected. The Android side serves user-imported
+        // images at https://appassets.androidplatform.net/slides/* which
+        // satisfies the https: branch automatically.
         return String(raw)
             .split(/[\n,]+/)
             .map(s => s.trim())
-            .filter(s => s.length > 0 && /^(https?:|file:|data:|img\/)/i.test(s));
+            .filter(s => s.length > 0 && /^(https?:|data:|img\/)/i.test(s));
     }
 
     function applySlideshow() {

@@ -87,6 +87,16 @@
 
     <PreferenceCategory app:title="@string/cat_slideshow">
 
+        <Preference
+            app:key="pick_slides"
+            app:title="@string/pref_pick_slides"
+            app:summary="@string/pref_pick_slides_sum"
+            app:icon="@android:drawable/ic_menu_gallery" />
+
+        <Preference
+            app:key="clear_slides"
+            app:title="@string/pref_clear_slides" />
+
         <EditTextPreference
             app:key="slideshow_urls"
             app:title="@string/pref_slideshow_urls"
