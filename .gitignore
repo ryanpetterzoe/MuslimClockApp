@@ -15,6 +15,9 @@ captures/
 *.ap_
 *.aar
 
+# Local smoke-test scratch
+.smoke/
+
 # OS
 .DS_Store
 Thumbs.db
