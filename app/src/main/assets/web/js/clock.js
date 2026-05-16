@@ -35,6 +35,8 @@
         show_analog: true,
         show_countdown: true,
         layout: 'minimal',
+        slideshow_urls: '',     // newline / comma separated. Empty = default bg.
+        slide_duration: 8,      // seconds per slide
     };
 
     const PRAYER_LABEL_ID = {
@@ -70,6 +72,7 @@
         adzanActive: false,
         iqomahActive: false,
         mountedLayout: null,
+        slideshow: { timer: null, idx: 0, urls: [], slots: [] },
     };
 
     function loadFromBridge() {
@@ -208,6 +211,7 @@
 
         applyConfigToDom();
         renderTimes();   // refresh card values for new DOM nodes
+        applySlideshow();
 
         const locChanged =
             prev.location_lat  !== state.cfg.location_lat  ||
@@ -220,6 +224,102 @@
             loadPrayerTimes();
         }
     };
+
+    /* ===== Slideshow =====
+     *
+     * Layouts that support a background slideshow expose a div.slideshow-host
+     * (currently `minimal` and `cinema`). We render two .slide layers inside
+     * that host and crossfade via CSS opacity.
+     *
+     * URL list comes from cfg.slideshow_urls — newline / comma separated.
+     * Empty list falls back to the bundled default-bg.svg so the layout
+     * always has *some* background image.
+     *
+     * Bad URLs (decode error / 404) are dropped silently; if every URL fails
+     * we fall back to the default image.
+     */
+    function parseSlideshowUrls(raw) {
+        if (!raw) return [];
+        return String(raw)
+            .split(/[\n,]+/)
+            .map(s => s.trim())
+            .filter(s => s.length > 0 && /^(https?:|file:|data:|img\/)/i.test(s));
+    }
+
+    function applySlideshow() {
+        // Stop any running slideshow first.
+        if (state.slideshow.timer) {
+            clearInterval(state.slideshow.timer);
+            state.slideshow.timer = null;
+        }
+
+        const host = document.querySelector('.slideshow-host');
+        if (!host) {
+            // Layouts without a slideshow slot (mosque/neon/classic): nothing to do.
+            return;
+        }
+
+        const urls = parseSlideshowUrls(state.cfg.slideshow_urls);
+        const useFallback = urls.length === 0;
+        const list = useFallback ? ['img/default-bg.svg'] : urls;
+
+        // Build two crossfade slots if not already present.
+        host.innerHTML = '';
+        const slotA = document.createElement('div');
+        const slotB = document.createElement('div');
+        for (const el of [slotA, slotB]) {
+            el.className = 'slide';
+            el.style.position = 'absolute';
+            el.style.inset = '0';
+            host.appendChild(el);
+        }
+        state.slideshow.slots = [slotA, slotB];
+        state.slideshow.urls  = list;
+        state.slideshow.idx   = 0;
+
+        // Show first slide immediately.
+        showSlide(0);
+
+        if (list.length < 2) return;     // nothing to rotate through
+
+        const dur = Math.max(3, parseInt(state.cfg.slide_duration, 10) || 8) * 1000;
+        state.slideshow.timer = setInterval(() => {
+            state.slideshow.idx = (state.slideshow.idx + 1) % list.length;
+            showSlide(state.slideshow.idx);
+        }, dur);
+    }
+
+    function showSlide(idx) {
+        const list = state.slideshow.urls;
+        const [a, b] = state.slideshow.slots;
+        if (!a || !b) return;
+        const url = list[idx];
+        // Pre-load to avoid flash; only swap when the image actually decodes.
+        const probe = new Image();
+        probe.onload = () => {
+            // Decide which slot is currently hidden — that's where we paint next.
+            const front = a.classList.contains('active') ? a : b;
+            const back  = front === a ? b : a;
+            back.style.background = `#0a1a3c url("${cssUrl(url)}") center/cover no-repeat`;
+            back.classList.add('active');
+            // Defer hiding the previous slot until the new one's transition starts,
+            // so we get a real crossfade rather than a flash to black.
+            requestAnimationFrame(() => front.classList.remove('active'));
+        };
+        probe.onerror = () => {
+            // Skip this URL; advance to the next slide so a single bad link
+            // doesn't freeze the slideshow.
+            if (list.length <= 1) return;
+            const next = (idx + 1) % list.length;
+            if (next !== idx) showSlide(next);
+        };
+        probe.src = url;
+    }
+
+    function cssUrl(s) {
+        // Escape the only chars that break inside a CSS url("...").
+        return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    }
 
     /* ===== Analog clock ===== */
     function buildAnalogStatic() {
@@ -631,6 +731,7 @@
         loadFromBridge();
         mountLayout(state.cfg.layout || 'minimal');
         applyConfigToDom();
+        applySlideshow();
         wireGear();
         tickDigital();
         setInterval(tickDigital, 1000);

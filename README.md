@@ -97,6 +97,9 @@ Buka aplikasi → klik ikon **roda gigi** di pojok kanan atas, atau tekan tombol
   (KEMENAG / MWL / Karachi / dll. — sesuai daftar Aladhan)
 - **Tampilan**: pilih tema layout (minimal/mosque/cinema/neon/classic),
   warna primary, warna accent, toggle jam analog &amp; countdown
+- **Slideshow Background**: daftar URL gambar (satu per baris atau dipisah
+  koma) + durasi per slide. Hanya berlaku di layout `minimal` &amp; `cinema`
+  yang punya area background. Kosongkan untuk pakai gambar default.
 - **Adzan & Iqomah**: pesan, durasi (detik)
 
 Setting tersimpan di `SharedPreferences` lokal dan otomatis aktif saat kembali
@@ -132,14 +135,16 @@ app/src/main/
 
 - ~~Settings screen native Android~~ ✅ done
 - ~~5 layout populer (minimal, mosque, cinema, neon, classic)~~ ✅ done
+- ~~Slideshow background (URL list, fade transition)~~ ✅ done — di layout
+  `minimal` &amp; `cinema`
+- File picker storage Android (ACTION_OPEN_DOCUMENT) untuk slideshow
+  → saat ini hanya URL/path eksternal
 - Port 18 layout sisanya (aurora, festival, frame, galaxy, geometric, kinetic,
   magazine, marble, polaroid, portrait, showcase, split, stadium, sunset,
   terminal, theater, window, compact)
-- Slideshow gambar/video lokal (pilih file dari storage Android)
 - Running text custom
 - Rotasi ayat Al-Qur'an + terjemahan
 - Jadwal imam mingguan
-- Mode auto-update over-the-air (Aladhan calendar bulan, bukan harian)
 - Skin Android TV native untuk Settings (Leanback Preferences)
 
 ## Lisensi & atribusi

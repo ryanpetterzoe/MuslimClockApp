@@ -85,6 +85,21 @@
             app:defaultValue="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_slideshow">
+
+        <EditTextPreference
+            app:key="slideshow_urls"
+            app:title="@string/pref_slideshow_urls"
+            app:summary="@string/pref_slideshow_urls_sum"
+            app:dialogMessage="@string/pref_slideshow_urls_sum" />
+
+        <EditTextPreference
+            app:key="slide_duration"
+            app:title="@string/pref_slide_duration"
+            app:summary="@string/pref_slide_duration_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/cat_adzan">
 
         <EditTextPreference
