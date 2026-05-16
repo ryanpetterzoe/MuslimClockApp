@@ -1,19 +1,37 @@
-/* Muslim Clock — Android WebView build (MVP)
+/* Muslim Clock — Android WebView build
  *
- * Differences from the original web build:
- *  - Reads config from window.MC_CONFIG (no PHP backend)
- *  - Calls Aladhan API directly (no api/prayer.php proxy)
- *  - Caches prayer times in localStorage (offline-tolerant)
- *  - Single layout (minimal); features like slideshow/Quran/imam are stubbed off
+ * Config sources, in priority order:
+ *   1. native bridge `MCAndroid.getConfig()` (when running inside the app)
+ *   2. window.MC_CONFIG (defined in index.html — used outside Android)
+ *   3. hardcoded defaults below
+ *
+ * The native side calls window.applyConfig(json) whenever Settings change,
+ * so theme/text update live and prayer times re-fetch if location changed.
  */
 (function () {
     'use strict';
 
     const $  = (s, p = document) => p.querySelector(s);
-    const $$ = (s, p = document) => p.querySelectorAll(s);
     const pad = (n) => String(n).padStart(2, '0');
 
-    const CFG = window.MC_CONFIG || {};
+    const DEFAULTS = {
+        masjid_name: 'Masjid Muslim Clock',
+        masjid_address: 'Jakarta, Indonesia',
+        masjid_logo: '',
+        location_lat: -6.2,
+        location_lng: 106.816666,
+        timezone: 'Asia/Jakarta',
+        calc_method: 20,
+        theme_primary: '#0a4ea3',
+        theme_accent: '#f5b301',
+        font_display: 'Inter',
+        font_digital: 'Orbitron',
+        adzan_message: 'Saatnya Waktu Sholat',
+        adzan_duration: 600,
+        iqomah_duration: 600,
+        show_analog: true,
+        show_countdown: true,
+    };
 
     const PRAYER_LABEL_ID = {
         fajr: 'Subuh', dhuhr: 'Dzuhur', asr: 'Ashar',
@@ -39,49 +57,72 @@
         dhualhijjah: 11, dzulhijjah: 11, zulhijah: 11,
     };
 
+    /* ===== State (mutable) ===== */
     const state = {
+        cfg: Object.assign({}, DEFAULTS, window.MC_CONFIG || {}),
         times: {},
         adzanActive: false,
         iqomahActive: false,
     };
 
-    /* ============= Apply config to DOM ============= */
-    function applyConfig() {
-        if (CFG.theme_primary) {
-            document.documentElement.style.setProperty('--primary', CFG.theme_primary);
-            document.documentElement.style.setProperty('--primary-dark',
-                `color-mix(in srgb, ${CFG.theme_primary} 60%, black)`);
-            document.documentElement.style.setProperty('--primary-light',
-                `color-mix(in srgb, ${CFG.theme_primary} 80%, white)`);
+    function loadFromBridge() {
+        try {
+            if (window.MCAndroid && typeof window.MCAndroid.getConfig === 'function') {
+                const raw = window.MCAndroid.getConfig();
+                if (raw) {
+                    state.cfg = Object.assign({}, DEFAULTS, JSON.parse(raw));
+                }
+            }
+        } catch (e) {
+            console.warn('Bridge getConfig failed:', e);
         }
-        if (CFG.theme_accent) {
-            document.documentElement.style.setProperty('--accent', CFG.theme_accent);
-            document.documentElement.style.setProperty('--accent-shadow',
-                `color-mix(in srgb, ${CFG.theme_accent} 40%, transparent)`);
+    }
+
+    /* ===== Apply config to DOM ===== */
+    function applyConfigToDom() {
+        const cfg = state.cfg;
+
+        // CSS custom properties
+        if (cfg.theme_primary) {
+            document.documentElement.style.setProperty('--primary', cfg.theme_primary);
+            document.documentElement.style.setProperty(
+                '--primary-dark', `color-mix(in srgb, ${cfg.theme_primary} 60%, black)`);
+            document.documentElement.style.setProperty(
+                '--primary-light', `color-mix(in srgb, ${cfg.theme_primary} 80%, white)`);
+        }
+        if (cfg.theme_accent) {
+            document.documentElement.style.setProperty('--accent', cfg.theme_accent);
+            document.documentElement.style.setProperty(
+                '--accent-shadow', `color-mix(in srgb, ${cfg.theme_accent} 40%, transparent)`);
         }
 
-        const name = CFG.masjid_name || 'Masjid';
-        const prefixMatch = /^Masjid\s+/i.test(name);
+        // Masjid name + address
+        const name = cfg.masjid_name || 'Masjid';
         const namePrefixEl = $('#masjidPrefix');
         const nameEl = $('#masjidName');
-        if (prefixMatch && nameEl && namePrefixEl) {
-            namePrefixEl.textContent = 'Masjid';
-            nameEl.textContent = name.replace(/^Masjid\s+/i, '');
-        } else if (nameEl && namePrefixEl) {
-            namePrefixEl.textContent = '';
-            nameEl.textContent = name;
+        if (namePrefixEl && nameEl) {
+            if (/^Masjid\s+/i.test(name)) {
+                namePrefixEl.textContent = 'Masjid';
+                nameEl.textContent = name.replace(/^Masjid\s+/i, '');
+            } else {
+                namePrefixEl.textContent = '';
+                nameEl.textContent = name;
+            }
         }
         const addrEl = $('#masjidAddress');
-        if (addrEl) addrEl.textContent = CFG.masjid_address || '';
+        if (addrEl) addrEl.textContent = cfg.masjid_address || '';
 
-        if (CFG.masjid_logo) {
-            const box = $('#logoBox');
-            if (box) {
+        // Logo (only initial render — avoids replacing the element repeatedly)
+        if (cfg.masjid_logo) {
+            const box = document.querySelector('#logoBox');
+            if (box && !box.dataset.replaced) {
+                box.dataset.replaced = '1';
                 box.innerHTML = '';
                 const img = document.createElement('img');
-                img.src = CFG.masjid_logo;
+                img.src = cfg.masjid_logo;
                 img.alt = 'logo';
                 img.className = 'w-12 h-12 object-contain rounded-xl';
+                img.onerror = () => { img.replaceWith(box); }; // restore on failure
                 box.replaceWith(img);
             }
         }
@@ -93,25 +134,46 @@
         }
 
         // Body data-* attrs (kept for parity with screen.css selectors)
-        document.body.dataset.adzanMsg   = CFG.adzan_message || 'Saatnya Waktu Sholat';
-        document.body.dataset.adzanDur   = String(CFG.adzan_duration || 600);
-        document.body.dataset.iqomahDur  = String(CFG.iqomah_duration || 600);
-        document.body.dataset.showAnalog    = CFG.show_analog    ? '1' : '0';
-        document.body.dataset.showCountdown = CFG.show_countdown ? '1' : '0';
+        document.body.dataset.adzanMsg     = cfg.adzan_message || 'Saatnya Waktu Sholat';
+        document.body.dataset.adzanDur     = String(cfg.adzan_duration || 600);
+        document.body.dataset.iqomahDur    = String(cfg.iqomah_duration || 600);
+        document.body.dataset.showAnalog   = cfg.show_analog    ? '1' : '0';
+        document.body.dataset.showCountdown= cfg.show_countdown ? '1' : '0';
 
-        // Hide modules disabled in MVP
-        if (!CFG.show_analog) {
-            const a = $('#analogWrap'); if (a) a.style.display = 'none';
-        }
-        if (!CFG.show_countdown) {
-            const p = $('#nextPill'); if (p) p.style.display = 'none';
-        }
+        // Toggle modules
+        const a = $('#analogWrap'); if (a) a.style.display = cfg.show_analog    ? '' : 'none';
+        const p = $('#nextPill');   if (p) p.style.display = cfg.show_countdown ? '' : 'none';
 
         const ovMsg = $('#ovMsg');
-        if (ovMsg) ovMsg.textContent = CFG.adzan_message || 'Saatnya Waktu Sholat';
+        if (ovMsg) ovMsg.textContent = cfg.adzan_message || 'Saatnya Waktu Sholat';
+
+        // Show settings button only when the bridge is available
+        const gear = $('#gearBtn');
+        if (gear) gear.style.display = (window.MCAndroid && window.MCAndroid.openSettings) ? '' : 'none';
     }
 
-    /* ============= Analog clock ticks/numerals (built dynamically) ============= */
+    /**
+     * Public API: native code calls this when settings change so we can
+     * re-render and re-fetch without a page reload.
+     */
+    window.applyConfig = function (newCfg) {
+        const prev = state.cfg;
+        state.cfg = Object.assign({}, DEFAULTS, newCfg || {});
+        applyConfigToDom();
+
+        const locChanged =
+            prev.location_lat  !== state.cfg.location_lat  ||
+            prev.location_lng  !== state.cfg.location_lng  ||
+            prev.calc_method   !== state.cfg.calc_method   ||
+            prev.timezone      !== state.cfg.timezone;
+        if (locChanged) {
+            state.times = {};
+            renderTimes();
+            loadPrayerTimes();
+        }
+    };
+
+    /* ===== Analog clock ===== */
     function buildAnalogStatic() {
         const ticks = $('#ticks');
         const nums  = $('#numerals');
@@ -156,7 +218,7 @@
         requestAnimationFrame(tickAnalog);
     }
 
-    /* ============= Digital clock + date ============= */
+    /* ===== Digital clock + date ===== */
     function tickDigital() {
         const now = new Date();
         const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
@@ -175,7 +237,7 @@
         checkAdzanTrigger(now);
     }
 
-    /* ============= Hijri date ============= */
+    /* ===== Hijri date ===== */
     function loadHijri() {
         const el = $('#hij-date');
         if (!el) return;
@@ -201,23 +263,25 @@
         } catch (e) { el.textContent = ''; }
     }
 
-    /* ============= Prayer times via Aladhan ============= */
+    /* ===== Prayer times via Aladhan ===== */
     function cacheKey(d) {
+        const cfg = state.cfg;
         const dd = pad(d.getDate()), mm = pad(d.getMonth()+1), yy = d.getFullYear();
-        return `mc_prayer_${CFG.location_lat},${CFG.location_lng},${CFG.calc_method},${dd}-${mm}-${yy}`;
+        return `mc_prayer_${cfg.location_lat},${cfg.location_lng},${cfg.calc_method},${dd}-${mm}-${yy}`;
     }
 
     async function loadPrayerTimes() {
-        const lat = CFG.location_lat ?? -6.2;
-        const lng = CFG.location_lng ?? 106.816666;
-        const method = CFG.calc_method ?? 20;
-        const tz = CFG.timezone || 'Asia/Jakarta';
+        const cfg = state.cfg;
+        const lat = cfg.location_lat;
+        const lng = cfg.location_lng;
+        const method = cfg.calc_method;
+        const tz = cfg.timezone;
         const now = new Date();
         const dd = pad(now.getDate()), mm = pad(now.getMonth()+1), yy = now.getFullYear();
         const dParam = `${dd}-${mm}-${yy}`;
         const ck = cacheKey(now);
 
-        // Try cache first (valid for 6 hours)
+        // Cache (valid 6h)
         try {
             const raw = localStorage.getItem(ck);
             if (raw) {
@@ -227,9 +291,8 @@
                     renderTimes();
                 }
             }
-        } catch (e) { /* ignore cache errors */ }
+        } catch (e) { /* ignore */ }
 
-        // Fetch fresh
         const url = `https://api.aladhan.com/v1/timings/${dParam}` +
                     `?latitude=${encodeURIComponent(lat)}` +
                     `&longitude=${encodeURIComponent(lng)}` +
@@ -249,7 +312,6 @@
             }
         } catch (e) {
             console.warn('Aladhan fetch failed; using cache or fallback:', e);
-            // Final fallback: hardcoded approximate times so UI never empty
             if (!Object.keys(state.times).length) {
                 state.times = normalizeTimes({
                     Fajr: '04:30', Sunrise: '05:45', Dhuhr: '12:00',
@@ -275,7 +337,7 @@
         let nextKey = null, bestDiff = Infinity;
         order.forEach(k => {
             const t = state.times[k];
-            const card = $(`.prayer[data-key="${k}"]`);
+            const card = document.querySelector(`.prayer[data-key="${k}"]`);
             if (!card) return;
             card.classList.remove('next');
             const tEl = card.querySelector('[data-time]');
@@ -287,7 +349,7 @@
             if (diff > 0 && diff < bestDiff) { bestDiff = diff; nextKey = k; }
         });
         if (!nextKey) nextKey = 'fajr';
-        const next = $(`.prayer[data-key="${nextKey}"]`);
+        const next = document.querySelector(`.prayer[data-key="${nextKey}"]`);
         if (next) next.classList.add('next');
     }
 
@@ -319,10 +381,8 @@
         }
     }
 
-    /* ============= Adzan overlay ============= */
-    function dateKey(d) {
-        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
-    }
+    /* ===== Adzan overlay ===== */
+    function dateKey(d) { return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`; }
     function loadTriggered() {
         try { return JSON.parse(localStorage.getItem('mc_triggered') || '{}'); }
         catch { return {}; }
@@ -395,9 +455,24 @@
         }, 1000);
     }
 
-    /* ============= init ============= */
+    /* ===== Settings button ===== */
+    function wireGear() {
+        const gear = $('#gearBtn');
+        if (!gear) return;
+        gear.addEventListener('click', () => {
+            try {
+                if (window.MCAndroid && window.MCAndroid.openSettings) {
+                    window.MCAndroid.openSettings();
+                }
+            } catch (e) { console.warn(e); }
+        });
+    }
+
+    /* ===== init ===== */
     function init() {
-        applyConfig();
+        loadFromBridge();
+        applyConfigToDom();
+        wireGear();
         buildAnalogStatic();
         tickDigital();
         setInterval(tickDigital, 1000);
@@ -405,7 +480,6 @@
 
         loadHijri();
         loadPrayerTimes();
-        // Refresh every hour; will also cross midnight cleanly
         setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
         // Midnight refresh
@@ -416,7 +490,6 @@
             }
         }, 4000);
 
-        // Test hotkey: T to simulate adzan, ESC to dismiss
         document.addEventListener('keydown', (e) => {
             if (e.key === 't' || e.key === 'T') {
                 if (!state.adzanActive && !state.iqomahActive) showAdzan('maghrib');
@@ -424,7 +497,7 @@
             if (e.key === 'Escape') hideAdzan();
         });
 
-        console.log('[MuslimClock] Android WebView build');
+        console.log('[MuslimClock] Android WebView build, bridge=' + !!window.MCAndroid);
     }
 
     if (document.readyState === 'loading') {
