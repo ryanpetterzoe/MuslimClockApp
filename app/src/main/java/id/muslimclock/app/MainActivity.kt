@@ -8,6 +8,8 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -15,20 +17,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.webkit.WebViewAssetLoader
 
 /**
- * Hosts a WebView that loads the bundled HTML/JS/CSS from
- * `assets/web/index.html`. Designed for Android TV (landscape, fullscreen,
- * keep-screen-on) but also works on phones/tablets in landscape.
+ * Hosts a WebView that loads the bundled HTML/JS/CSS via [WebViewAssetLoader].
  *
- * The WebView talks to native code via [WebAppBridge], registered as
- * `window.MCAndroid`. On every page finished load we inject the latest
- * config from [Settings] so JS sees the same values the Settings screen
- * just wrote.
+ * The asset loader gives us a real http(s) origin — we pick
+ * `https://appassets.androidplatform.net` — so that:
+ *   1. We never have to enable `allowFileAccess` (a security smell).
+ *   2. User-imported slideshow images stored in `filesDir/slides/` can be
+ *      served at `https://appassets.androidplatform.net/slides/<name>` and
+ *      consumed by `<img>` / CSS background just like any remote URL.
+ *
+ * The bridge object [WebAppBridge] is registered as `window.MCAndroid`. On
+ * every page-finish + onResume we push a fresh JSON config to JS so theme
+ * and slideshow stay in sync with whatever Settings just wrote.
  */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var assetLoader: WebViewAssetLoader
     private var lastConfigSnapshot: String? = null
 
     @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
@@ -37,9 +45,21 @@ class MainActivity : AppCompatActivity() {
 
         Settings.ensureDefaults(this)
 
-        // Edge-to-edge + keep screen on (always-on prayer display)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        assetLoader = WebViewAssetLoader.Builder()
+            // Bundled web app: assets/web/* -> /assets/*
+            .addPathHandler(
+                "/assets/",
+                WebViewAssetLoader.AssetsPathHandler(this)
+            )
+            // User-imported slideshow images: filesDir/slides/* -> /slides/*
+            .addPathHandler(
+                "/slides/",
+                WebViewAssetLoader.InternalStoragePathHandler(this, SlideStorage.dir(this))
+            )
+            .build()
 
         webView = WebView(this).apply {
             setBackgroundColor(0xFF000000.toInt())
@@ -63,6 +83,11 @@ class MainActivity : AppCompatActivity() {
             addJavascriptInterface(WebAppBridge(this@MainActivity), "MCAndroid")
 
             webViewClient = object : WebViewClient() {
+                override fun shouldInterceptRequest(
+                    view: WebView,
+                    request: WebResourceRequest
+                ): WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     pushConfigToWeb()
@@ -72,19 +97,17 @@ class MainActivity : AppCompatActivity() {
         }
         setContentView(webView)
 
-        webView.loadUrl("file:///android_asset/web/index.html")
+        webView.loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
     }
 
     /**
-     * Hand the current settings to JS. Cheap, idempotent — safe to call on
-     * every onResume / onPageFinished. Triggers `window.applyConfig(json)`
-     * so `clock.js` re-applies theme/text without a page reload.
+     * Hand the current settings to JS. Idempotent: only emits the eval call
+     * when the JSON actually changed since the last push.
      */
     private fun pushConfigToWeb() {
         val json = Settings.toJson(this)
         if (json == lastConfigSnapshot) return
         lastConfigSnapshot = json
-        // JSON.parse keeps escaping safe; double-encode to embed in JS literal.
         val escaped = org.json.JSONObject.quote(json)
         val js = "if (window.applyConfig) { window.applyConfig(JSON.parse($escaped)); } " +
                  "else { window.MC_CONFIG = JSON.parse($escaped); }"
@@ -102,7 +125,6 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.systemBars())
 
-        // Older devices: legacy immersive flags
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = (
@@ -120,10 +142,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
-    /**
-     * MENU on TV remote opens settings; OK/CENTER forwards as Enter to JS
-     * (legacy hook from the original web build).
-     */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return when (keyCode) {
             KeyEvent.KEYCODE_MENU -> { openSettings(); true }
@@ -147,7 +165,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         webView.onResume()
         hideSystemUi()
-        // Re-push config in case the user just changed something in SettingsActivity.
         pushConfigToWeb()
     }
 
