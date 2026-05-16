@@ -15,4 +15,14 @@
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
     </style>
 
+    <!--
+      Settings screen uses a regular AppCompat theme (with action bar / back
+      button). Dark variant matches the rest of the app.
+    -->
+    <style name="Theme.MuslimClock.Settings" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#0A4EA3</item>
+        <item name="colorPrimaryDark">#072F62</item>
+        <item name="colorAccent">#F5B301</item>
+    </style>
+
 </resources>

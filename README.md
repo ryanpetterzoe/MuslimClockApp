@@ -6,9 +6,9 @@ server**. Versi ini adalah port dari project web
 [`muslimclockweb`](https://github.com/ryanpetterzoe/muslimclockweb), dibungkus
 sebagai WebView yang me-load aset HTML/CSS/JS yang di-bundle di dalam APK.
 
-> **Status:** MVP. Hanya layout `minimal`. Konfigurasi masih hardcoded
-> di `app/src/main/assets/web/index.html` (`window.MC_CONFIG`). Settings screen
-> native Android dan layout-layout lain akan dirilis di PR berikutnya.
+> **Status:** MVP + Settings native. Hanya layout `minimal` saat ini. Konfigurasi
+> bisa diubah lewat **Pengaturan** (ikon roda gigi, atau tombol MENU di remote
+> Android TV). Layout-layout lain menyusul di PR berikutnya.
 
 ## Fitur MVP
 
@@ -83,32 +83,25 @@ Salin `app-debug.apk` ke flashdisk atau gunakan aplikasi seperti
 "Send Files to TV" lalu buka file untuk install. Pastikan
 **Install from Unknown Sources** sudah diaktifkan di Android TV.
 
-## Konfigurasi (sementara, untuk MVP)
+## Konfigurasi
 
-Edit `app/src/main/assets/web/index.html`, blok `window.MC_CONFIG`:
+Buka aplikasi → klik ikon **roda gigi** di pojok kanan atas, atau tekan tombol
+**MENU** pada remote Android TV. Tersedia:
 
-```js
-window.MC_CONFIG = {
-    masjid_name: "Masjid Anda",
-    masjid_address: "Alamat masjid",
-    location_lat: -6.2,            // ganti ke koordinat masjid
-    location_lng: 106.816666,
-    timezone: "Asia/Jakarta",
-    calc_method: 20,               // 20 = KEMENAG; lihat aladhan.com utk daftar
-    theme_primary: "#0a4ea3",
-    theme_accent:  "#f5b301",
-    adzan_duration: 600,           // detik
-    iqomah_duration: 600,
-    // ...
-};
-```
+- **Masjid**: nama, alamat, URL logo (opsional)
+- **Lokasi & Hisab**: latitude, longitude, zona waktu, metode hitung
+  (KEMENAG / MWL / Karachi / dll. — sesuai daftar Aladhan)
+- **Tampilan**: warna primary, warna accent, toggle jam analog & countdown
+- **Adzan & Iqomah**: pesan, durasi (detik)
 
-Lalu rebuild APK.
+Setting tersimpan di `SharedPreferences` lokal dan otomatis aktif saat kembali
+ke layar utama (tema/teks live, jadwal di-fetch ulang jika lokasi berubah).
 
 ## Hotkey saat aplikasi berjalan
 
 | Tombol | Fungsi |
 |---|---|
+| `MENU` (remote TV) / ikon roda gigi | Buka layar Pengaturan |
 | `T` | Trigger overlay adzan untuk testing |
 | `Esc` | Tutup overlay adzan |
 | Double-click / D-Pad center | (di dalam WebView) memicu retry autoplay video |
@@ -132,8 +125,7 @@ app/src/main/
 
 ## Roadmap (tidak di MVP)
 
-- Settings screen native Android (DataStore / SharedPreferences) untuk:
-  nama masjid, lokasi, metode hisab, tema, durasi iqomah, dll.
+- ~~Settings screen native Android~~ ✅ done
 - Picker layout (cinema, mosque, neon, classic, ... — total 23 layout dari web)
 - Slideshow gambar/video lokal (pilih file dari storage Android)
 - Running text custom

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_masjid">
+
+        <EditTextPreference
+            app:key="masjid_name"
+            app:title="@string/pref_masjid_name"
+            app:summary="@string/pref_masjid_name_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="masjid_address"
+            app:title="@string/pref_masjid_address"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="masjid_logo"
+            app:title="@string/pref_masjid_logo"
+            app:summary="@string/pref_masjid_logo_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_location">
+
+        <EditTextPreference
+            app:key="location_lat"
+            app:title="@string/pref_lat"
+            app:summary="@string/pref_lat_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="location_lng"
+            app:title="@string/pref_lng"
+            app:summary="@string/pref_lng_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="timezone"
+            app:title="@string/pref_timezone"
+            app:entries="@array/timezone_entries"
+            app:entryValues="@array/timezone_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="calc_method"
+            app:title="@string/pref_calc_method"
+            app:entries="@array/calc_method_entries"
+            app:entryValues="@array/calc_method_values"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_appearance">
+
+        <EditTextPreference
+            app:key="theme_primary"
+            app:title="@string/pref_theme_primary"
+            app:summary="@string/pref_theme_primary_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="theme_accent"
+            app:title="@string/pref_theme_accent"
+            app:summary="@string/pref_theme_accent_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="show_analog"
+            app:title="@string/pref_show_analog"
+            app:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            app:key="show_countdown"
+            app:title="@string/pref_show_countdown"
+            app:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_adzan">
+
+        <EditTextPreference
+            app:key="adzan_message"
+            app:title="@string/pref_adzan_message"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_duration"
+            app:title="@string/pref_adzan_duration"
+            app:summary="@string/pref_adzan_duration_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="iqomah_duration"
+            app:title="@string/pref_iqomah_duration"
+            app:summary="@string/pref_iqomah_duration_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
