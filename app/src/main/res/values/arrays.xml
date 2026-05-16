@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Aladhan API calculation methods.
+      See https://aladhan.com/calculation-methods for the full list.
+      We expose the few that matter for Indonesian users plus the popular ones.
+    -->
+    <string-array name="calc_method_entries">
+        <item>Indonesia (KEMENAG)</item>
+        <item>Muslim World League (MWL)</item>
+        <item>Egyptian General Authority</item>
+        <item>Umm Al-Qura, Makkah</item>
+        <item>University of Islamic Sciences, Karachi</item>
+        <item>Institute of Geophysics, Tehran</item>
+        <item>Singapore</item>
+        <item>JAKIM (Malaysia)</item>
+        <item>Turkey (Diyanet)</item>
+        <item>Custom (manual)</item>
+    </string-array>
+
+    <!-- Values map directly to Aladhan `method` IDs. -->
+    <string-array name="calc_method_values">
+        <item>20</item>
+        <item>3</item>
+        <item>5</item>
+        <item>4</item>
+        <item>1</item>
+        <item>7</item>
+        <item>11</item>
+        <item>17</item>
+        <item>13</item>
+        <item>99</item>
+    </string-array>
+
+    <string-array name="timezone_entries">
+        <item>Asia/Jakarta (WIB)</item>
+        <item>Asia/Makassar (WITA)</item>
+        <item>Asia/Jayapura (WIT)</item>
+        <item>Asia/Kuala_Lumpur</item>
+        <item>Asia/Singapore</item>
+        <item>UTC</item>
+    </string-array>
+
+    <string-array name="timezone_values">
+        <item>Asia/Jakarta</item>
+        <item>Asia/Makassar</item>
+        <item>Asia/Jayapura</item>
+        <item>Asia/Kuala_Lumpur</item>
+        <item>Asia/Singapore</item>
+        <item>UTC</item>
+    </string-array>
+</resources>
