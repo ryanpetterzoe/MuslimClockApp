@@ -85,6 +85,26 @@
             app:defaultValue="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_ticker">
+
+        <SwitchPreferenceCompat
+            app:key="show_ticker"
+            app:title="@string/pref_show_ticker"
+            app:defaultValue="true" />
+
+        <EditTextPreference
+            app:key="ticker_text"
+            app:title="@string/pref_ticker_text"
+            app:summary="@string/pref_ticker_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="ticker_speed"
+            app:title="@string/pref_ticker_speed"
+            app:summary="@string/pref_ticker_speed_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/cat_slideshow">
 
         <Preference

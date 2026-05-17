@@ -35,6 +35,9 @@ object Settings {
     const val K_LAYOUT         = "layout"
     const val K_SLIDESHOW_URLS = "slideshow_urls"
     const val K_SLIDE_DURATION = "slide_duration"
+    const val K_SHOW_TICKER    = "show_ticker"
+    const val K_TICKER_TEXT    = "ticker_text"
+    const val K_TICKER_SPEED   = "ticker_speed"
 
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
@@ -66,6 +69,9 @@ object Settings {
             .putString(K_LAYOUT,         "minimal")
             .putString(K_SLIDESHOW_URLS, "")
             .putString(K_SLIDE_DURATION, "8")
+            .putBoolean(K_SHOW_TICKER,   true)
+            .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini")
+            .putString(K_TICKER_SPEED,   "30")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -98,10 +104,13 @@ object Settings {
             put("layout",          str(K_LAYOUT,                  "minimal"))
             put("slideshow_urls",  str(K_SLIDESHOW_URLS,          ""))
             put("slide_duration",  int(K_SLIDE_DURATION,           8))
+            put("show_ticker",     p.getBoolean(K_SHOW_TICKER,    true))
+            put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini"))
+            put("ticker_speed",    int(K_TICKER_SPEED,            30))
             // Modules not yet implemented in MVP — keep keys stable so future
             // PRs can flip these without touching clock.js again.
             put("show_imam",       false)
-            put("show_running",    false)
+            put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
             put("show_quran",      false)
         }.toString()
     }
