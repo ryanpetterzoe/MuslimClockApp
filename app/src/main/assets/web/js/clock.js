@@ -44,6 +44,16 @@
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
         show_gear: true,        // gear icon always visible (very faint until focused)
+        // Imam schedule: per-prayer name, plus Jum'at-specific imam & khatib.
+        // Empty strings ⇒ row hidden in the adzan overlay.
+        show_imam: true,
+        imam_fajr: '',
+        imam_dhuhr: '',
+        imam_asr: '',
+        imam_maghrib: '',
+        imam_isha: '',
+        imam_jumat: '',
+        khatib_jumat: '',
     };
 
     const PRAYER_LABEL_ID = {
@@ -127,8 +137,54 @@
                 slot.appendChild(analogTmpl.content.cloneNode(true));
             });
         }
+        // Make sure every layout has a .slideshow-host slot — even the
+        // ones whose templates don't declare one — so the user's
+        // slideshow is visible across all themes.
+        ensureSlideshowHost(host);
         buildAnalogStatic();   // populate ticks/numerals on the freshly cloned SVG
         return true;
+    }
+
+    /**
+     * Inject a `<div class="slideshow-host">` (plus a darkening scrim)
+     * as the first children of the active layout root, but only when
+     * the template didn't already supply one. Idempotent.
+     *
+     * Why first children: existing decorative absolute divs (blurs,
+     * gradients, patterns) and the actual content (header / main /
+     * section with `relative z-10`) all paint above us, which is
+     * exactly the layered look we want — slideshow at the bottom,
+     * decoration in the middle, content on top.
+     *
+     * Magazine is a light-theme layout. Stacking dark scrim + light
+     * text below would render invisible captions, so we use a light
+     * scrim there instead. Same goes for any future light layouts.
+     */
+    function ensureSlideshowHost(host) {
+        const root = host.firstElementChild;
+        if (!root || !root.classList) return;
+        if (root.querySelector(':scope > .slideshow-host')) return;
+
+        // Pick a scrim that keeps text contrast working on the layout's
+        // existing colour scheme. The dark variant is the right choice
+        // for almost every theme; the light one is for layouts that
+        // use dark text on a pale background (e.g. layout-magazine).
+        const lightThemes = ['layout-magazine'];
+        const isLight = lightThemes.some(c => root.classList.contains(c));
+
+        const slot = document.createElement('div');
+        slot.className = 'slideshow-host absolute inset-0';
+
+        const scrim = document.createElement('div');
+        scrim.className = 'absolute inset-0';
+        scrim.style.pointerEvents = 'none';
+        scrim.style.background = isLight
+            ? 'linear-gradient(180deg,rgba(250,249,246,0.55) 0%,rgba(250,249,246,0.82) 100%)'
+            : 'linear-gradient(180deg,rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.72) 100%)';
+
+        // Insert in reverse so we end up with [slot, scrim, ...rest].
+        root.insertBefore(scrim, root.firstChild);
+        root.insertBefore(slot,  root.firstChild);
     }
 
     /* ===== Apply config to DOM ===== */
@@ -237,6 +293,18 @@
         applyConfigToDom();
         renderTimes();   // refresh card values for new DOM nodes
         applySlideshow();
+
+        // If the adzan overlay is currently visible, refresh its imam
+        // line so the user sees the latest config without waiting for
+        // the next prayer.
+        if (state.adzanActive || state.iqomahActive) {
+            const cur = document.getElementById('ovPrayer');
+            const txt = (cur && cur.textContent || '').toLowerCase();
+            const map = { subuh: 'fajr', dzuhur: 'dhuhr', "jum'at": 'dhuhr',
+                          ashar: 'asr', maghrib: 'maghrib', isya: 'isha' };
+            const k = map[txt] || null;
+            if (k) applyImamToOverlay(k);
+        }
 
         const locChanged =
             prev.location_lat  !== state.cfg.location_lat  ||
@@ -583,16 +651,24 @@
             .filter(s => s.length > 0 && /^(https?:|data:|img\/)/i.test(s));
     }
 
+    /** True if [url] looks like a video file (by extension). */
+    function isVideoUrl(url) {
+        // We can't probe the mime cheaply from the JS side, so the
+        // extension list has to be exhaustive enough for common formats
+        // exported by Android galleries and slide-storage.
+        return /\.(mp4|m4v|webm|mkv|mov|3gp)(\?.*)?$/i.test(url);
+    }
+
     function applySlideshow() {
         // Stop any running slideshow first.
         if (state.slideshow.timer) {
-            clearInterval(state.slideshow.timer);
+            clearTimeout(state.slideshow.timer);
             state.slideshow.timer = null;
         }
 
         const host = document.querySelector('.slideshow-host');
         if (!host) {
-            // Layouts without a slideshow slot (mosque/neon/classic): nothing to do.
+            // Layouts without a slideshow slot: nothing to do.
             return;
         }
 
@@ -600,7 +676,11 @@
         const useFallback = urls.length === 0;
         const list = useFallback ? ['img/default-bg.svg'] : urls;
 
-        // Build two crossfade slots if not already present.
+        // Build two crossfade slots if not already present. Slots are
+        // empty containers — we put either a positioned <div> with a
+        // CSS background-image (for stills) or a <video> element
+        // inside them at swap time, keeping the same .active /
+        // opacity-fade contract for both kinds of media.
         host.innerHTML = '';
         const slotA = document.createElement('div');
         const slotB = document.createElement('div');
@@ -617,13 +697,51 @@
         // Show first slide immediately.
         showSlide(0);
 
-        if (list.length < 2) return;     // nothing to rotate through
+        // Even with a single image we don't need a timer; for a single
+        // video we still let it loop natively. Either way: skip rotation.
+        if (list.length < 2) return;
 
+        scheduleNextSlide();
+    }
+
+    /**
+     * Move on to the next slide in [state.slideshow.urls]. Used both by
+     * the natural-end handler on videos and the configured-duration
+     * timer on stills, so a mixed list rotates through smoothly.
+     */
+    function advanceSlide() {
+        const list = state.slideshow.urls;
+        if (!list || list.length < 2) return;
+        state.slideshow.idx = (state.slideshow.idx + 1) % list.length;
+        showSlide(state.slideshow.idx);
+        scheduleNextSlide();
+    }
+
+    /**
+     * Schedule the next rotation. Stills use the user's slide_duration;
+     * videos default to letting playback finish naturally (we hook
+     * `ended` in [showSlide]) but we keep a generous safety timeout in
+     * case the video stalls or is very long — so the slideshow never
+     * gets stuck on a broken clip.
+     */
+    function scheduleNextSlide() {
+        if (state.slideshow.timer) {
+            clearTimeout(state.slideshow.timer);
+            state.slideshow.timer = null;
+        }
+        const list = state.slideshow.urls;
+        if (!list || list.length < 2) return;
+
+        const url = list[state.slideshow.idx];
         const dur = Math.max(3, parseInt(state.cfg.slide_duration, 10) || 8) * 1000;
-        state.slideshow.timer = setInterval(() => {
-            state.slideshow.idx = (state.slideshow.idx + 1) % list.length;
-            showSlide(state.slideshow.idx);
-        }, dur);
+
+        if (isVideoUrl(url)) {
+            // Videos progress on natural end. The timer is a long-fuse
+            // fallback so a frozen / very long video doesn't trap us.
+            state.slideshow.timer = setTimeout(advanceSlide, 5 * 60 * 1000);
+        } else {
+            state.slideshow.timer = setTimeout(advanceSlide, dur);
+        }
     }
 
     function showSlide(idx) {
@@ -631,26 +749,161 @@
         const [a, b] = state.slideshow.slots;
         if (!a || !b) return;
         const url = list[idx];
-        // Pre-load to avoid flash; only swap when the image actually decodes.
+
+        // Decide which slot is currently hidden — that's where we paint next.
+        const front = a.classList.contains('active') ? a : b;
+        const back  = front === a ? b : a;
+
+        if (isVideoUrl(url)) {
+            paintVideoSlide(back, url, idx);
+        } else {
+            paintImageSlide(back, front, url, idx);
+        }
+    }
+
+    /**
+     * Render a still image into [back], then crossfade. Pre-decodes the
+     * image so we never flash through a transparent slot, and skips
+     * forward if the URL fails (network / 404 / decode error).
+     */
+    function paintImageSlide(back, front, url, idx) {
+        const list = state.slideshow.urls;
         const probe = new Image();
         probe.onload = () => {
-            // Decide which slot is currently hidden — that's where we paint next.
-            const front = a.classList.contains('active') ? a : b;
-            const back  = front === a ? b : a;
+            // Clear any previous video element in this slot before
+            // painting; otherwise it stays alive and keeps audio /
+            // CPU spinning even though it's invisible.
+            back.innerHTML = '';
             back.style.background = `#0a1a3c url("${cssUrl(url)}") center/cover no-repeat`;
             back.classList.add('active');
-            // Defer hiding the previous slot until the new one's transition starts,
-            // so we get a real crossfade rather than a flash to black.
-            requestAnimationFrame(() => front.classList.remove('active'));
+            requestAnimationFrame(() => {
+                front.classList.remove('active');
+                // Free the previous slot's video element if any.
+                if (front.firstChild && front.firstChild.tagName === 'VIDEO') {
+                    try { front.firstChild.pause(); } catch (e) {}
+                    front.innerHTML = '';
+                    front.style.background = '';
+                }
+            });
         };
         probe.onerror = () => {
-            // Skip this URL; advance to the next slide so a single bad link
-            // doesn't freeze the slideshow.
+            // Skip this URL; advance so a single bad link doesn't freeze
+            // the slideshow.
             if (list.length <= 1) return;
             const next = (idx + 1) % list.length;
-            if (next !== idx) showSlide(next);
+            if (next !== idx) {
+                state.slideshow.idx = next;
+                showSlide(next);
+            }
         };
         probe.src = url;
+    }
+
+    /**
+     * Render a video into [back]. We force `muted` because Android
+     * WebView only autoplays muted media by default; the native side
+     * additionally sets mediaPlaybackRequiresUserGesture=false but we
+     * want the page to still autoplay sensibly inside a regular browser.
+     *
+     * The crossfade contract: we add `.active` to the back slot first
+     * (revealing the loaded video), then in the next frame remove
+     * `.active` from the previous front slot. CSS does the rest.
+     */
+    function paintVideoSlide(back, url, idx) {
+        const list = state.slideshow.urls;
+        // Wipe any previous content in this slot first, including a
+        // stale video element that might still be playing.
+        const old = back.firstChild;
+        if (old && old.tagName === 'VIDEO') {
+            try { old.pause(); } catch (e) {}
+        }
+        back.innerHTML = '';
+        back.style.background = '#000';
+
+        const v = document.createElement('video');
+        v.className = 'slide-video';
+        v.src = url;
+        v.muted = true;
+        v.autoplay = true;
+        v.loop = (list.length === 1);   // single-video list ⇒ loop forever
+        v.playsInline = true;
+        v.setAttribute('playsinline', '');
+        v.setAttribute('webkit-playsinline', '');
+        v.setAttribute('preload', 'auto');
+        v.style.position = 'absolute';
+        v.style.inset = '0';
+        v.style.width  = '100%';
+        v.style.height = '100%';
+        v.style.objectFit = 'cover';
+
+        // Auto-skip on error or natural end (multi-video lists).
+        let advanced = false;
+        const tryAdvance = () => {
+            if (advanced) return;
+            advanced = true;
+            // The scheduler re-fires this anyway, but doing it here
+            // makes mixed photo/video lists look snappier when a video
+            // ends well before its scheduler timeout.
+            advanceSlide();
+        };
+        v.addEventListener('ended', () => {
+            if (list.length > 1) tryAdvance();
+        });
+        v.addEventListener('error', () => {
+            if (list.length <= 1) return;
+            const next = (idx + 1) % list.length;
+            if (next !== idx) {
+                state.slideshow.idx = next;
+                showSlide(next);
+            }
+        });
+
+        back.appendChild(v);
+
+        // Reveal the new slot, then hide the previous one. The same
+        // dance as paintImageSlide.
+        const front = back === state.slideshow.slots[0]
+            ? state.slideshow.slots[1]
+            : state.slideshow.slots[0];
+
+        const reveal = () => {
+            back.classList.add('active');
+            requestAnimationFrame(() => {
+                front.classList.remove('active');
+                // Free the previous slot's video element after the fade.
+                setTimeout(() => {
+                    const prev = front.firstChild;
+                    if (prev && prev.tagName === 'VIDEO') {
+                        try { prev.pause(); } catch (e) {}
+                        front.innerHTML = '';
+                        front.style.background = '';
+                    }
+                }, 1200);   // matches CSS .slide transition
+            });
+        };
+
+        // Try to play right away. If the first call rejects (some Android
+        // builds reject before the readyState bumps), retry once on
+        // canplay — which is when WebView is happiest with autoplay.
+        const playAttempt = v.play();
+        if (playAttempt && typeof playAttempt.catch === 'function') {
+            playAttempt.catch(() => {
+                v.addEventListener('canplay', () => {
+                    v.play().catch(() => { /* give up silently */ });
+                }, { once: true });
+            });
+        }
+        // Fade in once the video has actually decoded a frame so we
+        // don't crossfade to a black slot.
+        if (v.readyState >= 2) {
+            reveal();
+        } else {
+            v.addEventListener('loadeddata', reveal, { once: true });
+            // Fallback: if loadeddata never fires (network slow),
+            // reveal anyway after 600ms so the user isn't stuck on
+            // the previous slide.
+            setTimeout(reveal, 600);
+        }
     }
 
     function cssUrl(s) {
@@ -1018,6 +1271,7 @@
         const iqDur = parseInt(document.body.dataset.iqomahDur || '600', 10);
         $('#ovPrayer').textContent = (PRAYER_LABEL_ID[key] || key).toUpperCase();
         $('#ovSub').textContent = 'BERLANGSUNG';
+        applyImamToOverlay(key);
         overlay.classList.remove('hidden');
 
         startCountdown(dur, () => {
@@ -1029,6 +1283,68 @@
                 overlay.classList.add('hidden');
             });
         });
+    }
+
+    /**
+     * Pick the right imam name for the current prayer and reveal the
+     * imam block on the adzan overlay. Friday + dhuhr triggers the
+     * Jum'at imam (with the khatib appearing as a second line). Other
+     * combos use the per-prayer field. Empty fields ⇒ block hidden.
+     */
+    function applyImamToOverlay(key) {
+        const cfg = state.cfg;
+        const block       = document.getElementById('ovImamBlock');
+        const labelEl     = document.getElementById('ovImamLabel');
+        const nameEl      = document.getElementById('ovImamName');
+        const khatibLine  = document.getElementById('ovKhatibLine');
+        const khatibNameEl= document.getElementById('ovKhatibName');
+        if (!block || !nameEl) return;
+
+        if (cfg.show_imam === false) {
+            block.style.display = 'none';
+            return;
+        }
+
+        const isFriday = new Date().getDay() === 5;
+        const isJumat  = isFriday && key === 'dhuhr';
+
+        let label = 'Imam';
+        let name  = '';
+        let khatib = '';
+
+        if (isJumat) {
+            label  = "Imam Jum'at";
+            name   = (cfg.imam_jumat || '').trim();
+            khatib = (cfg.khatib_jumat || '').trim();
+        } else {
+            const pick = {
+                fajr:    cfg.imam_fajr,
+                dhuhr:   cfg.imam_dhuhr,
+                asr:     cfg.imam_asr,
+                maghrib: cfg.imam_maghrib,
+                isha:    cfg.imam_isha,
+            }[key];
+            name = (pick || '').trim();
+        }
+
+        // Hide the block entirely when there's nothing to show — neither
+        // a primary name nor a Friday khatib. This keeps the overlay
+        // clean for masjids that haven't set up an imam schedule yet.
+        if (!name && !khatib) {
+            block.style.display = 'none';
+            return;
+        }
+
+        block.style.display = '';
+        if (labelEl) labelEl.textContent = label;
+        nameEl.textContent = name || '—';
+
+        if (khatib && khatibLine && khatibNameEl) {
+            khatibLine.style.display = '';
+            khatibNameEl.textContent = khatib;
+        } else if (khatibLine) {
+            khatibLine.style.display = 'none';
+        }
     }
     function hideAdzan() {
         state.adzanActive = false;

@@ -51,16 +51,16 @@
     <string name="pref_quran_interval_sum">Berapa lama setiap ayat ditampilkan. Default 30 detik.</string>
     <string name="pref_quran_mode">Jenis Tampilan Ayat</string>
     <string name="pref_quran_mode_sum">Pilih cara ayat ditampilkan di layar</string>
-    <string name="pref_pick_slides">Tambah Gambar dari Galeri</string>
-    <string name="pref_pick_slides_sum">Pilih satu atau beberapa file gambar; otomatis ditambahkan ke daftar slideshow</string>
+    <string name="pref_pick_slides">Tambah Gambar / Video dari Galeri</string>
+    <string name="pref_pick_slides_sum">Pilih satu atau beberapa file gambar atau video; otomatis ditambahkan ke daftar slideshow. Video akan diputar otomatis (mute, looping).</string>
     <string name="pref_clear_slides">Hapus Semua Gambar Tersimpan</string>
     <string name="clear_slides_title">Hapus Gambar Slideshow?</string>
     <string name="clear_slides_message">Semua gambar yang tersimpan di penyimpanan aplikasi akan dihapus. URL eksternal di daftar tidak akan ikut terhapus.</string>
     <string name="slides_imported_count">%1$d gambar berhasil ditambahkan</string>
     <string name="slides_rejected_count">%1$d file ditolak (terlalu besar / format tidak didukung)</string>
     <string name="slides_cleared_count">%1$d gambar dihapus</string>
-    <string name="pref_slideshow_urls">Daftar URL Gambar</string>
-    <string name="pref_slideshow_urls_sum">Satu URL per baris (atau pisahkan dengan koma). Kosongkan untuk pakai gambar default. Hanya berlaku di layout Minimal &amp; Cinema.</string>
+    <string name="pref_slideshow_urls">Daftar URL Slide</string>
+    <string name="pref_slideshow_urls_sum">Satu URL gambar atau video per baris (atau pisahkan dengan koma). Mendukung jpg/png/webp dan mp4/webm. Kosongkan untuk pakai gambar default.</string>
     <string name="pref_slide_duration">Durasi per Slide (detik)</string>
     <string name="pref_slide_duration_sum">Berapa lama tiap gambar tampil sebelum berpindah. Default 8.</string>
 
@@ -71,4 +71,17 @@
     <string name="pref_iqomah_duration_sum">Default 600 = 10 menit</string>
 
     <string name="hint_settings_remote">Tekan MENU atau tekan-tahan OK pada remote (Enter pada keyboard) untuk membuka pengaturan</string>
+
+    <!-- Imam schedule -->
+    <string name="cat_imam">Jadwal Imam Masjid</string>
+    <string name="pref_show_imam">Tampilkan Nama Imam saat Adzan</string>
+    <string name="pref_show_imam_sum">Nama imam akan muncul di overlay adzan/iqomah</string>
+    <string name="pref_imam_fajr">Imam Subuh</string>
+    <string name="pref_imam_dhuhr">Imam Dzuhur</string>
+    <string name="pref_imam_asr">Imam Ashar</string>
+    <string name="pref_imam_maghrib">Imam Maghrib</string>
+    <string name="pref_imam_isha">Imam Isya</string>
+    <string name="pref_imam_jumat">Imam Sholat Jum\'at</string>
+    <string name="pref_khatib_jumat">Khatib Sholat Jum\'at</string>
+    <string name="pref_imam_sum_default">Misal: Ust. Ahmad Fauzi</string>
 </resources>

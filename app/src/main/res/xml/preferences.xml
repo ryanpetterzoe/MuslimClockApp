@@ -165,6 +165,57 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_imam">
+
+        <SwitchPreferenceCompat
+            app:key="show_imam"
+            app:title="@string/pref_show_imam"
+            app:summary="@string/pref_show_imam_sum"
+            app:defaultValue="true" />
+
+        <EditTextPreference
+            app:key="imam_fajr"
+            app:title="@string/pref_imam_fajr"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="imam_dhuhr"
+            app:title="@string/pref_imam_dhuhr"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="imam_asr"
+            app:title="@string/pref_imam_asr"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="imam_maghrib"
+            app:title="@string/pref_imam_maghrib"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="imam_isha"
+            app:title="@string/pref_imam_isha"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="imam_jumat"
+            app:title="@string/pref_imam_jumat"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="khatib_jumat"
+            app:title="@string/pref_khatib_jumat"
+            app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/cat_adzan">
 
         <EditTextPreference
