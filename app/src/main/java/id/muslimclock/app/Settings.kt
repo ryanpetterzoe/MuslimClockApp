@@ -40,6 +40,7 @@ object Settings {
     const val K_TICKER_SPEED   = "ticker_speed"
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
+    const val K_QURAN_MODE     = "quran_mode"
 
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
@@ -76,6 +77,7 @@ object Settings {
             .putString(K_TICKER_SPEED,   "30")
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
+            .putString(K_QURAN_MODE,     "fullcard")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -113,11 +115,11 @@ object Settings {
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
+            put("quran_mode",      str(K_QURAN_MODE,              "fullcard"))
             // Modules not yet implemented in MVP — keep keys stable so future
             // PRs can flip these without touching clock.js again.
             put("show_imam",       false)
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
-            put("show_quran",      false)
         }.toString()
     }
 }
