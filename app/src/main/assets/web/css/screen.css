@@ -7,6 +7,22 @@ body {
     color: #fff;
     overflow: hidden;
 }
+
+/* ---------- Viewport sizing fix for Android WebView ----------
+ * `100vh` / Tailwind's `h-screen` historically include the area behind
+ * translucent system bars in Android WebView, so the bottom of the
+ * layout gets clipped on some devices/skins. We use a JS-maintained
+ * custom property as the source of truth, and fall back to `100dvh`
+ * (dynamic viewport, supported in WebView 108+) and finally `100vh`.
+ */
+:root { --app-vh: 100vh; }
+@supports (height: 100dvh) {
+    :root { --app-vh: 100dvh; }
+}
+.app-screen {
+    height: var(--app-vh, 100vh);
+    width: 100vw;
+}
 .font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
 .font-arabic  { font-family: 'Amiri', 'Traditional Arabic', serif; }
 
