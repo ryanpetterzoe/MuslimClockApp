@@ -24,6 +24,17 @@
 
     <PreferenceCategory app:title="@string/cat_location">
 
+        <!--
+          Primary entry point: pick a city from the bundled list. Writes
+          location_lat / location_lng / timezone in one go.
+          The raw lat/lng/tz fields below remain for power users.
+        -->
+        <id.muslimclock.app.LocationSearchPreference
+            app:key="location_picker"
+            app:icon="@android:drawable/ic_menu_mylocation"
+            app:title="@string/pref_location_search"
+            app:summary="@string/pref_location_search_sum" />
+
         <EditTextPreference
             app:key="location_lat"
             app:title="@string/pref_lat"
@@ -62,17 +73,17 @@
             app:defaultValue="minimal"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <id.muslimclock.app.ColorPickerPreference
             app:key="theme_primary"
             app:title="@string/pref_theme_primary"
             app:summary="@string/pref_theme_primary_sum"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="#0A4EA3" />
 
-        <EditTextPreference
+        <id.muslimclock.app.ColorPickerPreference
             app:key="theme_accent"
             app:title="@string/pref_theme_accent"
             app:summary="@string/pref_theme_accent_sum"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="#F5B301" />
 
         <SwitchPreferenceCompat
             app:key="show_analog"
@@ -83,6 +94,12 @@
             app:key="show_countdown"
             app:title="@string/pref_show_countdown"
             app:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            app:key="show_gear"
+            app:title="@string/pref_show_gear"
+            app:summary="@string/pref_show_gear_sum"
+            app:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_ticker">

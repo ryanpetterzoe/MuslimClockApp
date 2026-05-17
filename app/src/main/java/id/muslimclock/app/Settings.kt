@@ -40,6 +40,11 @@ object Settings {
     const val K_TICKER_SPEED   = "ticker_speed"
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
+    // Floating gear button visibility. When false, the only way to open
+    // Settings is the MENU key (or long-press OK on TV remotes / Enter
+    // on a keyboard). MainActivity also exposes a long-press handler so
+    // this still works on devices without a dedicated MENU key.
+    const val K_SHOW_GEAR      = "show_gear"
 
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
@@ -76,6 +81,7 @@ object Settings {
             .putString(K_TICKER_SPEED,   "30")
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
+            .putBoolean(K_SHOW_GEAR,     false)   // hidden by default — opens via MENU key
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -113,6 +119,7 @@ object Settings {
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
+            put("show_gear",       p.getBoolean(K_SHOW_GEAR,     false))
             // Modules not yet implemented in MVP — keep keys stable so future
             // PRs can flip these without touching clock.js again.
             put("show_imam",       false)

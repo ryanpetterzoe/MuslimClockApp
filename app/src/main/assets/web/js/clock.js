@@ -42,6 +42,7 @@
         ticker_speed: 30,       // seconds for one full scroll cycle
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
+        show_gear: false,       // floating settings icon visibility
     };
 
     const PRAYER_LABEL_ID = {
@@ -201,9 +202,19 @@
         const ovMsg = $('#ovMsg');
         if (ovMsg) ovMsg.textContent = cfg.adzan_message || 'Saatnya Waktu Sholat';
 
-        // Show settings button only when the bridge is available
+        // Floating gear button.
+        // Two layers of gating:
+        //   1. The bridge must be available (no point opening Settings
+        //      from a browser preview).
+        //   2. cfg.show_gear must be true. Defaults to false so the
+        //      icon doesn't get in the way on a finished public display
+        //      — users open Settings via remote MENU / long-press OK.
         const gear = $('#gearBtn');
-        if (gear) gear.style.display = (window.MCAndroid && window.MCAndroid.openSettings) ? '' : 'none';
+        if (gear) {
+            const bridgeOk = !!(window.MCAndroid && window.MCAndroid.openSettings);
+            const wantGear = cfg.show_gear === true;
+            gear.style.display = (bridgeOk && wantGear) ? '' : 'none';
+        }
 
         // Ticker (running text)
         applyTicker();
