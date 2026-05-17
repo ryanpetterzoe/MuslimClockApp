@@ -84,4 +84,34 @@
     <string name="pref_imam_jumat">Imam Sholat Jum\'at</string>
     <string name="pref_khatib_jumat">Khatib Sholat Jum\'at</string>
     <string name="pref_imam_sum_default">Misal: Ust. Ahmad Fauzi</string>
+
+    <!-- Layout editor -->
+    <string name="cat_layout_editor">Editor Tata Letak</string>
+    <string name="layout_editor_intro">Atur ukuran &amp; posisi tiap elemen. Berlaku di semua tema. Tekan tombol Reset di bawah untuk kembali ke default.</string>
+
+    <string name="pref_analog_size">Ukuran Jam Analog</string>
+    <string name="pref_analog_x">Geser Jam Analog (Horizontal)</string>
+    <string name="pref_analog_y">Geser Jam Analog (Vertikal)</string>
+    <string name="pref_digital_size">Ukuran Jam Digital</string>
+    <string name="pref_digital_x">Geser Jam Digital (Horizontal)</string>
+    <string name="pref_digital_y">Geser Jam Digital (Vertikal)</string>
+    <string name="pref_prayers_size">Ukuran Kartu Jadwal Sholat</string>
+    <string name="pref_prayers_x">Geser Kartu Jadwal (Horizontal)</string>
+    <string name="pref_prayers_y">Geser Kartu Jadwal (Vertikal)</string>
+    <string name="pref_quran_size">Ukuran Kartu Qur\'an</string>
+    <string name="pref_quran_x">Geser Kartu Qur\'an (Horizontal)</string>
+    <string name="pref_quran_y">Geser Kartu Qur\'an (Vertikal)</string>
+
+    <string name="pref_size_sum">100% = ukuran default. 50–200%.</string>
+    <string name="pref_offset_sum">0 = posisi default. -50 sampai +50 (% lebar/tinggi layar).</string>
+
+    <string name="pref_reset_layout">Reset Tata Letak ke Default</string>
+    <string name="pref_reset_layout_sum">Kembalikan semua ukuran ke 100% dan posisi ke 0.</string>
+    <string name="layout_reset_done">Tata letak dikembalikan ke default</string>
+
+    <!-- Fonts -->
+    <string name="pref_font_display">Font Tampilan (Display)</string>
+    <string name="pref_font_display_sum">Untuk nama masjid, label, dan tanggal</string>
+    <string name="pref_font_digital">Font Jam Digital</string>
+    <string name="pref_font_digital_sum">Khusus untuk angka jam besar dan jadwal sholat</string>
 </resources>

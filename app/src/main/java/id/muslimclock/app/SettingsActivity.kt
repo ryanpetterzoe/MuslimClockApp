@@ -63,6 +63,10 @@ class SettingsActivity : AppCompatActivity() {
                 confirmClearSlides()
                 true
             }
+            findPreference<Preference>("reset_layout")?.setOnPreferenceClickListener {
+                confirmResetLayout()
+                true
+            }
             updateClearSummary()
         }
 
@@ -164,6 +168,44 @@ class SettingsActivity : AppCompatActivity() {
             val files = SlideStorage.dir(ctx).listFiles()?.size ?: 0
             findPreference<Preference>("clear_slides")?.summary =
                 resources.getQuantityString(R.plurals.stored_slides_count, files, files)
+        }
+
+        /**
+         * Push every layout-editor key back to its default. Resetting via
+         * the hosted [androidx.preference.SeekBarPreference] objects fires
+         * each preference's change listener (if any) and refreshes the
+         * displayed value, which is what we want — otherwise the slider
+         * UI would still show the old number until the user scrolled.
+         */
+        private fun confirmResetLayout() {
+            val ctx = requireContext()
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.pref_reset_layout)
+                .setMessage(R.string.pref_reset_layout_sum)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    // Pairs of (pref key, default value). Sizes default to
+                    // 100 (%); offsets to 0 (centred / unchanged).
+                    val resets = listOf(
+                        Settings.K_ANALOG_SIZE   to 100,
+                        Settings.K_ANALOG_X_PCT  to 0,
+                        Settings.K_ANALOG_Y_PCT  to 0,
+                        Settings.K_DIGITAL_SIZE  to 100,
+                        Settings.K_DIGITAL_X_PCT to 0,
+                        Settings.K_DIGITAL_Y_PCT to 0,
+                        Settings.K_PRAYERS_SIZE  to 100,
+                        Settings.K_PRAYERS_X_PCT to 0,
+                        Settings.K_PRAYERS_Y_PCT to 0,
+                        Settings.K_QURAN_SIZE    to 100,
+                        Settings.K_QURAN_X_PCT   to 0,
+                        Settings.K_QURAN_Y_PCT   to 0,
+                    )
+                    for ((key, def) in resets) {
+                        findPreference<androidx.preference.SeekBarPreference>(key)?.value = def
+                    }
+                    Toast.makeText(ctx, R.string.layout_reset_done, Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
     }
 }

@@ -620,3 +620,84 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-sunset .prayer.next::before {
     display: none;
 }
+
+
+
+/* ===================== NEW LAYOUTS (set 2): GLASS / NEWSPAPER / BRUTALIST / HERITAGE / MONO / SUNRISE ===================== */
+
+/* Glass — frosted card highlight on next prayer. */
+.layout-glass .prayer.next .glass-prayer,
+.layout-glass .glass-prayer.next {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--accent) 22%, rgba(255,255,255,0.07)),
+        color-mix(in srgb, var(--accent) 6%, rgba(255,255,255,0.07)));
+    border-color: var(--accent);
+    box-shadow: 0 12px 40px -10px var(--accent), inset 0 0 18px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.layout-glass .glass-prayer.next [data-time] { color: var(--accent); }
+
+/* Newspaper — bold left-rule highlight on the next prayer cell. */
+.layout-newspaper .prayer.next .np-cell {
+    background: #1a1a1a;
+    color: #f5f1e8;
+    margin: -8px -4px;
+    padding: 8px 4px;
+    border-radius: 4px;
+}
+.layout-newspaper .prayer.next .np-cell [data-time] { color: var(--accent); }
+
+/* Brutalist — flip the highlighted cell to accent background. */
+.layout-brutalist .prayer.next .br-block {
+    background: var(--accent) !important;
+    color: #000 !important;
+}
+.layout-brutalist .prayer.next .br-block [data-time] { color: #000 !important; }
+
+/* Heritage — Islamic geometric pattern + ornate next-state. */
+.layout-heritage .heritage-pattern {
+    /* SVG pattern: 8-pointed star tiled — classic Islamic motif. Encoded
+     * inline as data: URL so we don't ship an extra asset; the foreground
+     * uses var(--accent) so theme colour propagates. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23F5B301' stroke-width='1.2' opacity='0.75'><polygon points='40,5 49,30 76,30 54,46 63,73 40,57 17,73 26,46 4,30 31,30'/><circle cx='40' cy='40' r='10'/></g></svg>");
+    background-size: 80px 80px;
+}
+.layout-heritage .heritage-card {
+    background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(10,31,58,0.7));
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+.layout-heritage .prayer.next .heritage-card,
+.layout-heritage .heritage-card.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.55)), color-mix(in srgb, var(--accent) 8%, transparent));
+    border-color: var(--accent);
+    box-shadow: 0 10px 36px -10px var(--accent);
+}
+
+/* Mono — invert the next prayer cell for monochrome theme. */
+.layout-mono .prayer.next .mono-cell {
+    background: #000;
+    color: #fff;
+}
+.layout-mono .prayer.next .mono-cell [style*="color:#525252"] { color: #d4d4d4 !important; }
+
+/* Sunrise — pop the next prayer card with brighter amber. */
+.layout-sunrise .prayer.next .sr-card {
+    background: rgba(124,45,18,1) !important;
+    box-shadow: 0 0 24px #fbbf24, inset 0 0 16px rgba(253,230,138,0.3);
+    transform: scale(1.04);
+}
+.layout-sunrise .prayer.next .sr-card [data-time] {
+    color: #fde68a !important;
+    text-shadow: 0 0 14px #fbbf24;
+}
+
+/* Override the universal left-bar for layouts that own their highlight. */
+.layout-glass .prayer.next::before,
+.layout-newspaper .prayer.next::before,
+.layout-brutalist .prayer.next::before,
+.layout-heritage .prayer.next::before,
+.layout-mono .prayer.next::before,
+.layout-sunrise .prayer.next::before {
+    display: none;
+}

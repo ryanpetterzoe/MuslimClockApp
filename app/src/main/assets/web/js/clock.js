@@ -54,6 +54,12 @@
         imam_isha: '',
         imam_jumat: '',
         khatib_jumat: '',
+        // Layout editor — defaults match Settings.kt. 100% size = use the
+        // layout's natural dimensions; 0% offset = no translation.
+        analog_size:  100, analog_x_pct:  0, analog_y_pct:  0,
+        digital_size: 100, digital_x_pct: 0, digital_y_pct: 0,
+        prayers_size: 100, prayers_x_pct: 0, prayers_y_pct: 0,
+        quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
     };
 
     const PRAYER_LABEL_ID = {
@@ -85,7 +91,8 @@
         'aurora', 'frame', 'stadium', 'magazine',
         'theater', 'showcase', 'split', 'polaroid',
         'window', 'festival', 'portrait',
-        'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset'
+        'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset',
+        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise'
     ];
 
     /* ===== State (mutable) ===== */
@@ -274,6 +281,13 @@
 
         // Quran ayat rotation
         applyQuran();
+
+        // Per-element resize / translate via Settings → Editor Tata Letak.
+        applyLayoutEditor();
+
+        // Font selection — load the chosen Google Font on demand and
+        // apply it via CSS custom properties.
+        applyFonts();
     }
 
     /**
@@ -623,6 +637,169 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
+    }
+
+    /* ===== Layout editor =====
+     *
+     * Lets the user resize and translate each major UI element (analog
+     * clock, digital clock, prayer cards, Quran bar) through the
+     * Settings → Editor Tata Letak section. Each element gets three
+     * knobs:
+     *   - size  (50..200%, applied as CSS `transform: scale()`)
+     *   - X/Y   (-50..+50% of viewport, applied via `translate()`)
+     *
+     * We read all four elements from each rendered layout — they're
+     * standardised across templates by their selectors — and write a
+     * single transform per element. transform-origin defaults to the
+     * element's natural anchor (centre for the clocks, top centre for
+     * the prayer row, etc.) which keeps things visually predictable
+     * without per-layout overrides.
+     *
+     * Applied at:
+     *   1. mountLayout — fresh DOM, fresh transforms
+     *   2. applyConfig push from native — live preview as the user drags
+     *      a slider in Settings.
+     */
+    function applyLayoutEditor() {
+        const cfg = state.cfg;
+        const apply = (selector, size, xPct, yPct, origin) => {
+            const els = document.querySelectorAll(selector);
+            if (!els.length) return;
+            const sz   = Math.max(50, Math.min(200, parseInt(size,  10) || 100)) / 100;
+            const x    = Math.max(-50, Math.min(50,  parseInt(xPct, 10) || 0));
+            const y    = Math.max(-50, Math.min(50,  parseInt(yPct, 10) || 0));
+            // Skip the work entirely when the user is at defaults — keeps
+            // the original layout pristine in that common case.
+            const isDefault = sz === 1 && x === 0 && y === 0;
+            for (const el of els) {
+                el.style.transformOrigin = origin || 'center center';
+                el.style.transform = isDefault
+                    ? ''
+                    : `translate(${x}vw, ${y}vh) scale(${sz})`;
+                // Prevent transformed elements from clipping inside their
+                // parents when scaled up. `will-change` keeps the WebView's
+                // compositor on its toes during slider drags.
+                if (!isDefault) el.style.willChange = 'transform';
+                else el.style.willChange = '';
+            }
+        };
+
+        // Analog clock — the [data-analog] slot is the size box, so
+        // scaling it scales the inner SVG too. Origin: center.
+        apply('[data-analog]', cfg.analog_size, cfg.analog_x_pct, cfg.analog_y_pct);
+
+        // Digital clock — the giant time text.
+        apply('#digital', cfg.digital_size, cfg.digital_x_pct, cfg.digital_y_pct);
+
+        // Prayer-time cards. Most layouts expose them inside a single
+        // `<section class="row-fixed">` containing all six .prayer
+        // children. We transform that section so all six move together.
+        // Fallback to scaling individual cards in pill-style layouts that
+        // don't have a single common parent.
+        const prayerSection = findPrayerContainer();
+        if (prayerSection) {
+            apply(uniqueSelectorFor(prayerSection),
+                  cfg.prayers_size, cfg.prayers_x_pct, cfg.prayers_y_pct,
+                  'center bottom');
+        }
+
+        // Quran bar — sits at the bottom edge already; default origin
+        // works fine, but bias toward the bottom so resizing doesn't
+        // float the card up off-screen.
+        apply('#quranBar', cfg.quran_size, cfg.quran_x_pct, cfg.quran_y_pct,
+              'center bottom');
+    }
+
+    /**
+     * Locate the node that contains all .prayer cards inside the
+     * currently mounted layout. Returns the deepest ancestor that
+     * contains every .prayer in the layout host (i.e. their lowest
+     * common parent), so we transform exactly that node.
+     */
+    function findPrayerContainer() {
+        const host = document.getElementById('layoutHost');
+        if (!host) return null;
+        const cards = host.querySelectorAll('.prayer');
+        if (!cards.length) return null;
+        // Walk up from the first card until the parent contains all of them.
+        let node = cards[0].parentElement;
+        while (node && node !== host) {
+            let containsAll = true;
+            for (const c of cards) {
+                if (!node.contains(c)) { containsAll = false; break; }
+            }
+            if (containsAll) return node;
+            node = node.parentElement;
+        }
+        return null;
+    }
+
+    /**
+     * Build a CSS selector that uniquely identifies [el] inside the
+     * layout host, so [apply] can find it via querySelectorAll. We
+     * stamp a data attribute the first time we see the node, then
+     * reuse it on subsequent calls — cheaper than recomputing a
+     * positional path every applyConfig.
+     */
+    function uniqueSelectorFor(el) {
+        if (!el) return null;
+        if (!el.dataset.mcEditorSlot) {
+            el.dataset.mcEditorSlot = 'prayers';
+        }
+        return `[data-mc-editor-slot="${el.dataset.mcEditorSlot}"]`;
+    }
+
+    /* ===== Fonts =====
+     *
+     * The user picks a display font and a digital font from a dropdown
+     * in Settings (Tampilan section). Both default to fonts already
+     * preloaded in index.html, but for the wider catalogue we lazy-load
+     * the requested family from Google Fonts on demand. Failures fall
+     * back silently to the system serif/sans-serif via CSS.
+     */
+    const _loadedFonts = new Set();
+
+    function ensureGoogleFont(family) {
+        if (!family) return;
+        // Built-in or already-loaded families need no extra request.
+        const skip = ['monospace', 'sans-serif', 'serif', 'system-ui'];
+        if (skip.includes(family.toLowerCase())) return;
+        const key = family.toLowerCase();
+        if (_loadedFonts.has(key)) return;
+        _loadedFonts.add(key);
+
+        // We can't tell from the JS side which weights a given font ships;
+        // request the most useful range and let Google Fonts cap to what
+        // exists. Wrap in a try because malformed font names should fail
+        // gracefully (broken stylesheet links don't crash the page).
+        try {
+            const safe = encodeURIComponent(family);
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${safe}:wght@400;500;600;700;800;900&display=swap`;
+            link.crossOrigin = 'anonymous';
+            link.referrerPolicy = 'no-referrer';
+            document.head.appendChild(link);
+        } catch (e) { /* offline or CSP blocked — fall back to system font */ }
+    }
+
+    function applyFonts() {
+        const cfg = state.cfg;
+        const display = (cfg.font_display || 'Inter').trim();
+        const digital = (cfg.font_digital || 'Orbitron').trim();
+        ensureGoogleFont(display);
+        ensureGoogleFont(digital);
+
+        // Quote the family name in the CSS rule so multi-word fonts
+        // ('Plus Jakarta Sans', 'Press Start 2P', etc.) resolve correctly.
+        document.documentElement.style.setProperty(
+            '--font-display',
+            `"${display}", system-ui, sans-serif`
+        );
+        document.documentElement.style.setProperty(
+            '--font-digital',
+            `"${digital}", "Orbitron", monospace`
+        );
     }
 
     /* ===== Slideshow =====

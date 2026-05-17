@@ -85,6 +85,24 @@
             app:summary="@string/pref_theme_accent_sum"
             app:defaultValue="#F5B301" />
 
+        <ListPreference
+            app:key="font_display"
+            app:title="@string/pref_font_display"
+            app:summary="@string/pref_font_display_sum"
+            app:entries="@array/font_display_entries"
+            app:entryValues="@array/font_display_values"
+            app:defaultValue="Inter"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="font_digital"
+            app:title="@string/pref_font_digital"
+            app:summary="@string/pref_font_digital_sum"
+            app:entries="@array/font_digital_entries"
+            app:entryValues="@array/font_digital_values"
+            app:defaultValue="Orbitron"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:key="show_analog"
             app:title="@string/pref_show_analog"
@@ -214,6 +232,139 @@
             app:title="@string/pref_khatib_jumat"
             app:summary="@string/pref_imam_sum_default"
             app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_layout_editor">
+
+        <Preference
+            app:selectable="false"
+            app:summary="@string/layout_editor_intro" />
+
+        <SeekBarPreference
+            app:key="analog_size"
+            app:title="@string/pref_analog_size"
+            app:summary="@string/pref_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="analog_x_pct"
+            app:title="@string/pref_analog_x"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="analog_y_pct"
+            app:title="@string/pref_analog_y"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="digital_size"
+            app:title="@string/pref_digital_size"
+            app:summary="@string/pref_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="digital_x_pct"
+            app:title="@string/pref_digital_x"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="digital_y_pct"
+            app:title="@string/pref_digital_y"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="prayers_size"
+            app:title="@string/pref_prayers_size"
+            app:summary="@string/pref_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="prayers_x_pct"
+            app:title="@string/pref_prayers_x"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="prayers_y_pct"
+            app:title="@string/pref_prayers_y"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="quran_size"
+            app:title="@string/pref_quran_size"
+            app:summary="@string/pref_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="quran_x_pct"
+            app:title="@string/pref_quran_x"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <SeekBarPreference
+            app:key="quran_y_pct"
+            app:title="@string/pref_quran_y"
+            app:summary="@string/pref_offset_sum"
+            android:max="50"
+            app:min="-50"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="0" />
+
+        <Preference
+            app:key="reset_layout"
+            app:title="@string/pref_reset_layout"
+            app:summary="@string/pref_reset_layout_sum"
+            app:icon="@android:drawable/ic_menu_revert" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_adzan">
