@@ -1,28 +1,50 @@
 /* ===== Muslim Clock Web — Display (v7, multi-layout) ===== */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; height: 100%; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
 body {
     font-family: var(--font-display, 'Inter', system-ui, sans-serif);
     background: #000;
     color: #fff;
     overflow: hidden;
+    /* Lock the body to the visual viewport so descendants using % of
+     * 'height' resolve against a guaranteed-correct height. Even if
+     * Android WebView reports 100vh that includes the area behind the
+     * status bar, position:fixed on .app-screen below pins us to the
+     * actual painted bounds the WebView knows about. */
+    position: fixed;
+    inset: 0;
 }
 
 /* ---------- Viewport sizing fix for Android WebView ----------
- * `100vh` / Tailwind's `h-screen` historically include the area behind
- * translucent system bars in Android WebView, so the bottom of the
- * layout gets clipped on some devices/skins. We use a JS-maintained
- * custom property as the source of truth, and fall back to `100dvh`
- * (dynamic viewport, supported in WebView 108+) and finally `100vh`.
+ * Two-pronged defence: position:fixed + 'inset: 0' guarantees we render
+ * inside the actual viewport rectangle the WebView allocated for the
+ * page (no confusion between 100vh and the visible area). The rest of
+ * the layout uses pure flexbox so the header & prayer-cards rows are
+ * fixed-size siblings that flex can't push off-screen.
  */
-:root { --app-vh: 100vh; }
-@supports (height: 100dvh) {
-    :root { --app-vh: 100dvh; }
-}
 .app-screen {
-    height: var(--app-vh, 100vh);
-    width: 100vw;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Pad inside the visible bounds for display-cutout / system-bar
+     * insets the Android side measured for us. Falls back to
+     * env(safe-area-inset-*) for non-Android previews. */
+    padding-top:    var(--safe-top,    env(safe-area-inset-top, 0));
+    padding-bottom: var(--safe-bottom, env(safe-area-inset-bottom, 0));
+    padding-left:   var(--safe-left,   env(safe-area-inset-left, 0));
+    padding-right:  var(--safe-right,  env(safe-area-inset-right, 0));
+    overflow: hidden;
 }
+
+/* The flex helper ensures direct children of a column-flex layout root
+ * have predictable shrink behaviour: header/footer rows never shrink,
+ * the main row absorbs all leftover space and may overflow into a
+ * hidden region rather than push siblings off-screen. */
+.flex-layout         { display: flex; flex-direction: column; }
+.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; }
+.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; }
+
 .font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
 .font-arabic  { font-family: 'Amiri', 'Traditional Arabic', serif; }
 
