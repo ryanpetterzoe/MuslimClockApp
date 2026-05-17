@@ -41,6 +41,18 @@ object Settings {
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
     const val K_QURAN_MODE     = "quran_mode"
+
+    // Imam schedule. One field per prayer slot (same imam every day).
+    // Friday extras hold the Jum'at imam + khatib (preacher).
+    const val K_SHOW_IMAM         = "show_imam"
+    const val K_IMAM_FAJR         = "imam_fajr"
+    const val K_IMAM_DHUHR        = "imam_dhuhr"
+    const val K_IMAM_ASR          = "imam_asr"
+    const val K_IMAM_MAGHRIB      = "imam_maghrib"
+    const val K_IMAM_ISHA         = "imam_isha"
+    const val K_IMAM_JUMAT        = "imam_jumat"
+    const val K_KHATIB_JUMAT      = "khatib_jumat"
+
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
 
@@ -77,6 +89,14 @@ object Settings {
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
             .putString(K_QURAN_MODE,     "fullcard")
+            .putBoolean(K_SHOW_IMAM,     true)
+            .putString(K_IMAM_FAJR,      "")
+            .putString(K_IMAM_DHUHR,     "")
+            .putString(K_IMAM_ASR,       "")
+            .putString(K_IMAM_MAGHRIB,   "")
+            .putString(K_IMAM_ISHA,      "")
+            .putString(K_IMAM_JUMAT,     "")
+            .putString(K_KHATIB_JUMAT,   "")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -115,9 +135,16 @@ object Settings {
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
             put("quran_mode",      str(K_QURAN_MODE,              "fullcard"))
-            // Modules not yet implemented in MVP — keep keys stable so future
-            // PRs can flip these without touching clock.js again.
-            put("show_imam",       false)
+            // Imam schedule. The web side reads these to label the adzan
+            // overlay with the responsible imam (and Jum'at khatib).
+            put("show_imam",       p.getBoolean(K_SHOW_IMAM, true))
+            put("imam_fajr",       str(K_IMAM_FAJR,        ""))
+            put("imam_dhuhr",      str(K_IMAM_DHUHR,       ""))
+            put("imam_asr",        str(K_IMAM_ASR,         ""))
+            put("imam_maghrib",    str(K_IMAM_MAGHRIB,     ""))
+            put("imam_isha",       str(K_IMAM_ISHA,        ""))
+            put("imam_jumat",      str(K_IMAM_JUMAT,       ""))
+            put("khatib_jumat",    str(K_KHATIB_JUMAT,     ""))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }
