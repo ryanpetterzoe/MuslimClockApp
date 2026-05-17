@@ -26,7 +26,10 @@ body {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;
+    /* Use the JS-measured viewport height (most reliable on Android WebView
+     * where 100% of a position:fixed box can still be wrong during immersive
+     * transitions). Falls back to 100% for the initial paint. */
+    height: var(--app-vh, 100%);
     /* Pad inside the visible bounds for display-cutout / system-bar
      * insets the Android side measured for us. Falls back to
      * env(safe-area-inset-*) for non-Android previews. */
