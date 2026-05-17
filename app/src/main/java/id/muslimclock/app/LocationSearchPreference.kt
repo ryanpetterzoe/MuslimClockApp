@@ -90,6 +90,13 @@ class LocationSearchPreference @JvmOverloads constructor(
         }
     }
 
+    /** Public trigger so the dialog can request a rebind after writing prefs. */
+    fun refreshSummary() {
+        // Setting summary to itself triggers the framework's notifyChanged()
+        // internally, which re-binds the view holder.
+        summary = summary
+    }
+
     /** Best-effort match: identifies the city by within-0.05° proximity. */
     private fun matchKnownCity(latS: String, lngS: String): IndoCity? {
         val lat = latS.toDoubleOrNull() ?: return null
@@ -251,7 +258,7 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
             .apply()
         // Notify dependent prefs so summaries refresh; the preference
         // screen rebinds on dismissal anyway.
-        pref.notifyChanged()
+        pref.refreshSummary()
         // Find any sister preferences and rebind their summaries.
         (preferenceFragmentCompat()
             ?.findPreference<Preference>(LocationSearchPreference.K_LAT))
