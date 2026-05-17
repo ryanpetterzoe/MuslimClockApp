@@ -37,6 +37,9 @@
         layout: 'minimal',
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
         slide_duration: 8,      // seconds per slide
+        show_ticker: true,
+        ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
+        ticker_speed: 30,       // seconds for one full scroll cycle
     };
 
     const PRAYER_LABEL_ID = {
@@ -199,6 +202,9 @@
         // Show settings button only when the bridge is available
         const gear = $('#gearBtn');
         if (gear) gear.style.display = (window.MCAndroid && window.MCAndroid.openSettings) ? '' : 'none';
+
+        // Ticker (running text)
+        applyTicker();
     }
 
     /**
@@ -230,6 +236,33 @@
             loadPrayerTimes();
         }
     };
+
+    /* ===== Ticker (running text) ===== */
+    function applyTicker() {
+        const cfg = state.cfg;
+        const bar = $('#tickerBar');
+        if (!bar) return;
+
+        const show = cfg.show_ticker !== false && cfg.show_running !== false;
+        const text = cfg.ticker_text || '';
+
+        if (!show || !text.trim()) {
+            bar.style.display = 'none';
+            return;
+        }
+
+        bar.style.display = '';
+        const content = $('#tickerContent');
+        if (content) {
+            // Replace | separator with spacing for visual separation
+            const formatted = text.split('|').map(s => s.trim()).filter(Boolean).join('      ●      ');
+            content.textContent = formatted;
+
+            // Set animation speed
+            const speed = Math.max(5, parseInt(cfg.ticker_speed, 10) || 30);
+            content.style.animationDuration = speed + 's';
+        }
+    }
 
     /* ===== Slideshow =====
      *
