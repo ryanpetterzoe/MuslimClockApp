@@ -50,7 +50,11 @@
         <item>UTC</item>
     </string-array>
 
-    <!-- Available web-side layouts. Keys must match <template id="layout-{key}">. -->
+    <!--
+      Available web-side layouts. Keys must match <template id="layout-{key}">.
+      Order: original 22 + 6 new themes added at the end (so existing user
+      selections by index/key keep working).
+    -->
     <string-array name="layout_entries">
         <item>Minimal</item>
         <item>Mosque (Kubah)</item>
@@ -74,6 +78,12 @@
         <item>Marble (Marmer)</item>
         <item>Terminal (Hacker)</item>
         <item>Sunset (Senja)</item>
+        <item>Glass (Glassmorphism)</item>
+        <item>Newspaper (Koran)</item>
+        <item>Brutalist (Berani)</item>
+        <item>Heritage (Pola Klasik)</item>
+        <item>Mono (Hitam Putih)</item>
+        <item>Sunrise (Fajar)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -99,6 +109,12 @@
         <item>marble</item>
         <item>terminal</item>
         <item>sunset</item>
+        <item>glass</item>
+        <item>newspaper</item>
+        <item>brutalist</item>
+        <item>heritage</item>
+        <item>mono</item>
+        <item>sunrise</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -116,5 +132,81 @@
         <item>typewriter</item>
         <item>slide</item>
         <item>marquee</item>
+    </string-array>
+
+    <!--
+      Display fonts (UI text — masjid name, prayer labels, dates).
+      Each entry is a Google Font that's already preloaded by index.html
+      via the multi-family request, so no extra network calls required.
+      Values are exact CSS font-family names so we can plug them straight
+      into the -font-display custom property.
+    -->
+    <string-array name="font_display_entries">
+        <item>Inter (Default)</item>
+        <item>Poppins</item>
+        <item>Plus Jakarta Sans</item>
+        <item>Roboto</item>
+        <item>Open Sans</item>
+        <item>Lato</item>
+        <item>Nunito</item>
+        <item>Montserrat</item>
+        <item>Raleway</item>
+        <item>Playfair Display (Serif)</item>
+        <item>Merriweather (Serif)</item>
+        <item>Cinzel (Klasik)</item>
+        <item>Amiri (Arab)</item>
+        <item>Scheherazade New (Arab)</item>
+        <item>Cairo (Latin + Arab)</item>
+    </string-array>
+
+    <string-array name="font_display_values">
+        <item>Inter</item>
+        <item>Poppins</item>
+        <item>Plus Jakarta Sans</item>
+        <item>Roboto</item>
+        <item>Open Sans</item>
+        <item>Lato</item>
+        <item>Nunito</item>
+        <item>Montserrat</item>
+        <item>Raleway</item>
+        <item>Playfair Display</item>
+        <item>Merriweather</item>
+        <item>Cinzel</item>
+        <item>Amiri</item>
+        <item>Scheherazade New</item>
+        <item>Cairo</item>
+    </string-array>
+
+    <!--
+      Digital fonts (the giant clock display). All are monospace-friendly
+      or have tabular-nums variants, so digit width stays constant and the
+      seconds counter doesn't shimmy as it ticks.
+    -->
+    <string-array name="font_digital_entries">
+        <item>Orbitron (Default, Futuristic)</item>
+        <item>Share Tech Mono (Retro)</item>
+        <item>VT323 (Pixel/CRT)</item>
+        <item>Major Mono Display</item>
+        <item>Press Start 2P (8-bit)</item>
+        <item>JetBrains Mono</item>
+        <item>Fira Code</item>
+        <item>Roboto Mono</item>
+        <item>Source Code Pro</item>
+        <item>IBM Plex Mono</item>
+        <item>DSEG7 / Digital-7 (System default)</item>
+    </string-array>
+
+    <string-array name="font_digital_values">
+        <item>Orbitron</item>
+        <item>Share Tech Mono</item>
+        <item>VT323</item>
+        <item>Major Mono Display</item>
+        <item>Press Start 2P</item>
+        <item>JetBrains Mono</item>
+        <item>Fira Code</item>
+        <item>Roboto Mono</item>
+        <item>Source Code Pro</item>
+        <item>IBM Plex Mono</item>
+        <item>monospace</item>
     </string-array>
 </resources>

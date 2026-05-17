@@ -35,6 +35,7 @@ object Settings {
     const val K_LAYOUT         = "layout"
     const val K_SLIDESHOW_URLS = "slideshow_urls"
     const val K_SLIDE_DURATION = "slide_duration"
+    const val K_SLIDESHOW_OPACITY = "slideshow_opacity"
     const val K_SHOW_TICKER    = "show_ticker"
     const val K_TICKER_TEXT    = "ticker_text"
     const val K_TICKER_SPEED   = "ticker_speed"
@@ -52,6 +53,26 @@ object Settings {
     const val K_IMAM_ISHA         = "imam_isha"
     const val K_IMAM_JUMAT        = "imam_jumat"
     const val K_KHATIB_JUMAT      = "khatib_jumat"
+
+    // Layout editor — per-element positioning. Each editable element has
+    // three knobs: size (50..200% of default), and X/Y offset in viewport
+    // percent (-50..+50). All are clamped server-side in [toJson] so a
+    // corrupted prefs file can never push elements completely off-screen.
+    const val K_ANALOG_SIZE   = "analog_size"
+    const val K_ANALOG_X_PCT  = "analog_x_pct"
+    const val K_ANALOG_Y_PCT  = "analog_y_pct"
+
+    const val K_DIGITAL_SIZE  = "digital_size"
+    const val K_DIGITAL_X_PCT = "digital_x_pct"
+    const val K_DIGITAL_Y_PCT = "digital_y_pct"
+
+    const val K_PRAYERS_SIZE  = "prayers_size"
+    const val K_PRAYERS_X_PCT = "prayers_x_pct"
+    const val K_PRAYERS_Y_PCT = "prayers_y_pct"
+
+    const val K_QURAN_SIZE    = "quran_size"
+    const val K_QURAN_X_PCT   = "quran_x_pct"
+    const val K_QURAN_Y_PCT   = "quran_y_pct"
 
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
@@ -83,6 +104,7 @@ object Settings {
             .putString(K_LAYOUT,         "minimal")
             .putString(K_SLIDESHOW_URLS, "")
             .putString(K_SLIDE_DURATION, "8")
+            .putInt(K_SLIDESHOW_OPACITY, 100)
             .putBoolean(K_SHOW_TICKER,   true)
             .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini")
             .putString(K_TICKER_SPEED,   "30")
@@ -97,6 +119,18 @@ object Settings {
             .putString(K_IMAM_ISHA,      "")
             .putString(K_IMAM_JUMAT,     "")
             .putString(K_KHATIB_JUMAT,   "")
+            .putInt(K_ANALOG_SIZE,    100)
+            .putInt(K_ANALOG_X_PCT,   0)
+            .putInt(K_ANALOG_Y_PCT,   0)
+            .putInt(K_DIGITAL_SIZE,   100)
+            .putInt(K_DIGITAL_X_PCT,  0)
+            .putInt(K_DIGITAL_Y_PCT,  0)
+            .putInt(K_PRAYERS_SIZE,   100)
+            .putInt(K_PRAYERS_X_PCT,  0)
+            .putInt(K_PRAYERS_Y_PCT,  0)
+            .putInt(K_QURAN_SIZE,     100)
+            .putInt(K_QURAN_X_PCT,    0)
+            .putInt(K_QURAN_Y_PCT,    0)
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -129,6 +163,7 @@ object Settings {
             put("layout",          str(K_LAYOUT,                  "minimal"))
             put("slideshow_urls",  str(K_SLIDESHOW_URLS,          ""))
             put("slide_duration",  int(K_SLIDE_DURATION,           8))
+            put("slideshow_opacity", p.getInt(K_SLIDESHOW_OPACITY, 100).coerceIn(0, 100))
             put("show_ticker",     p.getBoolean(K_SHOW_TICKER,    true))
             put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini"))
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
@@ -145,6 +180,20 @@ object Settings {
             put("imam_isha",       str(K_IMAM_ISHA,        ""))
             put("imam_jumat",      str(K_IMAM_JUMAT,       ""))
             put("khatib_jumat",    str(K_KHATIB_JUMAT,     ""))
+            // Layout editor — clamped server-side so a corrupted prefs
+            // file can never force the JS into nonsense (e.g. negative size).
+            put("analog_size",     p.getInt(K_ANALOG_SIZE,   100).coerceIn(50, 200))
+            put("analog_x_pct",    p.getInt(K_ANALOG_X_PCT,  0).coerceIn(-50, 50))
+            put("analog_y_pct",    p.getInt(K_ANALOG_Y_PCT,  0).coerceIn(-50, 50))
+            put("digital_size",    p.getInt(K_DIGITAL_SIZE,  100).coerceIn(50, 200))
+            put("digital_x_pct",   p.getInt(K_DIGITAL_X_PCT, 0).coerceIn(-50, 50))
+            put("digital_y_pct",   p.getInt(K_DIGITAL_Y_PCT, 0).coerceIn(-50, 50))
+            put("prayers_size",    p.getInt(K_PRAYERS_SIZE,  100).coerceIn(50, 200))
+            put("prayers_x_pct",   p.getInt(K_PRAYERS_X_PCT, 0).coerceIn(-50, 50))
+            put("prayers_y_pct",   p.getInt(K_PRAYERS_Y_PCT, 0).coerceIn(-50, 50))
+            put("quran_size",      p.getInt(K_QURAN_SIZE,    100).coerceIn(50, 200))
+            put("quran_x_pct",     p.getInt(K_QURAN_X_PCT,   0).coerceIn(-50, 50))
+            put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }
