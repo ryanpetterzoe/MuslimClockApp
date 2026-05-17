@@ -159,6 +159,15 @@ window.MC_CONFIG = {
     </div>
 </div>
 
+<!-- Quran ayat rotation (shared across layouts, above ticker). -->
+<div id="quranBar" class="fixed left-0 right-0 z-25 flex items-center justify-center px-8" style="display:none;bottom:34px;">
+    <div class="glass-dark rounded-xl px-6 py-3 text-center max-w-3xl w-full" style="border:1px solid rgba(255,255,255,0.08);">
+        <div id="quranArab" class="font-arabic text-xl leading-relaxed text-white mb-1" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        <div id="quranTrans" class="text-xs text-slate-300 leading-snug">Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.</div>
+        <div id="quranRef" class="text-[10px] mt-1 font-semibold" style="color:var(--accent);">— QS. Al-Fatihah: 1</div>
+    </div>
+</div>
+
 <!-- Floating settings button — overlays whatever layout is mounted. -->
 <button id="gearBtn"
         class="fixed top-4 right-4 z-40 w-10 h-10 rounded-full glass-dark text-white text-lg flex items-center justify-center shadow-soft"

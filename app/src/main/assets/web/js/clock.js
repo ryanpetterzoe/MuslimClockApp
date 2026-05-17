@@ -40,6 +40,8 @@
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
+        show_quran: true,
+        quran_interval: 30,     // seconds between ayat rotation
     };
 
     const PRAYER_LABEL_ID = {
@@ -205,6 +207,9 @@
 
         // Ticker (running text)
         applyTicker();
+
+        // Quran ayat rotation
+        applyQuran();
     }
 
     /**
@@ -248,10 +253,15 @@
 
         if (!show || !text.trim()) {
             bar.style.display = 'none';
+            // Remove bottom padding when ticker hidden
+            document.documentElement.style.setProperty('--ticker-h', '0px');
             return;
         }
 
         bar.style.display = '';
+        // Reserve space at the bottom so layouts don't get clipped by the ticker
+        document.documentElement.style.setProperty('--ticker-h', '32px');
+
         const content = $('#tickerContent');
         if (content) {
             // Replace | separator with spacing for visual separation
@@ -262,6 +272,68 @@
             const speed = Math.max(5, parseInt(cfg.ticker_speed, 10) || 30);
             content.style.animationDuration = speed + 's';
         }
+    }
+
+    /* ===== Quran rotation =====
+     * Displays a random ayat (Arabic + Indonesian translation) that
+     * rotates every cfg.quran_interval seconds. Uses a bundled list
+     * of short surahs for offline capability.
+     */
+    const QURAN_AYAT = [
+        { surah: 'Al-Fatihah', ayat: 1, arab: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', trans: 'Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.' },
+        { surah: 'Al-Fatihah', ayat: 2, arab: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ', trans: 'Segala puji bagi Allah, Tuhan seluruh alam.' },
+        { surah: 'Al-Ikhlas', ayat: 1, arab: 'قُلْ هُوَ اللَّهُ أَحَدٌ', trans: 'Katakanlah (Muhammad), "Dialah Allah, Yang Maha Esa."' },
+        { surah: 'Al-Ikhlas', ayat: 2, arab: 'اللَّهُ الصَّمَدُ', trans: 'Allah tempat meminta segala sesuatu.' },
+        { surah: 'Al-Ikhlas', ayat: 3, arab: 'لَمْ يَلِدْ وَلَمْ يُولَدْ', trans: 'Dia tidak beranak dan tidak pula diperanakkan.' },
+        { surah: 'Al-Ikhlas', ayat: 4, arab: 'وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ', trans: 'Dan tidak ada sesuatu yang setara dengan Dia.' },
+        { surah: 'Al-Falaq', ayat: 1, arab: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ', trans: 'Katakanlah, "Aku berlindung kepada Tuhan yang menguasai subuh."' },
+        { surah: 'An-Nas', ayat: 1, arab: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ', trans: 'Katakanlah, "Aku berlindung kepada Tuhannya manusia."' },
+        { surah: 'Al-Asr', ayat: 1, arab: 'وَالْعَصْرِ', trans: 'Demi masa.' },
+        { surah: 'Al-Asr', ayat: 2, arab: 'إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ', trans: 'Sungguh, manusia berada dalam kerugian.' },
+        { surah: 'Al-Asr', ayat: 3, arab: 'إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ', trans: 'Kecuali orang-orang yang beriman dan mengerjakan kebajikan serta saling menasihati untuk kebenaran dan saling menasihati untuk kesabaran.' },
+        { surah: 'Al-Kawthar', ayat: 1, arab: 'إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ', trans: 'Sungguh, Kami telah memberimu (Muhammad) nikmat yang banyak.' },
+        { surah: 'Al-Kawthar', ayat: 2, arab: 'فَصَلِّ لِرَبِّكَ وَانْحَرْ', trans: 'Maka laksanakanlah salat karena Tuhanmu, dan berkurbanlah.' },
+        { surah: 'Al-Fil', ayat: 1, arab: 'أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ', trans: 'Tidakkah engkau (Muhammad) perhatikan bagaimana Tuhanmu telah bertindak terhadap pasukan bergajah?' },
+        { surah: 'Al-Baqarah', ayat: 286, arab: 'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا', trans: 'Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.' },
+        { surah: 'Ali Imran', ayat: 139, arab: 'وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنْتُمُ الْأَعْلَوْنَ إِنْ كُنْتُمْ مُؤْمِنِينَ', trans: 'Dan janganlah kamu merasa lemah, dan jangan pula bersedih hati, sebab kamu paling tinggi derajatnya, jika kamu orang beriman.' },
+        { surah: 'Ar-Rahman', ayat: 13, arab: 'فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ', trans: 'Maka nikmat Tuhanmu yang manakah yang kamu dustakan?' },
+        { surah: 'Al-Insyirah', ayat: 5, arab: 'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا', trans: 'Maka sesungguhnya bersama kesulitan ada kemudahan.' },
+        { surah: 'Al-Insyirah', ayat: 6, arab: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا', trans: 'Sesungguhnya bersama kesulitan ada kemudahan.' },
+        { surah: 'Ibrahim', ayat: 7, arab: 'لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ', trans: 'Jika kamu bersyukur, niscaya Aku akan menambah (nikmat) kepadamu.' },
+    ];
+
+    let quranTimer = null;
+    let quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
+
+    function applyQuran() {
+        const cfg = state.cfg;
+        const bar = $('#quranBar');
+        if (!bar) return;
+
+        const show = cfg.show_quran === true;
+        if (!show) {
+            bar.style.display = 'none';
+            if (quranTimer) { clearInterval(quranTimer); quranTimer = null; }
+            return;
+        }
+
+        bar.style.display = '';
+        showNextAyat();
+
+        const interval = Math.max(10, parseInt(cfg.quran_interval, 10) || 30) * 1000;
+        if (quranTimer) clearInterval(quranTimer);
+        quranTimer = setInterval(showNextAyat, interval);
+    }
+
+    function showNextAyat() {
+        quranIdx = (quranIdx + 1) % QURAN_AYAT.length;
+        const ayat = QURAN_AYAT[quranIdx];
+        const arabEl = $('#quranArab');
+        const transEl = $('#quranTrans');
+        const refEl = $('#quranRef');
+        if (arabEl) arabEl.textContent = ayat.arab;
+        if (transEl) transEl.textContent = ayat.trans;
+        if (refEl) refEl.textContent = `— QS. ${ayat.surah}: ${ayat.ayat}`;
     }
 
     /* ===== Slideshow =====
