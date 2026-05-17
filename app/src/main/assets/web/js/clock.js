@@ -42,6 +42,7 @@
         ticker_speed: 30,       // seconds for one full scroll cycle
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
+        quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
     };
 
     const PRAYER_LABEL_ID = {
@@ -303,37 +304,250 @@
     ];
 
     let quranTimer = null;
+    let quranTypingTimer = null;
     let quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
+    let quranBuilt = '';        // last-built mode signature
+
+    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee'];
+
+    function clearQuranTimers() {
+        if (quranTimer)       { clearInterval(quranTimer);     quranTimer = null; }
+        if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
+    }
 
     function applyQuran() {
         const cfg = state.cfg;
-        const bar = $('#quranBar');
-        if (!bar) return;
+        const bar = document.getElementById('quranBar');
+        const inner = document.getElementById('quranInner');
+        if (!bar || !inner) return;
 
         const show = cfg.show_quran === true;
         if (!show) {
             bar.style.display = 'none';
-            if (quranTimer) { clearInterval(quranTimer); quranTimer = null; }
+            clearQuranTimers();
+            // Release reserved space so layouts re-flow.
+            document.documentElement.style.setProperty('--quran-h', '0px');
             return;
         }
 
+        const mode = QURAN_MODES.includes(cfg.quran_mode) ? cfg.quran_mode : 'fullcard';
         bar.style.display = '';
-        showNextAyat();
+
+        // (Re)build the inner DOM whenever the mode changes. Avoid rebuild
+        // when nothing structural changed so animations don't restart on
+        // every config push.
+        if (bar.dataset.mode !== mode || !quranBuilt) {
+            bar.dataset.mode = mode;
+            inner.innerHTML = buildQuranInner(mode);
+            quranBuilt = mode;
+        }
+
+        clearQuranTimers();
+
+        // Render the first ayat for this mode immediately.
+        showNextAyat(true);
+
+        // Reserve room at the bottom so prayer cards never overlap.
+        // Measure after layout settles. ResizeObserver also keeps it
+        // accurate if the host rotates / fonts load late.
+        reserveQuranSpace(bar);
+
+        // Marquee rotates at its own animation speed; the ayat itself
+        // doesn't rotate per-interval (the whole list scrolls in one loop).
+        if (mode === 'marquee') return;
 
         const interval = Math.max(10, parseInt(cfg.quran_interval, 10) || 30) * 1000;
-        if (quranTimer) clearInterval(quranTimer);
-        quranTimer = setInterval(showNextAyat, interval);
+        quranTimer = setInterval(() => showNextAyat(false), interval);
     }
 
-    function showNextAyat() {
-        quranIdx = (quranIdx + 1) % QURAN_AYAT.length;
+    function buildQuranInner(mode) {
+        if (mode === 'marquee') {
+            // The track is filled live in renderMarquee() because we want
+            // every ayat in a single pass, joined by a separator.
+            return `<div class="q-marquee"><div class="q-marquee-track"></div></div>`;
+        }
+        // All card-style modes share the same skeleton.
+        return `
+            <div class="q-card${mode === 'slide' ? ' q-enter' : ''}">
+                <div class="q-arab"></div>
+                <div class="q-trans"></div>
+                <div class="q-ref"></div>
+            </div>
+        `;
+    }
+
+    function reserveQuranSpace(bar) {
+        // Defer one frame so the new DOM has measurable height.
+        requestAnimationFrame(() => {
+            const h = bar.getBoundingClientRect().height || 0;
+            document.documentElement.style.setProperty('--quran-h', Math.ceil(h) + 'px');
+        });
+    }
+
+    function showNextAyat(initial) {
+        const mode = state.cfg.quran_mode || 'fullcard';
+
+        if (mode === 'marquee') {
+            renderMarquee();
+            return;
+        }
+
+        if (initial) {
+            // Pick a fresh starting index every (re)build so users don't
+            // see the same ayat after toggling settings.
+            quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
+        } else {
+            quranIdx = (quranIdx + 1) % QURAN_AYAT.length;
+        }
         const ayat = QURAN_AYAT[quranIdx];
-        const arabEl = $('#quranArab');
-        const transEl = $('#quranTrans');
-        const refEl = $('#quranRef');
-        if (arabEl) arabEl.textContent = ayat.arab;
+
+        switch (mode) {
+            case 'typewriter': renderTypewriter(ayat); break;
+            case 'slide':      renderSlide(ayat);      break;
+            case 'fullcard':   renderFullCard(ayat);   break;
+            case 'card':
+            default:           renderCard(ayat);       break;
+        }
+    }
+
+    function setAyatText(ayat) {
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        const refEl   = document.querySelector('#quranBar .q-ref');
+        if (arabEl)  arabEl.textContent  = ayat.arab;
         if (transEl) transEl.textContent = ayat.trans;
-        if (refEl) refEl.textContent = `— QS. ${ayat.surah}: ${ayat.ayat}`;
+        if (refEl)   refEl.textContent   = `— QS. ${ayat.surah}: ${ayat.ayat}`;
+    }
+
+    function renderCard(ayat) {
+        setAyatText(ayat);
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderFullCard(ayat) {
+        setAyatText(ayat);
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        // Auto-fit guard: shrink font-size step by step until both lines
+        // fit inside the 2-line clamp box (no truncation visible).
+        autoFitToTwoLines(arabEl,  14);
+        autoFitToTwoLines(transEl, 10);
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function autoFitToTwoLines(el, minPx) {
+        if (!el) return;
+        // Reset any previous adjustment so reflow uses CSS-defined size first.
+        el.style.fontSize = '';
+        // Measure: lineHeight*2 should be >= scrollHeight. If not, shrink.
+        let safety = 12;
+        while (el.scrollHeight > el.clientHeight + 1 && safety-- > 0) {
+            const cur = parseFloat(window.getComputedStyle(el).fontSize);
+            const next = Math.max(minPx, cur - 1);
+            if (next === cur) break;
+            el.style.fontSize = next + 'px';
+        }
+    }
+
+    function renderSlide(ayat) {
+        const card = document.querySelector('#quranBar .q-card');
+        if (!card) { setAyatText(ayat); return; }
+        // Restart enter animation by re-toggling the class.
+        card.classList.remove('q-enter');
+        // Force reflow so the next add re-triggers the animation.
+        // eslint-disable-next-line no-unused-expressions
+        void card.offsetWidth;
+        setAyatText(ayat);
+        card.classList.add('q-enter');
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderTypewriter(ayat) {
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        const refEl   = document.querySelector('#quranBar .q-ref');
+        if (!arabEl || !transEl || !refEl) return;
+
+        if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
+
+        // Start blank and type Arabic first, then translation, then ref.
+        arabEl.innerHTML  = '<span class="quran-cursor">|</span>';
+        transEl.innerHTML = '';
+        refEl.textContent = '';
+
+        const arabChars  = Array.from(ayat.arab);
+        const transChars = Array.from(ayat.trans);
+        const refText    = `— QS. ${ayat.surah}: ${ayat.ayat}`;
+
+        // Per-character delay scaled to fit comfortably within the rotation
+        // interval (we want typing to finish well before the next switch).
+        const intervalMs = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30) * 1000;
+        const totalChars = arabChars.length + transChars.length + refText.length;
+        const charDelay  = Math.max(15, Math.min(60, Math.floor(intervalMs * 0.6 / totalChars)));
+
+        let phase = 0;     // 0 = arab, 1 = trans, 2 = ref, 3 = done
+        let i = 0;
+        let arabBuf = '', transBuf = '';
+
+        quranTypingTimer = setInterval(() => {
+            if (phase === 0) {
+                if (i < arabChars.length) {
+                    arabBuf += arabChars[i++];
+                    arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
+                } else {
+                    arabEl.textContent = ayat.arab;
+                    transEl.innerHTML  = '<span class="quran-cursor">|</span>';
+                    phase = 1; i = 0;
+                }
+            } else if (phase === 1) {
+                if (i < transChars.length) {
+                    transBuf += transChars[i++];
+                    transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
+                } else {
+                    transEl.textContent = ayat.trans;
+                    phase = 2; i = 0;
+                }
+            } else if (phase === 2) {
+                if (i < refText.length) {
+                    refEl.textContent = refText.slice(0, ++i);
+                } else {
+                    phase = 3;
+                    clearInterval(quranTypingTimer);
+                    quranTypingTimer = null;
+                }
+            }
+        }, charDelay);
+
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderMarquee() {
+        const track = document.querySelector('#quranBar .q-marquee-track');
+        if (!track) return;
+        // Build a single long line: arab • trans (— QS. ...) | next ...
+        const parts = QURAN_AYAT.map(a => {
+            return `<span class="q-arab">${escapeHtml(a.arab)}</span>` +
+                   `<span class="q-trans">${escapeHtml(a.trans)}</span>` +
+                   `<span class="q-ref">— QS. ${escapeHtml(a.surah)}: ${a.ayat}</span>` +
+                   `<span class="q-sep">●</span>`;
+        }).join('');
+        track.innerHTML = parts;
+
+        // Scale animation duration with interval setting (longer interval =
+        // slower scroll). Roughly 2.5s per ayat at default 30s setting.
+        const interval = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30);
+        const dur = Math.max(30, QURAN_AYAT.length * (interval / 12));
+        track.style.animationDuration = dur + 's';
+
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
     /* ===== Slideshow =====
