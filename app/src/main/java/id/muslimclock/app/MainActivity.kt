@@ -14,10 +14,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.ViewCompat
 import androidx.webkit.WebViewAssetLoader
 
 /**
@@ -93,9 +93,8 @@ class MainActivity : AppCompatActivity() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     pushConfigToWeb()
-                    // Re-apply the cached safe-area insets after the page
-                    // (re)loads — the listener may have fired before
-                    // document.documentElement existed.
+                    // Re-apply cached safe-area insets — the inset listener
+                    // may have fired before the page was ready.
                     lastSafeAreaJs?.let { webView.evaluateJavascript(it, null) }
                 }
             }
@@ -103,9 +102,9 @@ class MainActivity : AppCompatActivity() {
         }
         setContentView(webView)
 
-        // Cutout / system-bar insets: forward them to the page as CSS
-        // custom properties so layouts can dodge the notch and the bottom
-        // navigation area when those briefly reappear (immersive sticky).
+        // Cutout / system-bar insets: forward to the page as CSS
+        // custom properties so layouts can dodge the notch and any
+        // residual bottom-bar area.
         ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
             val sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val cutout  = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
@@ -172,13 +171,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         // The system bars hide animates over a few frames. Tell the page
-        // to re-measure once that's done so `--app-vh` matches the final
+        // to re-measure once that's done so the layout matches the final
         // visible area, otherwise the layout's bottom edge gets clipped.
         webView.postDelayed({
             if (::webView.isInitialized) {
                 webView.evaluateJavascript(
                     "window.dispatchEvent(new Event('resize'));", null
                 )
+                lastSafeAreaJs?.let { webView.evaluateJavascript(it, null) }
             }
         }, 350)
     }

@@ -14,12 +14,12 @@
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">true</item>
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
         <!--
-          On phones / tablets with a display cutout (notch / camera hole),
-          the WebView used to render *behind* the cutout, then `100vh` was
+          On phones with a display cutout (notch / camera hole), the
+          WebView used to render *behind* the cutout, then `100vh` was
           larger than the actually-visible area and the bottom of the
-          layout was clipped. `shortEdges` lets the layout extend into the
-          cutout area on the long edges (landscape: top/bottom), and we
-          consume the rest via `env(safe-area-inset-*)` in CSS.
+          layout was clipped. `shortEdges` lets the layout extend into
+          the cutout area on the long edges (landscape: top/bottom),
+          and we consume the rest via `--safe-*` insets in CSS.
         -->
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
     </style>
