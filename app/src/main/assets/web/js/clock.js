@@ -718,6 +718,23 @@
         }, 1000);
     }
 
+    /* ===== Viewport sizing =====
+     *
+     * Android WebView's `100vh` and Tailwind's `h-screen` can include the
+     * area behind translucent status / nav bars before our immersive flags
+     * have applied, causing the bottom of the layout to be clipped. We
+     * track the *real* viewport via window.innerHeight and expose it as
+     * a CSS custom property `--app-vh` that the `.app-screen` class reads.
+     */
+    function syncViewportHeight() {
+        try {
+            const h = window.innerHeight;
+            if (h > 0) {
+                document.documentElement.style.setProperty('--app-vh', h + 'px');
+            }
+        } catch (e) { /* noop */ }
+    }
+
     /* ===== Settings button ===== */
     function wireGear() {
         const gear = $('#gearBtn');
@@ -734,6 +751,7 @@
     /* ===== init ===== */
     function init() {
         loadFromBridge();
+        syncViewportHeight();
         mountLayout(state.cfg.layout || 'minimal');
         applyConfigToDom();
         applySlideshow();
@@ -741,6 +759,11 @@
         tickDigital();
         setInterval(tickDigital, 1000);
         requestAnimationFrame(tickAnalog);
+
+        // Re-measure when the viewport changes — covers immersive mode
+        // applying after first paint, screen rotation, and split-screen.
+        window.addEventListener('resize', syncViewportHeight);
+        window.addEventListener('orientationchange', syncViewportHeight);
 
         loadHijri();
         loadPrayerTimes();
