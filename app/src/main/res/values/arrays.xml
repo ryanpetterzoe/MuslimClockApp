@@ -100,4 +100,21 @@
         <item>terminal</item>
         <item>sunset</item>
     </string-array>
+
+    <!-- Quran rotation card display modes. -->
+    <string-array name="quran_mode_entries">
+        <item>Full Card (Auto-fit) ★ ANTI-KEPOTONG</item>
+        <item>Kartu Statis</item>
+        <item>Typewriter</item>
+        <item>Slide Animasi</item>
+        <item>Running Text (Marquee)</item>
+    </string-array>
+
+    <string-array name="quran_mode_values">
+        <item>fullcard</item>
+        <item>card</item>
+        <item>typewriter</item>
+        <item>slide</item>
+        <item>marquee</item>
+    </string-array>
 </resources>

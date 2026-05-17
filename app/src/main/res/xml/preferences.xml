@@ -112,6 +112,15 @@
             app:title="@string/pref_show_quran"
             app:defaultValue="true" />
 
+        <ListPreference
+            app:key="quran_mode"
+            app:title="@string/pref_quran_mode"
+            app:summary="@string/pref_quran_mode_sum"
+            app:entries="@array/quran_mode_entries"
+            app:entryValues="@array/quran_mode_values"
+            app:defaultValue="fullcard"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:key="quran_interval"
             app:title="@string/pref_quran_interval"

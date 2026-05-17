@@ -49,6 +49,8 @@
 | 5 | feat/slideshow | Slideshow background URL list + crossfade |
 | 6 | feat/file-picker | File picker galeri + WebViewAssetLoader migration |
 | 8 | fix/viewport-clipped | Viewport fix: h-screen → app-screen + --app-vh JS |
+| 21 | feat/quran-rotation-ticker-fix | Quran ayat rotation (single mode) + ticker fix |
+| 23 | feat/quran-modes-and-fix | Fix show_quran toggle bug + 5 mode types (fullcard/card/typewriter/slide/marquee) |
 
 ## BUG MASIH OPEN
 
@@ -96,7 +98,9 @@ font_display, font_digital,
 adzan_message, adzan_duration, iqomah_duration,
 show_analog, show_countdown,
 layout,
-slideshow_urls, slide_duration
+slideshow_urls, slide_duration,
+show_ticker, ticker_text, ticker_speed,
+show_quran, quran_interval, quran_mode
 ```
 
 ## Cara Build
