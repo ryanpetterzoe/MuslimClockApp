@@ -136,6 +136,17 @@ class MainActivity : AppCompatActivity() {
                     or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 )
         }
+
+        // The system bars hide animates over a few frames. Tell the page
+        // to re-measure once that's done so `--app-vh` matches the final
+        // visible area, otherwise the layout's bottom edge gets clipped.
+        webView.postDelayed({
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript(
+                    "window.dispatchEvent(new Event('resize'));", null
+                )
+            }
+        }, 350)
     }
 
     private fun openSettings() {
