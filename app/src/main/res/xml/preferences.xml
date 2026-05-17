@@ -95,11 +95,6 @@
             app:title="@string/pref_show_countdown"
             app:defaultValue="true" />
 
-        <SwitchPreferenceCompat
-            app:key="show_gear"
-            app:title="@string/pref_show_gear"
-            app:summary="@string/pref_show_gear_sum"
-            app:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_ticker">

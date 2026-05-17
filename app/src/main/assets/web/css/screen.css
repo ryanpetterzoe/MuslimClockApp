@@ -211,6 +211,30 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 #debugBar button:hover { background: rgba(40,50,70,1); }
 
+/* ---------- Gear icon: very faint (samar) until interaction ----------
+ * The icon is always rendered so the user can still find Settings,
+ * but its resting opacity is very low (nearly invisible) to avoid
+ * distracting from the clock display on a public masjid screen.
+ * On hover (mouse), focus (D-pad / Tab), or touch the opacity rises
+ * to fully visible so the user can tap/click it.
+ */
+.gear-samar {
+    opacity: 0.12;
+    transition: opacity 0.35s ease, transform 0.25s ease;
+    cursor: pointer;
+}
+.gear-samar:hover,
+.gear-samar:focus,
+.gear-samar:focus-visible {
+    opacity: 1;
+    transform: scale(1.1);
+    outline: none;
+}
+.gear-samar:active {
+    opacity: 1;
+    transform: scale(0.95);
+}
+
 /* Hide scrollbars */
 ::-webkit-scrollbar { display: none; }
 
