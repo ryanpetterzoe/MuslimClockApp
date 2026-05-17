@@ -139,7 +139,7 @@
       Each entry is a Google Font that's already preloaded by index.html
       via the multi-family request, so no extra network calls required.
       Values are exact CSS font-family names so we can plug them straight
-      into the --font-display custom property.
+      into the -font-display custom property.
     -->
     <string-array name="font_display_entries">
         <item>Inter (Default)</item>
