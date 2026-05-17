@@ -32,8 +32,6 @@
     <string name="pref_theme_accent_sum">Warna sorot untuk aksen tampilan</string>
     <string name="pref_show_analog">Tampilkan Jam Analog</string>
     <string name="pref_show_countdown">Tampilkan Hitung Mundur</string>
-    <string name="pref_show_gear">Tampilkan Ikon Pengaturan</string>
-    <string name="pref_show_gear_sum">Saat dimatikan, buka pengaturan dengan tombol MENU pada remote, atau tekan-tahan OK / Enter</string>
 
     <string name="pref_layout">Tema Tampilan</string>
     <string name="pref_layout_sum">Pilih bagaimana jam &amp; jadwal sholat ditampilkan</string>
