@@ -197,17 +197,57 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_MENU -> { openSettings(); true }
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                webView.evaluateJavascript(
-                    "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
-                    null
-                )
-                true
+        when (keyCode) {
+            KeyEvent.KEYCODE_MENU,
+            KeyEvent.KEYCODE_SETTINGS -> {
+                openSettings()
+                return true
             }
-            else -> super.onKeyDown(keyCode, event)
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
+                // We use the long-press / short-press dance so the same
+                // key serves two purposes:
+                //   - tap   → forward Enter to the WebView (dismisses
+                //             the adzan overlay etc.)
+                //   - hold  → open native Settings
+                // Calling startTracking() on the first down event arms
+                // both onKeyLongPress and the "is this a deliberate
+                // press?" check we use in onKeyUp.
+                if (event != null && event.repeatCount == 0) {
+                    event.startTracking()
+                    return true
+                }
+                // Subsequent repeats while the key is held: swallow them
+                // so the WebView doesn't see a flood of Enter events.
+                return true
+            }
         }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+            keyCode == KeyEvent.KEYCODE_ENTER) {
+            openSettings()
+            return true
+        }
+        return super.onKeyLongPress(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if ((keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+             keyCode == KeyEvent.KEYCODE_ENTER)
+            && event != null && event.isTracking && !event.isCanceled) {
+            // The press was tracked AND it wasn't cancelled by a
+            // long-press → it's a genuine tap. Forward the synthetic
+            // Enter to the WebView so JS handlers (e.g. dismiss adzan)
+            // still work as before.
+            webView.evaluateJavascript(
+                "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
+                null
+            )
+            return true
+        }
+        return super.onKeyUp(keyCode, event)
     }
 
     override fun onPause() {

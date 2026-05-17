@@ -65,6 +65,18 @@ class SettingsActivity : AppCompatActivity() {
             updateClearSummary()
         }
 
+        /**
+         * Route custom DialogPreference subclasses (color picker,
+         * location search) through their own dialog fragments. The
+         * default PreferenceFragmentCompat doesn't know how to inflate
+         * them, so we intercept here.
+         */
+        override fun onDisplayPreferenceDialog(preference: Preference) {
+            if (maybeShowColorPicker(preference)) return
+            if (maybeShowLocationSearch(preference)) return
+            super.onDisplayPreferenceDialog(preference)
+        }
+
         private fun onImagesPicked(uris: List<Uri>) {
             val ctx = requireContext()
             // For ACTION_OPEN_DOCUMENT URIs we get a long-lived permission
