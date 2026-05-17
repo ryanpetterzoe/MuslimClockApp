@@ -12,6 +12,10 @@ import java.util.UUID
  * here are served back to the WebView through [WebViewAssetLoader] under the
  * virtual host `https://appassets.androidplatform.net/slides/<name>`.
  *
+ * Both still images and short video clips are accepted — the web side
+ * autoplays videos muted on a loop. Video files have a larger size budget
+ * because even a 5-second 720p clip easily clears the image cap.
+ *
  * We never expose `file://` paths to the WebView — that would require
  * `setAllowFileAccess(true)` and is widely flagged by review tools.
  */
@@ -20,12 +24,23 @@ object SlideStorage {
     /** Path served by WebViewAssetLoader. Keep in sync with MainActivity. */
     const val URL_PREFIX = "https://appassets.androidplatform.net/slides/"
 
-    /** Anything bigger than this is silently rejected to keep the APK
-     *  responsive on slow TV boxes; users see a toast in [importImage]. */
-    private const val MAX_BYTES = 8L * 1024 * 1024  // 8 MB
+    /** Cap for still-image imports — keeps the APK responsive on TV boxes. */
+    private const val MAX_IMAGE_BYTES = 8L  * 1024 * 1024  // 8 MB
 
-    private val ALLOWED_MIME = setOf(
+    /** Larger cap for video imports — short masjid promo clips run ~10-30 MB. */
+    private const val MAX_VIDEO_BYTES = 64L * 1024 * 1024  // 64 MB
+
+    private val ALLOWED_IMAGE_MIME = setOf(
         "image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"
+    )
+
+    /**
+     * Conservative video formats — anything Android WebView's stock video
+     * decoder reliably plays back. AV1 / HEVC etc. depend on device codec
+     * support so we keep them out by default.
+     */
+    private val ALLOWED_VIDEO_MIME = setOf(
+        "video/mp4", "video/webm", "video/3gpp", "video/x-matroska", "video/quicktime"
     )
 
     fun dir(ctx: Context): File =
@@ -34,14 +49,20 @@ object SlideStorage {
     /**
      * Copy the picked content URI into private storage. Returns the public
      * `appassets` URL on success, or null if the file is too big / wrong
-     * type / unreadable.
+     * type / unreadable. Accepts both images and a small set of video
+     * MIME types — see [ALLOWED_IMAGE_MIME] / [ALLOWED_VIDEO_MIME].
      */
     fun importImage(ctx: Context, uri: Uri): String? {
         val cr = ctx.contentResolver
         val mime = resolveMime(cr, uri) ?: return null
-        if (mime !in ALLOWED_MIME) return null
 
-        val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime) ?: "img"
+        val isVideo = mime in ALLOWED_VIDEO_MIME
+        val isImage = mime in ALLOWED_IMAGE_MIME
+        if (!isVideo && !isImage) return null
+        val maxBytes = if (isVideo) MAX_VIDEO_BYTES else MAX_IMAGE_BYTES
+
+        val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
+            ?: if (isVideo) "mp4" else "img"
         val name = "${UUID.randomUUID()}.$ext"
         val target = File(dir(ctx), name)
 
@@ -54,7 +75,7 @@ object SlideStorage {
                     val r = input.read(buf)
                     if (r < 0) break
                     copied += r
-                    if (copied > MAX_BYTES) {
+                    if (copied > maxBytes) {
                         out.close()
                         target.delete()
                         return null

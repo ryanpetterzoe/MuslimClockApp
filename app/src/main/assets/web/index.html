@@ -37,7 +37,15 @@ window.MC_CONFIG = {
     layout: "minimal",
     show_quran: true,
     quran_interval: 30,
-    quran_mode: "fullcard"
+    quran_mode: "fullcard",
+    show_imam: true,
+    imam_fajr: "",
+    imam_dhuhr: "",
+    imam_asr: "",
+    imam_maghrib: "",
+    imam_isha: "",
+    imam_jumat: "",
+    khatib_jumat: "",
     show_gear: true   // visible in browser preview so the icon is reachable
 };
 </script>
@@ -185,8 +193,17 @@ window.MC_CONFIG = {
     <div class="absolute inset-0" style="background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--primary) 30%, transparent), transparent 60%), radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 60%);"></div>
     <div class="relative text-center text-white">
         <div class="text-7xl font-black tracking-[10px]" id="ovPrayer" style="color: var(--accent);">MAGHRIB</div>
-        <div class="text-7xl font-extrabold mt-4 mb-10" id="ovMsg">Saatnya Waktu Sholat</div>
-        <div class="font-digital font-black leading-none tabular-nums text-white" id="ovCount" style="font-size: 14rem;">10:00</div>
+        <div class="text-7xl font-extrabold mt-4 mb-6" id="ovMsg">Saatnya Waktu Sholat</div>
+        <!-- Imam / khatib block. JS reveals only when names are configured. -->
+        <div id="ovImamBlock" class="mt-2 mb-6" style="display:none;">
+            <div class="text-xl tracking-[4px] uppercase font-semibold" style="color: color-mix(in srgb, var(--accent) 70%, white);" id="ovImamLabel">Imam</div>
+            <div class="text-4xl font-bold mt-2" id="ovImamName" style="color:#fff;">—</div>
+            <div class="text-xl mt-3" id="ovKhatibLine" style="display:none;color: color-mix(in srgb, var(--accent) 70%, white);">
+                <span class="tracking-[4px] uppercase font-semibold">Khatib</span>
+                <span class="font-bold ml-3" style="color:#fff;" id="ovKhatibName">—</span>
+            </div>
+        </div>
+        <div class="font-digital font-black leading-none tabular-nums text-white" id="ovCount" style="font-size: 12rem;">10:00</div>
         <div class="text-3xl mt-4 tracking-[6px] uppercase" id="ovSub" style="color: color-mix(in srgb, var(--accent) 80%, white);">Berlangsung</div>
     </div>
 </div>

@@ -44,8 +44,9 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            // Multi-select image picker. ACTION_OPEN_DOCUMENT under the
-            // hood — gives us a content:// URI we can immediately copy.
+            // Multi-select picker for both images and videos. We pass two
+            // MIME prefixes; ACTION_OPEN_DOCUMENT uses the union, which is
+            // what every Android gallery picker supports.
             pickImagesLauncher = registerForActivityResult(
                 ActivityResultContracts.OpenMultipleDocuments()
             ) { uris -> if (!uris.isNullOrEmpty()) onImagesPicked(uris) }
@@ -55,7 +56,7 @@ class SettingsActivity : AppCompatActivity() {
             setPreferencesFromResource(R.xml.preferences, rootKey)
 
             findPreference<Preference>("pick_slides")?.setOnPreferenceClickListener {
-                pickImagesLauncher.launch(arrayOf("image/*"))
+                pickImagesLauncher.launch(arrayOf("image/*", "video/*"))
                 true
             }
             findPreference<Preference>("clear_slides")?.setOnPreferenceClickListener {
@@ -66,15 +67,25 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         /**
-         * Route custom DialogPreference subclasses (color picker,
-         * location search) through their own dialog fragments. The
-         * default PreferenceFragmentCompat doesn't know how to inflate
-         * them, so we intercept here.
+         * Route custom DialogPreference subclasses (color picker) through
+         * their own dialog fragments. The default PreferenceFragmentCompat
+         * doesn't know how to inflate them, so we intercept here.
          */
         override fun onDisplayPreferenceDialog(preference: Preference) {
             if (maybeShowColorPicker(preference)) return
-            if (maybeShowLocationSearch(preference)) return
             super.onDisplayPreferenceDialog(preference)
+        }
+
+        /**
+         * Plain Preference (non-DialogPreference) clicks come through here.
+         * Location search lives on a regular Preference because a
+         * DialogPreference forces an AlertDialog with a scrollable container
+         * that breaks our inner ListView item-clicks (the original symptom:
+         * tapping a city closed the whole SettingsActivity).
+         */
+        override fun onPreferenceTreeClick(preference: Preference): Boolean {
+            if (maybeShowLocationSearch(preference)) return true
+            return super.onPreferenceTreeClick(preference)
         }
 
         private fun onImagesPicked(uris: List<Uri>) {

@@ -1,8 +1,8 @@
 package id.muslimclock.app
 
+import android.app.Dialog
 import android.content.Context
 import android.location.Geocoder
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,65 +13,54 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
-import androidx.preference.DialogPreference
+import androidx.fragment.app.DialogFragment
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceDialogFragmentCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import java.util.Locale
 import java.util.concurrent.Executors
 
 /**
- * A "pick a city" preference. Stores nothing of its own — when the user
- * picks a result the dialog writes lat / lng / timezone into three
- * separate string preferences via [PreferenceManager.getDefaultSharedPreferences].
+ * A "pick a city" preference. Clicking the row opens a custom DialogFragment
+ * that lets the user search Indonesian cities and (optionally) fall back to
+ * the device geocoder. When the user picks a result, lat / lng / timezone
+ * are written together to the same SharedPreferences keys other prefs read.
  *
- * Why not three independent preferences? The whole point of the picker
- * is to set them as an atomic group: it makes no sense for someone to
- * end up with Surabaya's latitude but Jakarta's timezone. So the
- * preference is a click-only entry and we write the trio in one
- * `apply()`.
- *
- * Search strategy:
- *  1. Substring match against the bundled [IndonesianCities] list.
- *     Always available, no permissions, instant.
- *  2. If the query has 4+ chars and no match was found locally, fall
- *     back to [Geocoder] (debounced) so users in non-Indonesian or
- *     small towns can still find their location. Geocoder runs off-
- *     thread and skips silently if the device has no service.
+ * We deliberately do NOT extend [DialogPreference] / use
+ * [PreferenceDialogFragmentCompat]. That path wraps our content in an
+ * AlertDialog with a forced scrollable container plus OK/Cancel buttons —
+ * the nested-scroll interaction with our inner ListView swallows / mis-routes
+ * row clicks, which on the original implementation made tapping a result
+ * dismiss the dialog AND finish SettingsActivity, dumping the user back to
+ * the clock screen. Owning the dialog ourselves avoids that entire mess.
  */
 class LocationSearchPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = androidx.preference.R.attr.dialogPreferenceStyle,
+    defStyleAttr: Int = androidx.preference.R.attr.preferenceStyle,
     defStyleRes: Int = 0
-) : DialogPreference(context, attrs, defStyleAttr, defStyleRes) {
+) : Preference(context, attrs, defStyleAttr, defStyleRes) {
 
     companion object {
-        // Three SharedPreferences keys the bundled config flow already uses.
         const val K_LAT = Settings.K_LAT
         const val K_LNG = Settings.K_LNG
         const val K_TZ  = Settings.K_TIMEZONE
     }
 
     init {
-        // We never read/write our own value — but we still need a key
-        // so PreferenceFragment can route the dialog. The XML supplies
-        // it ("location_picker").
+        // Preference is purely a launcher — value lives in lat/lng/tz prefs.
         isPersistent = false
     }
 
-    /**
-     * Render summary based on the current lat/lng saved in
-     * SharedPreferences. Re-bound whenever any of the underlying values
-     * change (Preference framework calls notifyChanged on the host
-     * after edits, which we trigger from the dialog).
-     */
+    /** Renders summary based on the currently saved lat/lng/timezone. */
     override fun onBindViewHolder(holder: androidx.preference.PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -90,13 +79,6 @@ class LocationSearchPreference @JvmOverloads constructor(
         }
     }
 
-    /** Public trigger so the dialog can request a rebind after writing prefs. */
-    fun refreshSummary() {
-        // Setting summary to itself triggers the framework's notifyChanged()
-        // internally, which re-binds the view holder.
-        summary = summary
-    }
-
     /** Best-effort match: identifies the city by within-0.05° proximity. */
     private fun matchKnownCity(latS: String, lngS: String): IndoCity? {
         val lat = latS.toDoubleOrNull() ?: return null
@@ -108,14 +90,14 @@ class LocationSearchPreference @JvmOverloads constructor(
     }
 }
 
-
 /**
- * Dialog backing [LocationSearchPreference].
- *
- * UI: a search EditText on top, a ListView of results below. Tapping a
- * row writes the trio (lat, lng, timezone) and dismisses.
+ * Standalone DialogFragment that hosts the picker UI. Returned from
+ * [maybeShowLocationSearch] when the host PreferenceFragment intercepts the
+ * click. We hold a reference to the host fragment so that on commit we can
+ * call the proper Preference setters (which keeps summaries / dependents in
+ * sync without us having to mutate them by hand).
  */
-class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
+class LocationSearchDialogFragment : DialogFragment() {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val geocoderExecutor = Executors.newSingleThreadExecutor()
@@ -124,18 +106,60 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
     private lateinit var adapter: ResultAdapter
     private lateinit var emptyView: TextView
 
-    override fun onCreateDialogView(context: Context): View {
-        val density = context.resources.displayMetrics.density
+    /**
+     * Host PreferenceFragment. Cached at attach time so we can flow
+     * the picked city into its bound EditTextPreference / ListPreference
+     * objects directly (which fires their own change listeners). This
+     * avoids the brittle targetFragment dance the old version used.
+     */
+    private var hostFragmentRef: PreferenceFragmentCompat? = null
+
+    fun bindHost(host: PreferenceFragmentCompat) {
+        hostFragmentRef = host
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // A bare Dialog so we get a normal window — no AlertDialog scroll
+        // container, no implicit OK/Cancel buttons, no fight with ListView.
+        val dialog = Dialog(requireContext(), theme)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setTitle(getString(R.string.pref_location_search))
+        return dialog
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val ctx = requireContext()
+        val density = ctx.resources.displayMetrics.density
         fun dp(v: Int) = (v * density).toInt()
 
-        val root = LinearLayout(context).apply {
+        val root = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(12), dp(20), dp(8))
+            setBackgroundColor(0xFF1E1E1E.toInt())
+            setPadding(dp(20), dp(16), dp(20), dp(16))
+            // Fill the dialog window so the ListView gets real height.
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
         }
 
-        val searchInput = EditText(context).apply {
-            hint = context.getString(R.string.pref_location_search_hint)
+        val title = TextView(ctx).apply {
+            text = ctx.getString(R.string.pref_location_search)
+            textSize = 18f
+            setTextColor(0xFFFFFFFF.toInt())
+            setPadding(0, 0, 0, dp(8))
+        }
+        root.addView(title)
+
+        val searchInput = EditText(ctx).apply {
+            hint = ctx.getString(R.string.pref_location_search_hint)
             isSingleLine = true
+            setTextColor(0xFFFFFFFF.toInt())
+            setHintTextColor(0xFF999999.toInt())
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -143,14 +167,21 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
         }
         root.addView(searchInput)
 
-        val listView = ListView(context).apply {
+        val listView = ListView(ctx).apply {
+            // Visible divider helps the user identify rows on dark themes.
+            divider = null
+            isClickable = true
+            isFocusable = true
+            // The 1f weight lets the ListView consume all remaining vertical
+            // space inside the LinearLayout, which is essential — otherwise
+            // it ends up 0px tall and clicks land on the underlying scrim.
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
+                0,
                 1f
             ).apply { topMargin = dp(8) }
         }
-        adapter = ResultAdapter(context)
+        adapter = ResultAdapter(ctx)
         listView.adapter = adapter
         listView.setOnItemClickListener { _, _, position, _ ->
             val item = adapter.getItem(position) as? IndoCity ?: return@setOnItemClickListener
@@ -158,12 +189,12 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
         }
         root.addView(listView)
 
-        emptyView = TextView(context).apply {
-            text = context.getString(R.string.pref_location_search_empty)
+        emptyView = TextView(ctx).apply {
+            text = ctx.getString(R.string.pref_location_search_empty)
             gravity = Gravity.CENTER
             setPadding(0, dp(16), 0, 0)
             visibility = View.GONE
-            setTextColor(0xFF777777.toInt())
+            setTextColor(0xFF999999.toInt())
         }
         root.addView(emptyView)
 
@@ -174,12 +205,22 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val q = s?.toString().orEmpty()
-                runSearch(q)
+                runSearch(s?.toString().orEmpty())
             }
         })
 
         return root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Make the dialog occupy a usable portion of the screen — default
+        // wrap_content from Dialog gives us a tiny stub that the ListView
+        // can't scroll inside.
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
     }
 
     private fun runSearch(query: String) {
@@ -187,16 +228,13 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
         adapter.replaceAll(local)
         emptyView.visibility = if (local.isEmpty()) View.VISIBLE else View.GONE
 
-        // Cancel any pending geocoder run.
         pendingGeocode?.let { mainHandler.removeCallbacks(it) }
         pendingGeocode = null
 
-        // Only fall back to Geocoder when local set is unhelpful and the
-        // query is meaningful (avoids hitting it on every keystroke).
         if (query.length < 4) return
         val task = Runnable { geocodeAsync(query) }
         pendingGeocode = task
-        mainHandler.postDelayed(task, 450)   // debounce
+        mainHandler.postDelayed(task, 450)
     }
 
     private fun geocodeAsync(query: String) {
@@ -220,8 +258,7 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
                 emptyList()
             }
             mainHandler.post {
-                if (results.isEmpty()) return@post
-                // Append after the local matches, de-duplicated by name.
+                if (results.isEmpty() || !isAdded) return@post
                 val existing = adapter.snapshot().map { it.name.lowercase() }.toMutableSet()
                 val merged = adapter.snapshot().toMutableList()
                 for (r in results) {
@@ -233,56 +270,67 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
         }
     }
 
-    /**
-     * Indonesia spans three IANA zones; rough longitude split:
-     *   - WIB  (Asia/Jakarta)   <  ~116.0
-     *   - WITA (Asia/Makassar)  ≥ ~116.0 and < ~134.0
-     *   - WIT  (Asia/Jayapura)  ≥ ~134.0
-     * Outside Indonesia we just default to Asia/Jakarta — the user can
-     * adjust manually via the timezone preference if needed.
-     */
     private fun inferTzFromLng(lng: Double): String = when {
         lng >= 134.0 -> "Asia/Jayapura"
         lng >= 116.0 -> "Asia/Makassar"
         else         -> "Asia/Jakarta"
     }
 
+    /**
+     * Persist the picked city. We:
+     *   1. Write SharedPreferences directly (atomic group commit).
+     *   2. Push the same values into the host PreferenceFragment's
+     *      bound prefs so summaries / dependent UI refresh immediately
+     *      and the framework's change listeners fire correctly.
+     *   3. Dismiss this DialogFragment — the host SettingsActivity is
+     *      untouched and stays in front of the user.
+     */
     private fun commitCity(city: IndoCity) {
-        val pref = preference as? LocationSearchPreference ?: return
-        val sp = PreferenceManager.getDefaultSharedPreferences(pref.context)
+        val ctx = context ?: return
+        val sp = PreferenceManager.getDefaultSharedPreferences(ctx)
         sp.edit()
-            // Match the existing schema: lat/lng are stored as strings.
             .putString(LocationSearchPreference.K_LAT, city.lat.toString())
             .putString(LocationSearchPreference.K_LNG, city.lng.toString())
             .putString(LocationSearchPreference.K_TZ,  city.timezone)
             .apply()
-        // Notify dependent prefs so summaries refresh; the preference
-        // screen rebinds on dismissal anyway.
-        pref.refreshSummary()
-        // Find any sister preferences and rebind their summaries.
-        (preferenceFragmentCompat()
-            ?.findPreference<Preference>(LocationSearchPreference.K_LAT))
-            ?.summary = city.lat.toString()
-        (preferenceFragmentCompat()
-            ?.findPreference<Preference>(LocationSearchPreference.K_LNG))
-            ?.summary = city.lng.toString()
-        (preferenceFragmentCompat()
-            ?.findPreference<Preference>(LocationSearchPreference.K_TZ))
-            ?.let { tzPref ->
-                if (tzPref is androidx.preference.ListPreference) {
-                    tzPref.value = city.timezone
+
+        // Sync the visible Preference objects so the summaries (which use
+        // useSimpleSummaryProvider) update without waiting for a rebind.
+        // Each setter is wrapped individually so a failure (e.g. TZ value
+        // not in the ListPreference's entries) doesn't blow up the others.
+        val host = hostFragmentRef
+        if (host != null && host.isAdded) {
+            runCatching {
+                (host.findPreference<EditTextPreference>(LocationSearchPreference.K_LAT))
+                    ?.text = city.lat.toString()
+            }
+            runCatching {
+                (host.findPreference<EditTextPreference>(LocationSearchPreference.K_LNG))
+                    ?.text = city.lng.toString()
+            }
+            runCatching {
+                val tzPref = host.findPreference<Preference>(LocationSearchPreference.K_TZ)
+                if (tzPref is ListPreference) {
+                    // ListPreference.value silently no-ops if outside entries;
+                    // verify before assigning so we don't leave a stale value.
+                    val entries = tzPref.entryValues?.map { it.toString() } ?: emptyList()
+                    if (city.timezone in entries) {
+                        tzPref.value = city.timezone
+                    } else {
+                        tzPref.summary = city.timezone
+                    }
                 } else {
-                    tzPref.summary = city.timezone
+                    tzPref?.summary = city.timezone
                 }
             }
-        dialog?.dismiss()
-    }
-
-    private fun preferenceFragmentCompat(): PreferenceFragmentCompat? =
-        @Suppress("DEPRECATION") (targetFragment as? PreferenceFragmentCompat)
-
-    override fun onDialogClosed(positiveResult: Boolean) {
-        // Tap-to-pick already commits; nothing to do on OK.
+            // Re-bind the location-search preference so its summary picks
+            // up the new lat/lng/tz immediately.
+            runCatching {
+                host.findPreference<LocationSearchPreference>("location_picker")
+                    ?.notifyChanged()
+            }
+        }
+        dismissAllowingStateLoss()
     }
 
     override fun onDestroy() {
@@ -291,7 +339,6 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
         geocoderExecutor.shutdownNow()
     }
 
-    /** Simple two-line list adapter. */
     private class ResultAdapter(private val ctx: Context) : BaseAdapter() {
         private val data = mutableListOf<IndoCity>()
 
@@ -311,33 +358,38 @@ class LocationSearchDialogFragment : PreferenceDialogFragmentCompat() {
             val view = convertView ?: LayoutInflater.from(ctx)
                 .inflate(android.R.layout.simple_list_item_2, parent, false)
             val item = data[position]
-            (view.findViewById<TextView>(android.R.id.text1)).text = item.name
-            (view.findViewById<TextView>(android.R.id.text2)).text =
-                "${item.province}  ·  ${item.timezone}"
+            (view.findViewById<TextView>(android.R.id.text1)).apply {
+                text = item.name
+                setTextColor(0xFFFFFFFF.toInt())
+            }
+            (view.findViewById<TextView>(android.R.id.text2)).apply {
+                text = "${item.province}  ·  ${item.timezone}"
+                setTextColor(0xFFAAAAAA.toInt())
+            }
             return view
         }
     }
-
-    companion object {
-        fun newInstance(key: String): LocationSearchDialogFragment =
-            LocationSearchDialogFragment().apply {
-                arguments = Bundle().apply { putString(ARG_KEY, key) }
-            }
-    }
 }
 
+/**
+ * Helper that extends Preference's tiny notify-changed surface for
+ * subclasses outside this package can't otherwise reach.
+ */
+private fun LocationSearchPreference.notifyChanged() {
+    // Re-emit the current summary so PreferenceFragment rebinds the view.
+    val s = summary
+    summary = if (s.isNullOrEmpty()) " " else s
+    summary = s
+}
 
 /**
  * Routes location-search clicks from a [PreferenceFragmentCompat]'s
- * onDisplayPreferenceDialog. Mirrors [maybeShowColorPicker] for
- * consistency.
+ * preference click. Returns true if the click was handled.
  */
 fun PreferenceFragmentCompat.maybeShowLocationSearch(preference: Preference): Boolean {
     if (preference !is LocationSearchPreference) return false
     if (parentFragmentManager.findFragmentByTag(TAG_LOCATION) != null) return true
-    val dialog = LocationSearchDialogFragment.newInstance(preference.key)
-    @Suppress("DEPRECATION")
-    dialog.setTargetFragment(this, 0)
+    val dialog = LocationSearchDialogFragment().apply { bindHost(this@maybeShowLocationSearch) }
     dialog.show(parentFragmentManager, TAG_LOCATION)
     return true
 }
