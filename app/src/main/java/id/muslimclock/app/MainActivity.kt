@@ -181,6 +181,15 @@ class MainActivity : AppCompatActivity() {
                 lastSafeAreaJs?.let { webView.evaluateJavascript(it, null) }
             }
         }, 350)
+        // Second pass: some devices need more time for the bars to finish
+        // animating away (e.g. Samsung One UI).
+        webView.postDelayed({
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript(
+                    "window.dispatchEvent(new Event('resize'));", null
+                )
+            }
+        }, 800)
     }
 
     private fun openSettings() {
