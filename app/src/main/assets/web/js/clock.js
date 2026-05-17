@@ -728,7 +728,10 @@
      */
     function syncViewportHeight() {
         try {
-            const h = window.innerHeight;
+            // Prefer visualViewport (more reliable in Android WebView
+            // immersive mode where window.innerHeight can lag behind).
+            const vp = window.visualViewport;
+            const h = vp ? vp.height : window.innerHeight;
             if (h > 0) {
                 document.documentElement.style.setProperty('--app-vh', h + 'px');
             }
@@ -764,6 +767,11 @@
         // applying after first paint, screen rotation, and split-screen.
         window.addEventListener('resize', syncViewportHeight);
         window.addEventListener('orientationchange', syncViewportHeight);
+        // visualViewport fires more reliably on Android WebView when
+        // system bars animate in/out.
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncViewportHeight);
+        }
 
         loadHijri();
         loadPrayerTimes();
