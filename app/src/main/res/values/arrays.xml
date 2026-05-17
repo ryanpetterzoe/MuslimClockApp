@@ -57,6 +57,23 @@
         <item>Cinema (3 kolom)</item>
         <item>Neon (Cyber)</item>
         <item>Classic (Ornamen)</item>
+        <item>Aurora (Gradient)</item>
+        <item>Frame (Bingkai)</item>
+        <item>Stadium (Scoreboard)</item>
+        <item>Magazine (Editorial)</item>
+        <item>Theater (Slideshow)</item>
+        <item>Showcase (Galeri)</item>
+        <item>Split (Dua Sisi)</item>
+        <item>Polaroid (Foto)</item>
+        <item>Window (Jendela)</item>
+        <item>Festival (Pearl)</item>
+        <item>Portrait (Potret)</item>
+        <item>Galaxy (Angkasa)</item>
+        <item>Geometric (Pola)</item>
+        <item>Kinetic (Dinamis)</item>
+        <item>Marble (Marmer)</item>
+        <item>Terminal (Hacker)</item>
+        <item>Sunset (Senja)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -65,5 +82,22 @@
         <item>cinema</item>
         <item>neon</item>
         <item>classic</item>
+        <item>aurora</item>
+        <item>frame</item>
+        <item>stadium</item>
+        <item>magazine</item>
+        <item>theater</item>
+        <item>showcase</item>
+        <item>split</item>
+        <item>polaroid</item>
+        <item>window</item>
+        <item>festival</item>
+        <item>portrait</item>
+        <item>galaxy</item>
+        <item>geometric</item>
+        <item>kinetic</item>
+        <item>marble</item>
+        <item>terminal</item>
+        <item>sunset</item>
     </string-array>
 </resources>
