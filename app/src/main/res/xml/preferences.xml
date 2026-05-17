@@ -190,7 +190,7 @@
             app:min="0"
             app:seekBarIncrement="5"
             app:showSeekBarValue="true"
-            app:defaultValue="70" />
+            app:defaultValue="100" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_imam">

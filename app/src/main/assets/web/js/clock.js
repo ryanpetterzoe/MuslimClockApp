@@ -37,7 +37,7 @@
         layout: 'minimal',
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
         slide_duration: 8,      // seconds per slide
-        slideshow_opacity: 70,  // 0..100 — visual intensity of the slideshow background
+        slideshow_opacity: 100, // 0..100 — visual intensity of the slideshow background (default: full)
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
@@ -222,7 +222,7 @@
         // we map it to the --slide-opacity CSS var that .slide.active reads,
         // so a faded slideshow doesn't fight with the foreground content.
         const op = Math.max(0, Math.min(100, parseInt(cfg.slideshow_opacity, 10)));
-        const opVal = Number.isFinite(op) ? op : 70;
+        const opVal = Number.isFinite(op) ? op : 100;
         document.documentElement.style.setProperty('--slide-opacity', String(opVal / 100));
 
         // Masjid name + address
