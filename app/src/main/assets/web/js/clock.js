@@ -63,7 +63,13 @@
         dhualhijjah: 11, dzulhijjah: 11, zulhijah: 11,
     };
 
-    const SUPPORTED_LAYOUTS = ['minimal', 'mosque', 'cinema', 'neon', 'classic'];
+    const SUPPORTED_LAYOUTS = [
+        'minimal', 'mosque', 'cinema', 'neon', 'classic',
+        'aurora', 'frame', 'stadium', 'magazine',
+        'theater', 'showcase', 'split', 'polaroid',
+        'window', 'festival', 'portrait',
+        'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset'
+    ];
 
     /* ===== State (mutable) ===== */
     const state = {
