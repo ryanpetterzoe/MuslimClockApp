@@ -51,6 +51,8 @@
     <string name="pref_quran_interval_sum">Berapa lama setiap ayat ditampilkan. Default 30 detik.</string>
     <string name="pref_quran_mode">Jenis Tampilan Ayat</string>
     <string name="pref_quran_mode_sum">Pilih cara ayat ditampilkan di layar</string>
+    <string name="pref_quran_marquee_speed">Kecepatan Marquee (detik)</string>
+    <string name="pref_quran_marquee_speed_sum">Khusus mode Marquee — durasi satu putaran penuh seluruh ayat. Lebih kecil = lebih cepat. Default 50 detik (10–300).</string>
     <string name="pref_pick_slides">Tambah Gambar / Video dari Galeri</string>
     <string name="pref_pick_slides_sum">Pilih satu atau beberapa file gambar atau video; otomatis ditambahkan ke daftar slideshow. Video akan diputar otomatis (mute, looping).</string>
     <string name="pref_clear_slides">Hapus Semua Gambar Tersimpan</string>

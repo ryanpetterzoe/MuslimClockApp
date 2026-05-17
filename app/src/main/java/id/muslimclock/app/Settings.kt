@@ -42,6 +42,7 @@ object Settings {
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
     const val K_QURAN_MODE     = "quran_mode"
+    const val K_QURAN_MARQUEE_SPEED = "quran_marquee_speed"
 
     // Imam schedule. One field per prayer slot (same imam every day).
     // Friday extras hold the Jum'at imam + khatib (preacher).
@@ -111,6 +112,7 @@ object Settings {
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
             .putString(K_QURAN_MODE,     "fullcard")
+            .putInt(K_QURAN_MARQUEE_SPEED, 50)
             .putBoolean(K_SHOW_IMAM,     true)
             .putString(K_IMAM_FAJR,      "")
             .putString(K_IMAM_DHUHR,     "")
@@ -170,6 +172,7 @@ object Settings {
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
             put("quran_mode",      str(K_QURAN_MODE,              "fullcard"))
+            put("quran_marquee_speed", p.getInt(K_QURAN_MARQUEE_SPEED, 50).coerceIn(10, 300))
             // Imam schedule. The web side reads these to label the adzan
             // overlay with the responsible imam (and Jum'at khatib).
             put("show_imam",       p.getBoolean(K_SHOW_IMAM, true))
