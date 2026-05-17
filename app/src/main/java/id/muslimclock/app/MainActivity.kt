@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.ViewCompat
 import androidx.webkit.WebViewAssetLoader
 
 /**
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var assetLoader: WebViewAssetLoader
     private var lastConfigSnapshot: String? = null
+    private var lastSafeAreaJs: String? = null
 
     @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,11 +93,43 @@ class MainActivity : AppCompatActivity() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     pushConfigToWeb()
+                    // Re-apply the cached safe-area insets after the page
+                    // (re)loads — the listener may have fired before
+                    // document.documentElement existed.
+                    lastSafeAreaJs?.let { webView.evaluateJavascript(it, null) }
                 }
             }
             webChromeClient = WebChromeClient()
         }
         setContentView(webView)
+
+        // Cutout / system-bar insets: forward them to the page as CSS
+        // custom properties so layouts can dodge the notch and the bottom
+        // navigation area when those briefly reappear (immersive sticky).
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
+            val sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val cutout  = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+            val density = resources.displayMetrics.density.coerceAtLeast(1f)
+            fun toCssPx(px: Int) = (px / density).toInt()
+            val top    = toCssPx(maxOf(sysBars.top, cutout.top))
+            val bottom = toCssPx(maxOf(sysBars.bottom, cutout.bottom))
+            val left   = toCssPx(maxOf(sysBars.left, cutout.left))
+            val right  = toCssPx(maxOf(sysBars.right, cutout.right))
+            val js = """
+                (function(){
+                    var r = document.documentElement;
+                    if (!r) return;
+                    r.style.setProperty('--safe-top',    '${top}px');
+                    r.style.setProperty('--safe-bottom', '${bottom}px');
+                    r.style.setProperty('--safe-left',   '${left}px');
+                    r.style.setProperty('--safe-right',  '${right}px');
+                    window.dispatchEvent(new Event('resize'));
+                })();
+            """.trimIndent()
+            lastSafeAreaJs = js
+            webView.evaluateJavascript(js, null)
+            insets
+        }
 
         webView.loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
     }

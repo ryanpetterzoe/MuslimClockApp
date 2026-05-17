@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Muslim Clock</title>
 
 <!-- Tailwind: bundled locally (offline-friendly) -->
@@ -118,7 +118,7 @@ window.MC_CONFIG = {
     }
     .layout-classic .prayer-row {
         display: grid; grid-template-columns: 60px 1fr auto 1fr; align-items: center;
-        gap: 20px; padding: 14px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
+        gap: 20px; padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .layout-classic .prayer-row.next {
         background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
@@ -202,7 +202,7 @@ window.MC_CONFIG = {
     <div class="slideshow-host absolute inset-0"></div>
     <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(5,8,20,0.55) 0%, rgba(5,8,20,0.85) 60%, rgba(5,8,20,0.95) 100%);"></div>
 
-    <div class="relative z-10 h-full grid" style="grid-template-rows: 80px 1fr auto;">
+    <div class="relative z-10 h-full grid grid-shrink" style="grid-template-rows: minmax(64px, auto) minmax(0, 1fr) auto;">
         <header class="flex items-center justify-between px-10">
             <div class="flex items-center gap-4">
                 <div id="logoBox" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-soft" style="background: var(--primary); color: var(--accent);">&#x262A;</div>
@@ -220,7 +220,7 @@ window.MC_CONFIG = {
             </div>
         </header>
 
-        <main class="flex flex-col items-center justify-center px-10 gap-6">
+        <main class="flex flex-col items-center justify-center px-10 gap-4 min-h-0 overflow-hidden">
             <div id="nextPill" class="glass-dark rounded-full px-6 py-2 flex items-center gap-3 shadow-soft">
                 <span class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent);"></span>
                 <span class="text-[11px] uppercase tracking-[3px] text-slate-300 font-semibold">Menuju</span>
@@ -230,12 +230,12 @@ window.MC_CONFIG = {
             </div>
             <div class="text-center">
                 <div id="digital" class="font-digital font-black tracking-[0.06em] text-white leading-none drop-shadow-[0_8px_30px_rgba(0,0,0,0.8)]"
-                     style="font-size: clamp(120px, 16vw, 220px);">
+                     style="font-size: clamp(72px, min(16vw, 28vh), 220px);">
                     --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">--</span>
                 </div>
             </div>
             <div id="analogWrap" class="flex items-center gap-5">
-                <div data-analog class="w-40 h-40"></div>
+                <div data-analog class="w-32 h-32" style="width: clamp(96px, 14vh, 160px); height: clamp(96px, 14vh, 160px);"></div>
                 <div class="text-left">
                     <div class="text-[10px] uppercase tracking-[3px] text-slate-400 font-semibold">Waktu</div>
                     <div class="text-sm font-semibold text-white">Lokal</div>
@@ -243,31 +243,31 @@ window.MC_CONFIG = {
             </div>
         </main>
 
-        <section class="px-10 pb-8">
+        <section class="px-10 pb-6">
             <div class="grid grid-cols-6 gap-4">
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="fajr">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="fajr">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300">Subuh</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="sunrise">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="sunrise">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300">Syuruq</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="dhuhr">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="dhuhr">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300" id="dhuhrLabel">Dzuhur</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="asr">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="asr">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300">Ashar</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="maghrib">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="maghrib">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300">Maghrib</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-card p-5 backdrop-blur-md" data-key="isha">
+                <div class="prayer prayer-card p-4 backdrop-blur-md" data-key="isha">
                     <div class="label text-xs uppercase tracking-[3px] font-bold text-slate-300">Isya</div>
-                    <div class="font-digital text-4xl font-bold text-white tabular-nums mt-2" data-time>--:--</div>
+                    <div class="font-digital text-3xl font-bold text-white tabular-nums mt-1" data-time>--:--</div>
                 </div>
             </div>
         </section>
@@ -282,7 +282,7 @@ window.MC_CONFIG = {
     <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: var(--accent);"></div>
     <div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full opacity-25 blur-3xl pointer-events-none" style="background: var(--primary);"></div>
 
-    <div class="relative z-10 h-full grid" style="grid-template-rows: 100px 1fr auto;">
+    <div class="relative z-10 h-full grid grid-shrink" style="grid-template-rows: minmax(80px, auto) minmax(0, 1fr) auto;">
         <header class="flex items-center justify-between px-10 border-b" style="border-color: color-mix(in srgb, var(--accent) 30%, transparent);">
             <div class="flex items-center gap-4">
                 <div id="logoBox">
@@ -312,14 +312,14 @@ window.MC_CONFIG = {
             </div>
         </header>
 
-        <main class="grid items-center px-10" style="grid-template-columns: 1fr auto;">
+        <main class="grid items-center px-10 min-h-0 overflow-hidden" style="grid-template-columns: 1fr auto;">
             <div class="text-center">
                 <div class="text-[10px] uppercase tracking-[5px] text-slate-400 font-bold mb-2">Waktu Lokal</div>
                 <div id="digital" class="font-digital font-black tracking-wide text-white leading-none drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)]"
-                     style="font-size: clamp(100px, 14vw, 200px);">
+                     style="font-size: clamp(72px, min(14vw, 26vh), 200px);">
                     --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">--</span>
                 </div>
-                <div id="nextPill" class="mt-6 inline-flex items-center gap-3 glass-dark rounded-full px-6 py-2 shadow-soft">
+                <div id="nextPill" class="mt-4 inline-flex items-center gap-3 glass-dark rounded-full px-6 py-2 shadow-soft">
                     <span class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent);"></span>
                     <span class="text-xs uppercase tracking-[3px] text-slate-300 font-semibold">Menuju</span>
                     <span id="nextLabel" class="text-sm font-bold uppercase" style="color: var(--accent);">—</span>
@@ -327,34 +327,34 @@ window.MC_CONFIG = {
                     <span id="nextCountdown" class="font-digital text-sm font-semibold text-white">--:--:--</span>
                 </div>
             </div>
-            <div id="analogWrap" class="pl-10"><div data-analog class="w-40 h-40"></div></div>
+            <div id="analogWrap" class="pl-10"><div data-analog style="width: clamp(100px, 16vh, 160px); height: clamp(100px, 16vh, 160px);"></div></div>
         </main>
 
-        <section class="px-10 pb-8">
+        <section class="px-10 pb-6">
             <div class="grid grid-cols-6 gap-4">
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="fajr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Subuh</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="fajr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Subuh</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="sunrise">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Syuruq</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="sunrise">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Syuruq</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="dhuhr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2" id="dhuhrLabel">Dzuhur</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="dhuhr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1" id="dhuhrLabel">Dzuhur</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="asr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Ashar</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="asr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Ashar</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="maghrib">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Maghrib</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="maghrib">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Maghrib</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer prayer-grid-cell p-4 text-center backdrop-blur-md" data-key="isha">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Isya</div>
-                    <div class="font-digital text-3xl font-bold text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer prayer-grid-cell p-3 text-center backdrop-blur-md" data-key="isha">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Isya</div>
+                    <div class="font-digital text-2xl font-bold text-white tabular-nums" data-time>--:--</div>
                 </div>
             </div>
         </section>
@@ -365,7 +365,7 @@ window.MC_CONFIG = {
 
 <!-- ============== LAYOUT: CINEMA ============== -->
 <template id="layout-cinema">
-<div class="layout-cinema app-screen grid bg-slate-950" style="grid-template-rows: 92px 1fr;">
+<div class="layout-cinema app-screen grid grid-shrink bg-slate-950" style="grid-template-rows: minmax(76px, auto) minmax(0, 1fr);">
     <header class="bg-gradient-to-r from-white via-slate-50 to-white text-slate-900 flex items-center justify-between px-8 border-b-4 shadow-soft" style="border-color: var(--accent);">
         <div class="flex items-center gap-4">
             <div id="logoBox" class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-deep" style="background: var(--primary); color: var(--accent);">&#x262A;</div>
@@ -445,7 +445,7 @@ window.MC_CONFIG = {
     <div class="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl" style="background: var(--accent);"></div>
     <div class="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl" style="background: var(--primary);"></div>
 
-    <div class="relative z-10 h-full grid" style="grid-template-rows: 80px 1fr auto;">
+    <div class="relative z-10 h-full grid grid-shrink" style="grid-template-rows: minmax(64px, auto) minmax(0, 1fr) auto;">
         <header class="flex items-center justify-between px-10 border-b" style="border-color: rgba(255,255,255,0.08);">
             <div class="flex items-center gap-3">
                 <div id="logoBox" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-deep" style="background: var(--primary); color: var(--accent); box-shadow: 0 0 30px -5px var(--accent);">&#x262A;</div>
@@ -462,14 +462,14 @@ window.MC_CONFIG = {
             </div>
         </header>
 
-        <main class="grid items-center px-10 gap-8" style="grid-template-columns: 1.4fr 1fr;">
+        <main class="grid items-center px-10 gap-6 min-h-0 overflow-hidden" style="grid-template-columns: 1.4fr 1fr;">
             <div class="neon-frame text-center">
                 <div class="text-[10px] uppercase tracking-[6px] text-slate-400 font-bold mb-3">⬢ WAKTU LOKAL ⬢</div>
                 <div id="digital" class="font-digital font-black tracking-[0.06em] leading-none neon-glow"
-                     style="font-size: clamp(120px, 14vw, 200px); color: #fff;">
+                     style="font-size: clamp(72px, min(13vw, 24vh), 200px); color: #fff;">
                     --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">--</span>
                 </div>
-                <div id="nextPill" class="mt-6 inline-flex items-center gap-3 px-5 py-2 rounded-full"
+                <div id="nextPill" class="mt-4 inline-flex items-center gap-3 px-5 py-2 rounded-full"
                      style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);">
                     <span class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent); box-shadow: 0 0 10px var(--accent);"></span>
                     <span class="text-xs uppercase tracking-[3px] text-slate-300 font-semibold">Menuju</span>
@@ -479,35 +479,35 @@ window.MC_CONFIG = {
                 </div>
             </div>
             <div id="analogWrap" class="flex items-center justify-center">
-                <div data-analog class="w-44 h-44"></div>
+                <div data-analog style="width: clamp(112px, 18vh, 176px); height: clamp(112px, 18vh, 176px);"></div>
             </div>
         </main>
 
-        <section class="px-10 pb-8">
+        <section class="px-10 pb-6">
             <div class="grid grid-cols-6 gap-3">
-                <div class="prayer neon-card p-4 text-center" data-key="fajr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Subuh</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="fajr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Subuh</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer neon-card p-4 text-center" data-key="sunrise">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Syuruq</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="sunrise">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Syuruq</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer neon-card p-4 text-center" data-key="dhuhr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2" id="dhuhrLabel">Dzuhur</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="dhuhr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1" id="dhuhrLabel">Dzuhur</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer neon-card p-4 text-center" data-key="asr">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Ashar</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="asr">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Ashar</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer neon-card p-4 text-center" data-key="maghrib">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Maghrib</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="maghrib">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Maghrib</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
-                <div class="prayer neon-card p-4 text-center" data-key="isha">
-                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-2">Isya</div>
-                    <div class="font-digital text-3xl font-black text-white tabular-nums" data-time>--:--</div>
+                <div class="prayer neon-card p-3 text-center" data-key="isha">
+                    <div class="text-[10px] uppercase tracking-[3px] font-bold text-slate-400 mb-1">Isya</div>
+                    <div class="font-digital text-2xl font-black text-white tabular-nums" data-time>--:--</div>
                 </div>
             </div>
         </section>
@@ -521,7 +521,7 @@ window.MC_CONFIG = {
 <div class="layout-classic app-screen relative overflow-hidden">
     <div class="pattern"></div>
 
-    <div class="relative z-10 h-full grid" style="grid-template-rows: auto 1fr;">
+    <div class="relative z-10 h-full grid grid-shrink" style="grid-template-rows: auto minmax(0, 1fr);">
         <header class="px-12 py-5 relative" style="background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 40%, transparent), transparent);">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-5">
@@ -553,16 +553,16 @@ window.MC_CONFIG = {
             <div class="ornament-divider mt-4"><span class="text-2xl">❋</span></div>
         </header>
 
-        <main class="grid px-12 py-6 gap-8 items-center" style="grid-template-columns: 1fr 1.2fr;">
+        <main class="grid px-12 py-4 gap-8 items-center min-h-0 overflow-hidden" style="grid-template-columns: 1fr 1.2fr;">
             <div class="text-center">
-                <div id="analogWrap" class="flex items-center justify-center mb-6">
-                    <div data-analog class="w-52 h-52"></div>
+                <div id="analogWrap" class="flex items-center justify-center mb-4">
+                    <div data-analog style="width: clamp(120px, 22vh, 208px); height: clamp(120px, 22vh, 208px);"></div>
                 </div>
-                <div id="digital" class="font-digital font-black tracking-wide text-white leading-none drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]" style="font-size: 80px;">
+                <div id="digital" class="font-digital font-black tracking-wide text-white leading-none drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]" style="font-size: clamp(48px, min(7vw, 12vh), 80px);">
                     --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.5em;" class="align-top ml-2">--</span>
                 </div>
-                <div class="ornament-divider mt-4 text-sm"><span style="color: var(--accent);">✦</span></div>
-                <div id="nextPill" class="mt-3">
+                <div class="ornament-divider mt-3 text-sm"><span style="color: var(--accent);">✦</span></div>
+                <div id="nextPill" class="mt-2">
                     <div class="text-[10px] uppercase tracking-[4px] text-slate-400 font-semibold">Menuju Sholat</div>
                     <div class="mt-1.5">
                         <span id="nextLabel" class="text-lg font-bold uppercase tracking-wider" style="color: var(--accent);">—</span>
@@ -572,7 +572,7 @@ window.MC_CONFIG = {
                 </div>
             </div>
 
-            <div class="rounded-2xl overflow-hidden" style="background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.3)); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px -10px rgba(0,0,0,0.5);">
+            <div class="rounded-2xl overflow-hidden self-stretch flex flex-col" style="background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.3)); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px -10px rgba(0,0,0,0.5);">
                 <div class="px-6 py-3 border-b border-white/10 flex items-center justify-between" style="background: color-mix(in srgb, var(--primary) 30%, transparent);">
                     <span class="text-xs uppercase tracking-[3px] font-bold" style="color: var(--accent);">Jadwal Sholat Hari Ini</span>
                     <span class="text-xs text-slate-400" style="font-size:14px;">مَوَاقِيتُ الصَّلاَةِ</span>
