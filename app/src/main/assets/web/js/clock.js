@@ -37,6 +37,7 @@
         layout: 'minimal',
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
         slide_duration: 8,      // seconds per slide
+        slideshow_opacity: 70,  // 0..100 — visual intensity of the slideshow background
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
@@ -170,7 +171,12 @@
     function ensureSlideshowHost(host) {
         const root = host.firstElementChild;
         if (!root || !root.classList) return;
-        if (root.querySelector(':scope > .slideshow-host')) return;
+        // Some layouts (e.g. cinema) declare their own .slideshow-host
+        // *nested* inside a subsection rather than as a direct child of
+        // the layout root. We must detect any descendant — otherwise
+        // the auto-injected wrapper covers the whole screen and breaks
+        // multi-column designs like cinema.
+        if (root.querySelector('.slideshow-host')) return;
 
         // Pick a scrim that keeps text contrast working on the layout's
         // existing colour scheme. The dark variant is the right choice
@@ -211,6 +217,13 @@
             document.documentElement.style.setProperty(
                 '--accent-shadow', `color-mix(in srgb, ${cfg.theme_accent} 40%, transparent)`);
         }
+
+        // Slideshow visual intensity. The user picks 0..100% in Settings;
+        // we map it to the --slide-opacity CSS var that .slide.active reads,
+        // so a faded slideshow doesn't fight with the foreground content.
+        const op = Math.max(0, Math.min(100, parseInt(cfg.slideshow_opacity, 10)));
+        const opVal = Number.isFinite(op) ? op : 70;
+        document.documentElement.style.setProperty('--slide-opacity', String(opVal / 100));
 
         // Masjid name + address
         const name = cfg.masjid_name || 'Masjid';

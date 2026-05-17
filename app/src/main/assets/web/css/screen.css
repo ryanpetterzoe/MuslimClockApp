@@ -60,7 +60,7 @@ body {
     background-size: cover;
     background-position: center;
 }
-.slide.active { opacity: 1; }
+.slide.active { opacity: var(--slide-opacity, 1); }
 video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 /* ---------- Marquee ticker ---------- */
