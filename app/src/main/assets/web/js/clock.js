@@ -44,6 +44,7 @@
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
+        quran_marquee_speed: 50, // seconds per full marquee loop (longer = slower)
         show_gear: true,        // gear icon always visible (very faint until focused)
         // Imam schedule: per-prayer name, plus Jum'at-specific imam & khatib.
         // Empty strings ⇒ row hidden in the adzan overlay.
@@ -635,11 +636,11 @@
         }).join('');
         track.innerHTML = parts;
 
-        // Scale animation duration with interval setting (longer interval =
-        // slower scroll). Roughly 2.5s per ayat at default 30s setting.
-        const interval = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30);
-        const dur = Math.max(30, QURAN_AYAT.length * (interval / 12));
-        track.style.animationDuration = dur + 's';
+        // Scroll duration is the user's marquee_speed setting (seconds for
+        // one full loop). Smaller = faster scroll. Clamp to a sane range
+        // so we never trip into a freeze (0s) or imperceptible crawl.
+        const speed = Math.max(10, Math.min(300, parseInt(state.cfg.quran_marquee_speed, 10) || 50));
+        track.style.animationDuration = speed + 's';
 
         reserveQuranSpace(document.getElementById('quranBar'));
     }
