@@ -181,6 +181,16 @@
             app:title="@string/pref_slide_duration"
             app:summary="@string/pref_slide_duration_sum"
             app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            app:key="slideshow_opacity"
+            app:title="@string/pref_slideshow_opacity"
+            app:summary="@string/pref_slideshow_opacity_sum"
+            android:max="100"
+            app:min="0"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_imam">

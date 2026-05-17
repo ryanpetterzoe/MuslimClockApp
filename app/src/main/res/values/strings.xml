@@ -63,6 +63,8 @@
     <string name="pref_slideshow_urls_sum">Satu URL gambar atau video per baris (atau pisahkan dengan koma). Mendukung jpg/png/webp dan mp4/webm. Kosongkan untuk pakai gambar default.</string>
     <string name="pref_slide_duration">Durasi per Slide (detik)</string>
     <string name="pref_slide_duration_sum">Berapa lama tiap gambar tampil sebelum berpindah. Default 8.</string>
+    <string name="pref_slideshow_opacity">Opacity Slideshow</string>
+    <string name="pref_slideshow_opacity_sum">Atur intensitas tampilan background slideshow (0% = tidak terlihat, 100% = penuh). Turunkan jika gambar terlalu gonjreng. Default 100%.</string>
 
     <string name="pref_adzan_message">Pesan Adzan</string>
     <string name="pref_adzan_duration">Durasi Adzan (detik)</string>
