@@ -105,6 +105,20 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_quran">
+
+        <SwitchPreferenceCompat
+            app:key="show_quran"
+            app:title="@string/pref_show_quran"
+            app:defaultValue="true" />
+
+        <EditTextPreference
+            app:key="quran_interval"
+            app:title="@string/pref_quran_interval"
+            app:summary="@string/pref_quran_interval_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/cat_slideshow">
 
         <Preference
