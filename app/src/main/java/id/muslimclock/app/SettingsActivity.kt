@@ -42,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
 
         private lateinit var pickImagesLauncher: ActivityResultLauncher<Array<String>>
         private lateinit var pickLogoLauncher: ActivityResultLauncher<Array<String>>
+        private lateinit var pickAdzanAudioLauncher: ActivityResultLauncher<Array<String>>
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -58,6 +59,12 @@ class SettingsActivity : AppCompatActivity() {
             pickLogoLauncher = registerForActivityResult(
                 ActivityResultContracts.OpenDocument()
             ) { uri -> if (uri != null) onLogoPicked(uri) }
+
+            // Single-select picker for the adzan alarm sound. Same contract
+            // as the logo picker; only one audio file is active at a time.
+            pickAdzanAudioLauncher = registerForActivityResult(
+                ActivityResultContracts.OpenDocument()
+            ) { uri -> if (uri != null) onAdzanAudioPicked(uri) }
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -83,12 +90,26 @@ class SettingsActivity : AppCompatActivity() {
                 confirmClearLogo()
                 true
             }
+            findPreference<Preference>("pick_adzan_audio")?.setOnPreferenceClickListener {
+                // "audio/*" alone is enough on every modern Android — it
+                // catches MP3 / M4A / OGG / WAV / FLAC. We don't pass an
+                // explicit MIME list because some pickers misfile less
+                // common types (e.g. WhatsApp voice notes) and would hide
+                // them from the list otherwise.
+                pickAdzanAudioLauncher.launch(arrayOf("audio/*"))
+                true
+            }
+            findPreference<Preference>("clear_adzan_audio")?.setOnPreferenceClickListener {
+                confirmClearAdzanAudio()
+                true
+            }
             findPreference<Preference>("reset_layout")?.setOnPreferenceClickListener {
                 confirmResetLayout()
                 true
             }
             updateClearSummary()
             updateLogoSummary()
+            updateAdzanAudioSummary()
         }
 
         /**
@@ -255,6 +276,75 @@ class SettingsActivity : AppCompatActivity() {
                     ctx.getString(R.string.pref_pick_logo_sum_local)
                 else ->
                     ctx.getString(R.string.pref_pick_logo_sum_url)
+            }
+        }
+
+        /**
+         * Adzan audio picker callback. Copies the picked audio into
+         * private storage and writes the resulting `appassets://.../audio/<uuid>`
+         * URL straight into the [Settings.K_ADZAN_AUDIO_URL] EditText pref so
+         * the existing JSON config flow picks it up — the WebView's
+         * <audio> element then plays it when adzan triggers.
+         *
+         * Replaces any previous file (handled inside [AudioStorage]) so
+         * uploading a new clip cleanly supersedes the old one.
+         */
+        private fun onAdzanAudioPicked(uri: Uri) {
+            val ctx = requireContext()
+            val url = AudioStorage.importAudio(ctx, uri)
+            if (url == null) {
+                Toast.makeText(ctx, R.string.adzan_audio_import_failed, Toast.LENGTH_LONG).show()
+                return
+            }
+            findPreference<EditTextPreference>(Settings.K_ADZAN_AUDIO_URL)?.text = url
+            Toast.makeText(ctx, R.string.adzan_audio_imported, Toast.LENGTH_SHORT).show()
+            updateAdzanAudioSummary()
+        }
+
+        /**
+         * Confirm + wipe the locally stored adzan audio. Also clears the
+         * `adzan_audio_url` preference *iff* it was pointing at our local
+         * URL — external http(s) URLs typed in by the user are left
+         * alone so we don't surprise them.
+         */
+        private fun confirmClearAdzanAudio() {
+            val ctx = requireContext()
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.clear_adzan_audio_title)
+                .setMessage(R.string.clear_adzan_audio_message)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val removed = AudioStorage.clear(ctx)
+                    val pref = findPreference<EditTextPreference>(Settings.K_ADZAN_AUDIO_URL)
+                    if (pref != null && AudioStorage.isLocalAudioUrl(pref.text)) {
+                        pref.text = ""
+                    }
+                    Toast.makeText(
+                        ctx,
+                        if (removed) R.string.adzan_audio_cleared
+                        else R.string.adzan_audio_nothing_to_clear,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateAdzanAudioSummary()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        /**
+         * Show a friendly hint under the "Upload Suara Adzan" button so
+         * users can tell at a glance whether an alarm sound is currently
+         * configured without scrolling down to the URL field.
+         */
+        private fun updateAdzanAudioSummary() {
+            val ctx = context ?: return
+            val current = Settings.prefs(ctx).getString(Settings.K_ADZAN_AUDIO_URL, "").orEmpty()
+            findPreference<Preference>("pick_adzan_audio")?.summary = when {
+                current.isBlank() ->
+                    ctx.getString(R.string.pref_pick_adzan_audio_sum_empty)
+                AudioStorage.isLocalAudioUrl(current) ->
+                    ctx.getString(R.string.pref_pick_adzan_audio_sum_local)
+                else ->
+                    ctx.getString(R.string.pref_pick_adzan_audio_sum_url)
             }
         }
 

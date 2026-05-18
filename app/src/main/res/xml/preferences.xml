@@ -400,6 +400,33 @@
 
     <PreferenceCategory app:title="@string/cat_adzan">
 
+        <Preference
+            app:key="pick_adzan_audio"
+            app:title="@string/pref_pick_adzan_audio"
+            app:summary="@string/pref_pick_adzan_audio_sum_empty"
+            app:icon="@android:drawable/ic_lock_silent_mode_off" />
+
+        <Preference
+            app:key="clear_adzan_audio"
+            app:title="@string/pref_clear_adzan_audio"
+            app:summary="@string/pref_clear_adzan_audio_sum" />
+
+        <EditTextPreference
+            app:key="adzan_audio_url"
+            app:title="@string/pref_adzan_audio_url"
+            app:summary="@string/pref_adzan_audio_url_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            app:key="adzan_audio_loops"
+            app:title="@string/pref_adzan_audio_loops"
+            app:summary="@string/pref_adzan_audio_loops_sum"
+            android:max="20"
+            app:min="1"
+            app:seekBarIncrement="1"
+            app:showSeekBarValue="true"
+            app:defaultValue="1" />
+
         <EditTextPreference
             app:key="adzan_message"
             app:title="@string/pref_adzan_message"

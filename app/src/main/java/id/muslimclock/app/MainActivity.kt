@@ -66,6 +66,11 @@ class MainActivity : AppCompatActivity() {
                 "/logo/",
                 WebViewAssetLoader.InternalStoragePathHandler(this, LogoStorage.dir(this))
             )
+            // User-uploaded adzan alarm audio: filesDir/audio/* -> /audio/*
+            .addPathHandler(
+                "/audio/",
+                WebViewAssetLoader.InternalStoragePathHandler(this, AudioStorage.dir(this))
+            )
             .build()
 
         webView = WebView(this).apply {
@@ -213,7 +218,8 @@ class MainActivity : AppCompatActivity() {
                 // key serves two purposes:
                 //   - tap   → forward Enter to the WebView (dismisses
                 //             the adzan overlay etc.)
-                //   - hold  → open native Settings
+                //   - hold  → cycle to the next layout/theme.
+                // Settings is reachable via MENU or the gear button.
                 // Calling startTracking() on the first down event arms
                 // both onKeyLongPress and the "is this a deliberate
                 // press?" check we use in onKeyUp.
@@ -232,10 +238,52 @@ class MainActivity : AppCompatActivity() {
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
             keyCode == KeyEvent.KEYCODE_ENTER) {
-            openSettings()
+            // Long-press OK = cycle to the next layout/theme. Settings is
+            // still reachable via the MENU key on the remote and the
+            // floating gear button in the WebView, so we can spend this
+            // gesture on something the user actually does often: trying
+            // out themes from across the room without a keyboard.
+            cycleToNextLayout()
             return true
         }
         return super.onKeyLongPress(keyCode, event)
+    }
+
+    /**
+     * Pick the next layout in [R.array.layout_values], save it to
+     * preferences, push the config to the WebView so the new theme
+     * mounts immediately, and surface a Toast so the user sees which
+     * theme they just landed on.
+     *
+     * Wraps around at the end of the list. If the current value isn't
+     * found (corrupted prefs) we start from the top.
+     */
+    private fun cycleToNextLayout() {
+        val values  = resources.getStringArray(R.array.layout_values)
+        val entries = resources.getStringArray(R.array.layout_entries)
+        if (values.isEmpty()) return
+
+        val prefs = Settings.prefs(this)
+        val current = prefs.getString(Settings.K_LAYOUT, values[0]) ?: values[0]
+        val curIdx = values.indexOf(current).takeIf { it >= 0 } ?: -1
+        val nextIdx = (curIdx + 1) % values.size
+        val nextKey = values[nextIdx]
+        val nextLabel = if (nextIdx < entries.size) entries[nextIdx] else nextKey
+
+        prefs.edit().putString(Settings.K_LAYOUT, nextKey).apply()
+
+        // Force a config push even if pushConfigToWeb's snapshot check
+        // would otherwise short-circuit (it shouldn't here, layout
+        // changed, but be explicit so future cosmetic fields can't
+        // accidentally suppress the update).
+        lastConfigSnapshot = null
+        pushConfigToWeb()
+
+        android.widget.Toast.makeText(
+            this,
+            getString(R.string.theme_switched_to, nextLabel),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
