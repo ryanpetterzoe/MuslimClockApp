@@ -106,7 +106,9 @@
         // New: 5 photo-frame themes (foto + jam besar + jadwal horizontal)
         'gallery', 'journal', 'studio', 'canvas', 'memory',
         // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
-        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon'
+        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
+        // New: 5 vertical prayer-card themes (jadwal sholat tersusun tegak)
+        'vertical', 'pillar', 'stack', 'rack', 'column'
     ];
 
     /* ===== State (mutable) ===== */
@@ -931,6 +933,20 @@
             '--font-digital',
             `"${digital}", "Orbitron", monospace`
         );
+
+        // Re-run the prayer-card auto-fit once the chosen fonts actually
+        // arrive over the network. Without this, switching to a wider
+        // font would leave clipped text on screen until the next clock
+        // tick (or layout change) triggered renderTimes() again.
+        if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+            document.fonts.ready.then(() => {
+                requestAnimationFrame(autoFitPrayerCards);
+            }).catch(() => {});
+        } else {
+            // Older WebView fallback: defer 250ms so the @font-face has
+            // had a chance to load before we measure.
+            setTimeout(autoFitPrayerCards, 250);
+        }
     }
 
     /**
@@ -1630,6 +1646,71 @@
         if (!nextKey) nextKey = 'fajr';
         const next = document.querySelector(`.prayer[data-key="${nextKey}"]`);
         if (next) next.classList.add('next');
+
+        // Cross-font safety: shrink any prayer-card text that overflows
+        // its container. Defer one frame so the DOM has measurable
+        // dimensions (especially after a layout swap).
+        requestAnimationFrame(autoFitPrayerCards);
+    }
+
+    /**
+     * Make sure every prayer-card label and time digit fits its container,
+     * regardless of which Google Font the user picked. The clamp() font
+     * sizes baked into each layout template are tuned for the default
+     * Inter / Orbitron pair; wider-glyph fonts (Press Start 2P, Major
+     * Mono Display, Bungee, Cinzel, Audiowide) and tall-ascender fonts
+     * (Playfair Display, Merriweather) routinely overflow those bounds.
+     *
+     * For each `.prayer` we walk every text-bearing inline / block child
+     * and incrementally shrink its `font-size` until `scrollWidth` no
+     * longer exceeds `clientWidth`. Bounded by a minimum so we never
+     * shrink to illegibility. Idempotent — resets `font-size` first so a
+     * later font swap (or layout change) measures from the baseline.
+     */
+    function autoFitPrayerCards() {
+        const cards = document.querySelectorAll('.prayer');
+        if (!cards.length) return;
+        cards.forEach(card => {
+            // 1) The time digit cell. Strict no-wrap, must fit horizontally.
+            const tEl = card.querySelector('[data-time]');
+            if (tEl) shrinkOneLineToWidth(tEl, 11);
+            // 2) Any other text-bearing leaf inside the card (label /
+            //    pname / ptime / arrow / bullet etc.). We target only
+            //    elements that own direct text nodes so we don't try to
+            //    shrink purely structural wrappers.
+            const candidates = card.querySelectorAll('div, span, strong, p');
+            candidates.forEach(el => {
+                if (el === tEl) return;
+                if (tEl && (tEl.contains(el) || el.contains(tEl))) return;
+                const hasOwnText = Array.from(el.childNodes).some(n =>
+                    n.nodeType === 3 && n.textContent.trim().length > 0);
+                if (!hasOwnText) return;
+                shrinkOneLineToWidth(el, 8);
+            });
+        });
+    }
+
+    /**
+     * Shrink [el]'s font-size step-by-step until its content no longer
+     * overflows horizontally. Bounded by [minPx]. Resets the inline
+     * `font-size` before measuring so we always start from the
+     * stylesheet-defined baseline (re-runnable / idempotent).
+     */
+    function shrinkOneLineToWidth(el, minPx) {
+        if (!el) return;
+        // Reset previous adjustment; we want fresh CSS-defined size.
+        el.style.fontSize = '';
+        // Bail early if the element has no measurable width yet (e.g.
+        // hidden or display:none container). Otherwise the loop would
+        // spin until safety expires.
+        if (!el.clientWidth) return;
+        let safety = 16;
+        while ((el.scrollWidth > el.clientWidth + 1) && safety-- > 0) {
+            const cur = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+            const next = Math.max(minPx, cur - 1);
+            if (next === cur) break;
+            el.style.fontSize = next + 'px';
+        }
     }
 
     function updateNextCountdown(now) {
@@ -1958,6 +2039,23 @@
         // system bars animate in/out.
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', syncViewportHeight);
+        }
+
+        // Prayer-card auto-fit must also re-run on viewport changes
+        // because every clamp() inside the templates is `vw`-relative.
+        // Debounced so we don't burn cycles during a continuous resize.
+        let _autoFitTimer = null;
+        const scheduleAutoFit = () => {
+            if (_autoFitTimer) clearTimeout(_autoFitTimer);
+            _autoFitTimer = setTimeout(() => {
+                _autoFitTimer = null;
+                autoFitPrayerCards();
+            }, 120);
+        };
+        window.addEventListener('resize', scheduleAutoFit);
+        window.addEventListener('orientationchange', scheduleAutoFit);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', scheduleAutoFit);
         }
 
         loadHijri();

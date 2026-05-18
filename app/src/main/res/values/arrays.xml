@@ -104,6 +104,11 @@
         <item>Bulletin (Newsroom) ★ BARU</item>
         <item>Tower (Indigo Besar) ★ BARU</item>
         <item>Beacon (Aksen Glow) ★ BARU</item>
+        <item>Vertical (Daftar Tegak) ★ VERTIKAL</item>
+        <item>Pillar (Pilar Emas Kanan) ★ VERTIKAL</item>
+        <item>Stack (Tumpukan Tengah) ★ VERTIKAL</item>
+        <item>Rack (Rak Kayu Sholat) ★ VERTIKAL</item>
+        <item>Column (Kolom Klasik Ornamen) ★ VERTIKAL</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -155,6 +160,11 @@
         <item>bulletin</item>
         <item>tower</item>
         <item>beacon</item>
+        <item>vertical</item>
+        <item>pillar</item>
+        <item>stack</item>
+        <item>rack</item>
+        <item>column</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
