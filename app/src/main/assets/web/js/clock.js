@@ -98,7 +98,9 @@
         'theater', 'showcase', 'split', 'polaroid',
         'window', 'festival', 'portrait',
         'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset',
-        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise'
+        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
+        'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
+        'celestial', 'rumi', 'andalusia', 'medina', 'batik'
     ];
 
     /* ===== State (mutable) ===== */

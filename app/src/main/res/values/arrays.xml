@@ -84,6 +84,16 @@
         <item>Heritage (Pola Klasik)</item>
         <item>Mono (Hitam Putih)</item>
         <item>Sunrise (Fajar)</item>
+        <item>Arabesque (Islam Klasik)</item>
+        <item>Royal (Kerajaan)</item>
+        <item>Calligraphy (Kaligrafi)</item>
+        <item>Jade (Giok)</item>
+        <item>Ottoman (Turki Usmani)</item>
+        <item>Celestial (Langit)</item>
+        <item>Rumi (Persia)</item>
+        <item>Andalusia (Moor)</item>
+        <item>Medina (Madinah)</item>
+        <item>Batik (Jawa)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -115,6 +125,16 @@
         <item>heritage</item>
         <item>mono</item>
         <item>sunrise</item>
+        <item>arabesque</item>
+        <item>royal</item>
+        <item>calligraphy</item>
+        <item>jade</item>
+        <item>ottoman</item>
+        <item>celestial</item>
+        <item>rumi</item>
+        <item>andalusia</item>
+        <item>medina</item>
+        <item>batik</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -157,6 +177,14 @@
         <item>Amiri (Arab)</item>
         <item>Scheherazade New (Arab)</item>
         <item>Cairo (Latin + Arab)</item>
+        <item>Quicksand (Rounded)</item>
+        <item>Josefin Sans (Stylish)</item>
+        <item>Cormorant Garamond (Elegant Serif)</item>
+        <item>DM Sans (Modern)</item>
+        <item>Space Grotesk (Geometric)</item>
+        <item>Libre Baskerville (Classic Serif)</item>
+        <item>Noto Kufi Arabic (Kufi Arab)</item>
+        <item>El Messiri (Arab Modern)</item>
     </string-array>
 
     <string-array name="font_display_values">
@@ -175,6 +203,14 @@
         <item>Amiri</item>
         <item>Scheherazade New</item>
         <item>Cairo</item>
+        <item>Quicksand</item>
+        <item>Josefin Sans</item>
+        <item>Cormorant Garamond</item>
+        <item>DM Sans</item>
+        <item>Space Grotesk</item>
+        <item>Libre Baskerville</item>
+        <item>Noto Kufi Arabic</item>
+        <item>El Messiri</item>
     </string-array>
 
     <!--
@@ -194,6 +230,11 @@
         <item>Source Code Pro</item>
         <item>IBM Plex Mono</item>
         <item>DSEG7 / Digital-7 (System default)</item>
+        <item>Chakra Petch (Futuristic Thai)</item>
+        <item>Audiowide (Racing)</item>
+        <item>Bungee (Bold Display)</item>
+        <item>Silkscreen (Pixel)</item>
+        <item>Doto (LED Dots)</item>
     </string-array>
 
     <string-array name="font_digital_values">
@@ -208,5 +249,10 @@
         <item>Source Code Pro</item>
         <item>IBM Plex Mono</item>
         <item>monospace</item>
+        <item>Chakra Petch</item>
+        <item>Audiowide</item>
+        <item>Bungee</item>
+        <item>Silkscreen</item>
+        <item>Doto</item>
     </string-array>
 </resources>
