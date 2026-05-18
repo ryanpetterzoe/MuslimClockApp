@@ -87,6 +87,13 @@ object Settings {
     // the clock to come back by itself.
     const val K_START_ON_BOOT = "start_on_boot"
 
+    // Long-press OK on the remote = cycle to the next layout/theme.
+    // Default ON because the gesture is designed for masjid admins to
+    // try out themes from across the room without a keyboard. Some
+    // venues prefer to disable it (e.g. a kid keeps holding OK), so
+    // we surface a toggle in Settings → Sistem.
+    const val K_LONGPRESS_THEME = "longpress_theme"
+
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
 
@@ -166,6 +173,7 @@ object Settings {
             .putInt(K_QURAN_X_PCT,    0)
             .putInt(K_QURAN_Y_PCT,    0)
             .putBoolean(K_START_ON_BOOT, true)
+            .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -237,6 +245,7 @@ object Settings {
             put("quran_x_pct",     p.getInt(K_QURAN_X_PCT,   0).coerceIn(-50, 50))
             put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
+            put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }
