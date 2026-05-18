@@ -53,6 +53,9 @@ object LicenseManager {
         return Secure.getString(ctx.contentResolver, Secure.ANDROID_ID) ?: "unknown"
     }
 
+    /** Firebase RTDB URL — must match the region you created the database in. */
+    private const val DB_URL = "https://muslimclockapp-default-rtdb.asia-southeast1.firebasedatabase.app"
+
     /**
      * Attempt to activate a license code. Calls back on the main thread.
      */
@@ -64,7 +67,7 @@ object LicenseManager {
         }
 
         val deviceId = getDeviceId(ctx)
-        val ref = FirebaseDatabase.getInstance().getReference(DB_PATH).child(trimmed)
+        val ref = FirebaseDatabase.getInstance(DB_URL).getReference(DB_PATH).child(trimmed)
 
         ref.get().addOnSuccessListener { snapshot ->
             if (!snapshot.exists()) {
@@ -130,7 +133,7 @@ object LicenseManager {
         }
 
         val deviceId = getDeviceId(ctx)
-        val ref = FirebaseDatabase.getInstance().getReference(DB_PATH).child(licenseKey)
+        val ref = FirebaseDatabase.getInstance(DB_URL).getReference(DB_PATH).child(licenseKey)
 
         ref.get().addOnSuccessListener { snapshot ->
             if (!snapshot.exists()) {
