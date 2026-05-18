@@ -4,6 +4,9 @@
     <string name="settings_title">Pengaturan</string>
 
     <string name="cat_masjid">Masjid</string>
+    <string name="cat_system">Sistem</string>
+    <string name="pref_start_on_boot">Mulai Otomatis Saat Hidupkan TV</string>
+    <string name="pref_start_on_boot_sum">Aplikasi langsung tampil setelah TV/Android Box dinyalakan. Catatan: di TV/HP merk tertentu (Xiaomi, Realme, Oppo, dsb.) Anda perlu mengaktifkan izin \"Autostart\" di pengaturan sistem.</string>
     <string name="cat_location">Lokasi &amp; Hisab</string>
     <string name="cat_appearance">Tampilan</string>
     <string name="cat_adzan">Adzan &amp; Iqomah</string>
