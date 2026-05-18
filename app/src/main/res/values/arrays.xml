@@ -94,6 +94,16 @@
         <item>Andalusia (Moor)</item>
         <item>Medina (Madinah)</item>
         <item>Batik (Jawa)</item>
+        <item>Gallery (Foto + Jam Besar) ★ BARU</item>
+        <item>Journal (Album Vintage) ★ BARU</item>
+        <item>Studio (Foto Premium) ★ BARU</item>
+        <item>Canvas (Editorial Putih) ★ BARU</item>
+        <item>Memory (Album Hangat) ★ BARU</item>
+        <item>Bigboard (Jam Sholat Besar) ★ BARU</item>
+        <item>Pulpit (Mimbar Hijau Emas) ★ BARU</item>
+        <item>Bulletin (Newsroom) ★ BARU</item>
+        <item>Tower (Indigo Besar) ★ BARU</item>
+        <item>Beacon (Aksen Glow) ★ BARU</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -135,6 +145,16 @@
         <item>andalusia</item>
         <item>medina</item>
         <item>batik</item>
+        <item>gallery</item>
+        <item>journal</item>
+        <item>studio</item>
+        <item>canvas</item>
+        <item>memory</item>
+        <item>bigboard</item>
+        <item>pulpit</item>
+        <item>bulletin</item>
+        <item>tower</item>
+        <item>beacon</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->

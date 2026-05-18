@@ -730,3 +730,185 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-sunrise .prayer.next::before {
     display: none;
 }
+
+
+
+/* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas / memory) ===================== */
+
+/* Shared base for the prayer-row cards in photo layouts. Each layout has
+ * its own .*-card class that picks distinct colours / borders. */
+.layout-gallery .gal-card,
+.layout-studio  .studio-tile {
+    background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.layout-gallery .prayer.next .gal-card,
+.layout-gallery .gal-card.next,
+.layout-studio  .prayer.next .studio-tile,
+.layout-studio  .studio-tile.next {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 12px 36px -10px var(--accent);
+    transform: translateY(-2px);
+}
+.layout-gallery .prayer.next .gal-card [data-time],
+.layout-studio  .prayer.next .studio-tile [data-time] { color: var(--accent); }
+
+.layout-journal .journal-tag {
+    background: rgba(253,230,138,0.06);
+    border: 1px dashed rgba(218,165,32,0.45);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-journal .prayer.next .journal-tag,
+.layout-journal .journal-tag.next {
+    background: rgba(218,165,32,0.18);
+    border-color: #daa520;
+    border-style: solid;
+    box-shadow: 0 6px 20px -6px rgba(218,165,32,0.6);
+}
+.layout-journal .prayer.next .journal-tag [data-time] { color: #fff8e1; }
+
+.layout-canvas .canvas-cell {
+    background: #fff;
+    border: 1px solid rgba(28,25,23,0.15);
+    border-bottom: 3px solid var(--primary);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-canvas .prayer.next .canvas-cell,
+.layout-canvas .canvas-cell.next {
+    background: #1c1917;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.4);
+}
+.layout-canvas .prayer.next .canvas-cell [data-time],
+.layout-canvas .prayer.next .canvas-cell > div:first-child {
+    color: var(--accent) !important;
+}
+
+.layout-memory .mem-card {
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 10px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-memory .prayer.next .mem-card,
+.layout-memory .mem-card.next {
+    background: linear-gradient(180deg, rgba(251,191,36,0.22), rgba(180,83,9,0.12));
+    border-color: #fbbf24;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px -8px rgba(251,191,36,0.55);
+}
+
+/* ===================== BIG-SCHEDULE LAYOUTS (bigboard / pulpit / bulletin / tower / beacon) ===================== */
+
+.layout-bigboard .bb-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-bigboard .prayer.next .bb-card,
+.layout-bigboard .bb-card.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px -8px var(--accent);
+}
+.layout-bigboard .prayer.next .bb-card [data-time] { color: var(--accent); }
+
+.layout-pulpit .pulp-card {
+    background: rgba(218,165,32,0.06);
+    border: 1px solid rgba(218,165,32,0.3);
+    border-top: 3px solid #daa520;
+    border-radius: 8px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-pulpit .prayer.next .pulp-card,
+.layout-pulpit .pulp-card.next {
+    background: linear-gradient(180deg, rgba(218,165,32,0.25), rgba(218,165,32,0.08));
+    border-color: #fef3c7;
+    border-top-color: #fef3c7;
+    box-shadow: 0 12px 36px -10px rgba(218,165,32,0.7), inset 0 0 18px rgba(218,165,32,0.15);
+}
+.layout-pulpit .prayer.next .pulp-card [data-time] { color: #daa520; text-shadow: 0 0 12px rgba(218,165,32,0.6); }
+
+.layout-bulletin .bul-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 4px solid var(--primary);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-bulletin .prayer.next .bul-card,
+.layout-bulletin .bul-card.next {
+    background: var(--primary);
+    border-color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+.layout-bulletin .prayer.next .bul-card [data-time] { color: var(--accent); }
+
+.layout-tower .tw-card {
+    background: rgba(99,102,241,0.07);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-left: 4px solid #6366f1;
+    border-radius: 10px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-tower .prayer.next .tw-card,
+.layout-tower .tw-card.next {
+    background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(99,102,241,0.1));
+    border-color: #a5b4fc;
+    border-left-color: #c7d2fe;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -8px rgba(99,102,241,0.7);
+}
+.layout-tower .prayer.next .tw-card [data-time] { color: #c7d2fe; text-shadow: 0 0 12px rgba(165,180,252,0.6); }
+
+.layout-beacon .bc-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+.layout-beacon .prayer.next .bc-card,
+.layout-beacon .bc-card.next {
+    background: rgba(0,0,0,0.5);
+    border-color: var(--accent);
+    transform: scale(1.03);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 30px var(--accent-shadow), inset 0 0 18px var(--accent-shadow);
+}
+.layout-beacon .prayer.next .bc-card [data-time] {
+    color: var(--accent);
+    text-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-shadow);
+}
+
+/* Override the universal left-bar highlight for layouts that own theirs */
+.layout-gallery .prayer.next::before,
+.layout-journal .prayer.next::before,
+.layout-studio .prayer.next::before,
+.layout-canvas .prayer.next::before,
+.layout-memory .prayer.next::before,
+.layout-bigboard .prayer.next::before,
+.layout-pulpit .prayer.next::before,
+.layout-bulletin .prayer.next::before,
+.layout-tower .prayer.next::before,
+.layout-beacon .prayer.next::before {
+    display: none;
+}
+
+/* Ensure the photo-layout slideshow-host inside the inner frame element
+ * fills its container (the layouts inject .slideshow-host as direct
+ * children of the inner photo frame, so default `position:absolute`
+ * inset:0 already does the job — these are kept as no-op safety nets). */
+.layout-gallery .slideshow-host,
+.layout-journal .slideshow-host,
+.layout-studio  .slideshow-host,
+.layout-canvas  .slideshow-host,
+.layout-memory  .slideshow-host {
+    inset: 0;
+}
