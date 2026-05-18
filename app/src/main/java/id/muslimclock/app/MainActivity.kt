@@ -220,8 +220,7 @@ class MainActivity : AppCompatActivity() {
     /** Set to true when onKeyLongPress fires so onKeyUp doesn't also fire a tap. */
     private var longPressConsumed = false
 
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        if (event == null) return super.dispatchKeyEvent(event)
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val keyCode = event.keyCode
 
         // MENU / SETTINGS: open settings immediately on down.
