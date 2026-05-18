@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- For start-on-boot (auto-launch the clock when the TV powers on). -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Declare TV support; touchscreen NOT required for Android TV. -->
     <uses-feature
@@ -54,5 +56,25 @@
             android:label="@string/settings_title"
             android:theme="@style/Theme.MuslimClock.Settings"
             android:parentActivityName=".MainActivity" />
+
+        <!--
+          Auto-launch the clock after boot when the user has the
+          start-on-boot toggle on. Listens to BOOT_COMPLETED plus the
+          two QUICKBOOT_POWERON variants (HTC's and the legacy
+          unprefixed form some Android TV boxes still send).
+          The receiver itself reads the toggle and bails early if
+          off, so being declared here unconditionally is harmless.
+        -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true"
+            android:enabled="true"
+            android:directBootAware="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

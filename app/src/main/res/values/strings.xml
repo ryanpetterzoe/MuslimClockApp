@@ -8,6 +8,11 @@
     <string name="cat_appearance">Tampilan</string>
     <string name="cat_adzan">Adzan &amp; Iqomah</string>
 
+    <!-- System category (paling atas Settings) -->
+    <string name="cat_system">Sistem</string>
+    <string name="pref_start_on_boot">Mulai Otomatis Saat Hidupkan TV</string>
+    <string name="pref_start_on_boot_sum">Buka aplikasi otomatis saat TV/perangkat dinyalakan setelah mati listrik. Catatan: di sebagian TV (Xiaomi/Realme/Oppo) Anda perlu mengaktifkan \"Autostart\" di pengaturan sistem juga.</string>
+
     <string name="pref_masjid_name">Nama Masjid</string>
     <string name="pref_masjid_name_sum">Misal: Masjid Al-Hidayah</string>
     <string name="pref_masjid_address">Alamat</string>
@@ -104,7 +109,10 @@
     <string name="pref_adzan_audio_loops">Jumlah Pengulangan</string>
     <string name="pref_adzan_audio_loops_sum">Berapa kali nada diputar berturut-turut saat masuk waktu sholat. 1 = sekali, 2 atau lebih akan diulang.</string>
 
-    <string name="hint_settings_remote">Tekan MENU untuk pengaturan.</string>
+    <string name="hint_settings_remote">Tekan MENU untuk pengaturan. Tahan tombol OK pada remote untuk berganti tema.</string>
+
+    <!-- Hint shown when the user holds OK to cycle through layouts. %1$s = layout entry label. -->
+    <string name="theme_switched_to">Tema: %1$s</string>
 
     <!-- Imam schedule -->
     <string name="cat_imam">Jadwal Imam Masjid</string>
