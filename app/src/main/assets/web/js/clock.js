@@ -895,7 +895,7 @@
         if (!overlay) {
             overlay = document.createElement('div');
             overlay.id = 'demoWatermark';
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;';
             overlay.innerHTML = `
                 <div style="background:rgba(0,0,0,0.75);padding:24px 48px;border-radius:16px;text-align:center;border:2px solid rgba(255,255,255,0.3);">
                     <div style="font-size:clamp(24px,4vw,48px);font-weight:900;color:#ff4444;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,0.5);">DEMO VERSION</div>
@@ -1617,12 +1617,14 @@
             if (!_adzanPlayState) return;
             _adzanPlayState.remaining -= 1;
             if (_adzanPlayState.remaining > 0) {
-                // Replay. Setting currentTime first guarantees a fresh
-                // pass even if the file's duration is sub-second
-                // (Android WebView occasionally skips the first play()
-                // call on an already-seeked element otherwise).
-                try { audio.currentTime = 0; } catch (e) { /* readonly while loading */ }
-                audio.play().catch(() => { /* device denied; give up silently */ });
+                // Replay with a small delay to avoid WebView race condition
+                // where setting currentTime=0 + play() on the same tick
+                // can fire 'ended' again immediately on some Android builds.
+                setTimeout(() => {
+                    if (!_adzanPlayState) return;
+                    try { audio.currentTime = 0; } catch (e) { /* readonly while loading */ }
+                    audio.play().catch(() => { /* device denied; give up silently */ });
+                }, 100);
             } else {
                 // All loops done — release the slot so the next adzan
                 // starts cleanly.
@@ -1630,7 +1632,10 @@
             }
         };
 
-        audio.removeEventListener('ended', _adzanPlayState._onEndedAttached || (() => {}));
+        // Clean up any stale listener from a previous play cycle
+        if (_adzanPlayState._onEndedAttached) {
+            audio.removeEventListener('ended', _adzanPlayState._onEndedAttached);
+        }
         audio.addEventListener('ended', onEnded);
         _adzanPlayState._onEndedAttached = onEnded;
 
