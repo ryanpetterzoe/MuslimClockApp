@@ -259,10 +259,22 @@ class MainActivity : AppCompatActivity() {
             }
             KeyEvent.ACTION_UP -> {
                 if (trackingOkKey && !longPressConsumed) {
-                    // Short tap: forward synthetic Enter to JS so handlers
-                    // (e.g. dismiss adzan overlay) still work.
+                    // Short tap: we consumed the down event so WebView never
+                    // saw it, which means the focused element (e.g. gear
+                    // button) won't auto-fire its click handler. Manually
+                    // click the active element AND dispatch a synthetic Enter
+                    // on document so keyboard listeners (adzan overlay
+                    // dismiss etc.) still receive their cue.
                     webView.evaluateJavascript(
-                        "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
+                        "(function(){" +
+                        "  try {" +
+                        "    var el = document.activeElement;" +
+                        "    if (el && el !== document.body && typeof el.click === 'function') {" +
+                        "      el.click();" +
+                        "    }" +
+                        "  } catch(e) {}" +
+                        "  document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));" +
+                        "})();",
                         null
                     )
                 }
