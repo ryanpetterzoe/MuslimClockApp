@@ -30,6 +30,12 @@ object Settings {
     const val K_ADZAN_MESSAGE  = "adzan_message"
     const val K_ADZAN_DURATION = "adzan_duration"
     const val K_IQOMAH_DURATION = "iqomah_duration"
+    // Adzan alarm audio. URL points either to a user-imported file
+    // served via WebViewAssetLoader (appassets://...) or an external
+    // http(s) URL. Loop count: how many times to play the clip in a row
+    // when the prayer time hits; 1 = play once, ≥2 repeats.
+    const val K_ADZAN_AUDIO_URL = "adzan_audio_url"
+    const val K_ADZAN_AUDIO_LOOPS = "adzan_audio_loops"
     const val K_SHOW_ANALOG    = "show_analog"
     const val K_SHOW_COUNTDOWN = "show_countdown"
     const val K_LAYOUT         = "layout"
@@ -100,6 +106,8 @@ object Settings {
             .putString(K_ADZAN_MESSAGE,  "Saatnya Waktu Sholat")
             .putString(K_ADZAN_DURATION, "600")
             .putString(K_IQOMAH_DURATION,"600")
+            .putString(K_ADZAN_AUDIO_URL, "")
+            .putString(K_ADZAN_AUDIO_LOOPS, "1")
             .putBoolean(K_SHOW_ANALOG,   true)
             .putBoolean(K_SHOW_COUNTDOWN,true)
             .putString(K_LAYOUT,         "minimal")
@@ -160,6 +168,12 @@ object Settings {
             put("adzan_message",   str(K_ADZAN_MESSAGE,  "Saatnya Waktu Sholat"))
             put("adzan_duration",  int(K_ADZAN_DURATION,  600))
             put("iqomah_duration", int(K_IQOMAH_DURATION, 600))
+            put("adzan_audio_url",   str(K_ADZAN_AUDIO_URL, ""))
+            // Loops are clamped to a sane band: at minimum once (you
+            // wouldn't pick an alarm sound to never play it), at most
+            // 20 — a 5-min clip × 20 = ~100 minutes, well past the
+            // adzan window even at the longest practical setting.
+            put("adzan_audio_loops", int(K_ADZAN_AUDIO_LOOPS, 1).coerceIn(1, 20))
             put("show_analog",     p.getBoolean(K_SHOW_ANALOG,    true))
             put("show_countdown",  p.getBoolean(K_SHOW_COUNTDOWN, true))
             put("layout",          str(K_LAYOUT,                  "minimal"))

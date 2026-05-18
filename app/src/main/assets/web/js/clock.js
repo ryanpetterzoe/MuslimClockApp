@@ -32,6 +32,10 @@
         adzan_message: 'Saatnya Waktu Sholat',
         adzan_duration: 600,
         iqomah_duration: 600,
+        // Adzan alarm audio. Empty URL = silent (visual overlay only).
+        // Loops controls how many full plays to chain — 1 = once, 2+ = repeat.
+        adzan_audio_url: '',
+        adzan_audio_loops: 1,
         show_analog: true,
         show_countdown: true,
         layout: 'minimal',
@@ -270,6 +274,10 @@
         document.body.dataset.adzanMsg     = cfg.adzan_message || 'Saatnya Waktu Sholat';
         document.body.dataset.adzanDur     = String(cfg.adzan_duration || 600);
         document.body.dataset.iqomahDur    = String(cfg.iqomah_duration || 600);
+        document.body.dataset.adzanAudio   = cfg.adzan_audio_url || '';
+        document.body.dataset.adzanLoops   = String(
+            Math.max(1, Math.min(20, parseInt(cfg.adzan_audio_loops, 10) || 1))
+        );
         document.body.dataset.showAnalog   = cfg.show_analog    ? '1' : '0';
         document.body.dataset.showCountdown= cfg.show_countdown ? '1' : '0';
 
@@ -1465,15 +1473,113 @@
         applyImamToOverlay(key);
         overlay.classList.remove('hidden');
 
+        // Kick off the alarm sound (no-op if no audio URL configured).
+        // We start playback BEFORE the visual countdown so a long
+        // intro/takbir sound aligns with the overlay appearing.
+        playAdzanAlarm();
+
         startCountdown(dur, () => {
             state.adzanActive = false;
             state.iqomahActive = true;
             $('#ovSub').textContent = 'IQOMAH';
+            // Iqomah is a different phase from adzan — no audio loop;
+            // most masjids handle iqomah with a live caller, not a
+            // recording. Stopping here also covers the case where the
+            // configured loops outlast the adzan window itself.
+            stopAdzanAlarm();
             startCountdown(iqDur, () => {
                 state.iqomahActive = false;
                 overlay.classList.add('hidden');
             });
         });
+    }
+
+    /* ===== Adzan alarm audio =====
+     *
+     * Plays the user's chosen audio file (cfg.adzan_audio_url) `loops`
+     * times back-to-back when the prayer time hits. Implementation
+     * notes:
+     *
+     *   - We deliberately do NOT use HTMLMediaElement.loop because that
+     *     would loop forever / can't be used for "play exactly N times".
+     *     Instead we hook `ended` and replay until the configured count
+     *     is reached.
+     *   - Android WebView's autoplay rules: with
+     *     `mediaPlaybackRequiresUserGesture=false` set in MainActivity
+     *     (it is), unmuted programmatic play is allowed. If a future
+     *     build flips that flag back, we attempt to play and silently
+     *     fall back to muted-then-unmute on the first canplay.
+     *   - The adzan duration timer in showAdzan stops audio when the
+     *     user moves into iqomah, so we don't need a separate timeout.
+     */
+    let _adzanPlayState = null;
+
+    function playAdzanAlarm() {
+        const audio = document.getElementById('adzanAudio');
+        if (!audio) return;
+        const url = (document.body.dataset.adzanAudio || '').trim();
+        if (!url) return;   // silent mode: no file configured
+        const loops = Math.max(1, Math.min(20,
+            parseInt(document.body.dataset.adzanLoops, 10) || 1));
+
+        // If we're already mid-play (e.g. somebody fired showAdzan twice
+        // in quick succession), reset and start fresh rather than stack
+        // ended-handlers.
+        stopAdzanAlarm();
+
+        _adzanPlayState = { remaining: loops, src: url };
+
+        const onEnded = () => {
+            // Defensive: bail if we got here after stopAdzanAlarm() ran.
+            if (!_adzanPlayState) return;
+            _adzanPlayState.remaining -= 1;
+            if (_adzanPlayState.remaining > 0) {
+                // Replay. Setting currentTime first guarantees a fresh
+                // pass even if the file's duration is sub-second
+                // (Android WebView occasionally skips the first play()
+                // call on an already-seeked element otherwise).
+                try { audio.currentTime = 0; } catch (e) { /* readonly while loading */ }
+                audio.play().catch(() => { /* device denied; give up silently */ });
+            } else {
+                // All loops done — release the slot so the next adzan
+                // starts cleanly.
+                stopAdzanAlarm();
+            }
+        };
+
+        audio.removeEventListener('ended', _adzanPlayState._onEndedAttached || (() => {}));
+        audio.addEventListener('ended', onEnded);
+        _adzanPlayState._onEndedAttached = onEnded;
+
+        // Fresh src triggers a load() automatically. Setting muted=false
+        // explicitly because WebView's previous slideshow video may have
+        // left the global audio context muted on some builds.
+        audio.muted = false;
+        audio.volume = 1.0;
+        audio.src = url;
+
+        const attempt = audio.play();
+        if (attempt && typeof attempt.catch === 'function') {
+            attempt.catch(() => {
+                // First play rejected. Wait for canplay then retry once.
+                audio.addEventListener('canplay', () => {
+                    audio.play().catch(() => { /* give up — silent adzan */ });
+                }, { once: true });
+            });
+        }
+    }
+
+    function stopAdzanAlarm() {
+        const audio = document.getElementById('adzanAudio');
+        if (!audio) return;
+        if (_adzanPlayState && _adzanPlayState._onEndedAttached) {
+            audio.removeEventListener('ended', _adzanPlayState._onEndedAttached);
+        }
+        _adzanPlayState = null;
+        try {
+            audio.pause();
+            audio.currentTime = 0;
+        } catch (e) { /* not yet loaded */ }
     }
 
     /**
@@ -1540,6 +1646,11 @@
     function hideAdzan() {
         state.adzanActive = false;
         state.iqomahActive = false;
+        // Also kill any in-flight audio so dismissing the overlay
+        // really does silence the alarm. If the user only meant to
+        // hide the visual and keep listening they can let it run on
+        // its own — they won't hit hideAdzan in that flow.
+        stopAdzanAlarm();
         $('#adzanOverlay').classList.add('hidden');
     }
     function startCountdown(seconds, onDone) {

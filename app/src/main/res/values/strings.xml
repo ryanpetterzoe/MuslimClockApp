@@ -74,7 +74,27 @@
     <string name="pref_iqomah_duration">Durasi Iqomah (detik)</string>
     <string name="pref_iqomah_duration_sum">Default 600 = 10 menit</string>
 
-    <string name="hint_settings_remote">Tekan MENU atau tekan-tahan OK pada remote (Enter pada keyboard) untuk membuka pengaturan</string>
+    <string name="pref_pick_adzan_audio">Upload Suara Adzan</string>
+    <string name="pref_pick_adzan_audio_sum_empty">Pilih file audio (MP3/M4A/OGG/WAV) yang akan diputar saat masuk waktu sholat.</string>
+    <string name="pref_pick_adzan_audio_sum_local">Audio aktif: file lokal yang Anda upload. Tap untuk ganti.</string>
+    <string name="pref_pick_adzan_audio_sum_url">Audio aktif: URL eksternal (di field di bawah). Tap untuk upload file dari perangkat sebagai gantinya.</string>
+    <string name="pref_clear_adzan_audio">Hapus Suara Adzan</string>
+    <string name="pref_clear_adzan_audio_sum">Kembali ke mode tanpa suara (hanya overlay visual).</string>
+    <string name="clear_adzan_audio_title">Hapus Suara Adzan?</string>
+    <string name="clear_adzan_audio_message">File audio yang sudah di-upload akan dihapus dari penyimpanan aplikasi. URL eksternal yang Anda ketik manual tidak akan ikut terhapus.</string>
+    <string name="adzan_audio_imported">Suara adzan berhasil diupload</string>
+    <string name="adzan_audio_import_failed">File audio ditolak (terlalu besar atau format tidak didukung)</string>
+    <string name="adzan_audio_cleared">Suara adzan dihapus</string>
+    <string name="adzan_audio_nothing_to_clear">Tidak ada suara adzan tersimpan</string>
+    <string name="pref_adzan_audio_url">URL Suara Adzan (opsional)</string>
+    <string name="pref_adzan_audio_url_sum">Bisa diisi manual dengan URL audio (mis. http://...mp3), atau pakai tombol Upload di atas.</string>
+    <string name="pref_adzan_audio_loops">Jumlah Pengulangan</string>
+    <string name="pref_adzan_audio_loops_sum">Berapa kali nada diputar berturut-turut saat masuk waktu sholat. 1 = sekali, 2 atau lebih akan diulang.</string>
+
+    <!-- Hint shown when the user holds OK to cycle through layouts. %1$s = layout entry label. -->
+    <string name="theme_switched_to">Tema: %1$s</string>
+
+    <string name="hint_settings_remote">Tekan MENU untuk pengaturan. Tahan tombol OK pada remote untuk berganti tema.</string>
 
     <!-- Imam schedule -->
     <string name="cat_imam">Jadwal Imam Masjid</string>
