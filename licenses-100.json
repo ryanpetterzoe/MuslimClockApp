@@ -1,0 +1,504 @@
+{
+  "licenses": {
+    "MC-0B5M2EFM": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-0PBTAYWY": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-0UBKXYY4": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-13GHXJKD": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-1KB5H7XO": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-2JPU53FH": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-2PGDO4HR": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-2SJ9EXAE": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4A8HT804": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4FSHOO6T": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4SCPEEL8": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4SPMLECW": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4VSPNGI8": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-4XLR7EBB": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-56WCS39Q": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-5E10WQJI": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-5VPOGCX8": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-7V4046S9": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-8UKVVHAK": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-9RH41ZT1": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-9YDONMU8": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ABH6ZLAZ": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-AG0EMME3": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ALBH9ZBC": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-AQX27VJZ": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-AV7I7N0Z": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-AW1JKM5U": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-AZK38Y2H": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-B2IRPCJW": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-B4F5YWQN": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-BEJBQUQ3": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-BPT2GQYE": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-BX36Y666": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-CWNDZB4C": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-D67M6AWN": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-EIBFPFQ7": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-FBOOQ6JX": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-FF2E7ZEJ": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-FMJSAPMG": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-FSX73AHL": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-FZODI274": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-G3H3KAZE": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-G95RW304": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-G9K6V87G": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-GLXI3SWJ": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-GPAH0NFD": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-H6ORTAXX": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-H9UEI619": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-HJ6XHHD2": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-HM6IE8FH": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-I86EOOHI": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ILT2KDW6": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ISJB18BL": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ITJUYLDA": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-IVBMTD23": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-IX1BO4G6": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-J1XU3FZN": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-J6OF1QVA": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-JEGNEH3F": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-JV9OOS17": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-KY0IAI1V": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-L7NSUGHY": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-LZRSRAOG": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-MQFHJINR": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-N50ZSH6M": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-OKUA8FN5": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-ON3NYCDN": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-P40HC24W": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-PSCZ24OR": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-Q1009O0W": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-Q2NOYOMY": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-Q8DFHVF0": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-Q8UQIZFW": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-QJRXE0LR": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-QOWAJ2SH": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-QRTH1S85": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-QW6N8BZD": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-R0JOZI8U": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-R7ALOW0B": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-RA825UZA": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-RFYGS5WK": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-RJFFO2A8": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-RNRYRITE": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-SLO5IAB4": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-STC2PH1T": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-SZMB0CEC": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-TFCMCOJA": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-UBRYSJUL": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-V0CB6ARI": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-VLMZDVEI": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-WE5RQ2BP": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-WHVVCP44": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-WJXJN8SP": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-XD5G8AQH": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-XLPORIGR": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-Y1QN0979": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-YGZEJ4L0": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-YI7ZKNZZ": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-YND2SL4B": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    },
+    "MC-YNL1V7EI": {
+      "used": false,
+      "device_id": "",
+      "activated_at": ""
+    }
+  }
+}
