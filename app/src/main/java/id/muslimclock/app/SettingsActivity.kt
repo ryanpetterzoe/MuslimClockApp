@@ -384,6 +384,9 @@ class SettingsActivity : AppCompatActivity() {
                         Settings.K_DATE_SIZE     to 100,
                         Settings.K_DATE_X_PCT    to 0,
                         Settings.K_DATE_Y_PCT    to 0,
+                        Settings.K_NEXT_SIZE     to 100,
+                        Settings.K_NEXT_X_PCT    to 0,
+                        Settings.K_NEXT_Y_PCT    to 0,
                     )
                     for ((key, def) in resets) {
                         findPreference<androidx.preference.SeekBarPreference>(key)?.value = def

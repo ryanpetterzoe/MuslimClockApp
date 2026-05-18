@@ -67,6 +67,7 @@
         prayers_size: 100, prayers_x_pct: 0, prayers_y_pct: 0,
         quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
         date_size:    100, date_x_pct:    0, date_y_pct:    0,
+        next_size:    100, next_x_pct:    0, next_y_pct:    0,
     };
 
     const PRAYER_LABEL_ID = {
@@ -101,7 +102,11 @@
         'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset',
         'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
         'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
-        'celestial', 'rumi', 'andalusia', 'medina', 'batik'
+        'celestial', 'rumi', 'andalusia', 'medina', 'batik',
+        // New: 5 photo-frame themes (foto + jam besar + jadwal horizontal)
+        'gallery', 'journal', 'studio', 'canvas', 'memory',
+        // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
+        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon'
     ];
 
     /* ===== State (mutable) ===== */
@@ -782,6 +787,13 @@
         // float the card up off-screen.
         apply('#quranBar', cfg.quran_size, cfg.quran_x_pct, cfg.quran_y_pct,
               'center bottom');
+
+        // "Menuju Sholat" countdown pill — every layout exposes it under
+        // #nextPill. We transform it independently of the digital clock
+        // (which lives under #digital) so users can enlarge the
+        // countdown without resizing the time.
+        apply('#nextPill', cfg.next_size, cfg.next_x_pct, cfg.next_y_pct,
+              'center center');
 
         // Date block (Gregorian + Hijri). Each layout has its own
         // wrapper — `#greg-date` and `#hij-date` are siblings inside a

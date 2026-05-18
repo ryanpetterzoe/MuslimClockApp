@@ -160,6 +160,10 @@
     <string name="pref_date_x">Geser Tanggal (Horizontal)</string>
     <string name="pref_date_y">Geser Tanggal (Vertikal)</string>
 
+    <string name="pref_next_size">Ukuran "Menuju Sholat"</string>
+    <string name="pref_next_x">Geser "Menuju Sholat" (Horizontal)</string>
+    <string name="pref_next_y">Geser "Menuju Sholat" (Vertikal)</string>
+
     <string name="pref_size_sum">100% = ukuran default. 50–200%.</string>
     <string name="pref_offset_sum">0 = posisi default. -50 sampai +50 (% lebar/tinggi layar).</string>
 
