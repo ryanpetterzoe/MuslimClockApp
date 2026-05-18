@@ -90,6 +90,24 @@ object Settings {
      */
     fun ensureDefaults(ctx: Context) {
         val p = prefs(ctx)
+
+        // Migration: an older build (alarm-adzan PR) wrote
+        // K_ADZAN_AUDIO_LOOPS as a String, but preferences.xml declares
+        // the key as a SeekBarPreference which reads it via getInt().
+        // On devices that ran the buggy build, opening Settings throws
+        // ClassCastException ("String cannot be cast to Integer") the
+        // moment the framework tries to inflate the slider. Detect any
+        // String-typed value here and rewrite it as an Int so the next
+        // Settings open succeeds.
+        runCatching {
+            val raw = p.all[K_ADZAN_AUDIO_LOOPS]
+            if (raw is String) {
+                val n = raw.toIntOrNull()?.coerceIn(1, 20) ?: 1
+                p.edit().remove(K_ADZAN_AUDIO_LOOPS).apply()
+                p.edit().putInt(K_ADZAN_AUDIO_LOOPS, n).apply()
+            }
+        }
+
         if (p.getBoolean("__initialized", false)) return
         p.edit()
             .putString(K_MASJID_NAME,    "Masjid Muslim Clock")
@@ -107,7 +125,7 @@ object Settings {
             .putString(K_ADZAN_DURATION, "600")
             .putString(K_IQOMAH_DURATION,"600")
             .putString(K_ADZAN_AUDIO_URL, "")
-            .putString(K_ADZAN_AUDIO_LOOPS, "1")
+            .putInt(K_ADZAN_AUDIO_LOOPS, 1)
             .putBoolean(K_SHOW_ANALOG,   true)
             .putBoolean(K_SHOW_COUNTDOWN,true)
             .putString(K_LAYOUT,         "minimal")
@@ -173,7 +191,7 @@ object Settings {
             // wouldn't pick an alarm sound to never play it), at most
             // 20 — a 5-min clip × 20 = ~100 minutes, well past the
             // adzan window even at the longest practical setting.
-            put("adzan_audio_loops", int(K_ADZAN_AUDIO_LOOPS, 1).coerceIn(1, 20))
+            put("adzan_audio_loops", p.getInt(K_ADZAN_AUDIO_LOOPS, 1).coerceIn(1, 20))
             put("show_analog",     p.getBoolean(K_SHOW_ANALOG,    true))
             put("show_countdown",  p.getBoolean(K_SHOW_COUNTDOWN, true))
             put("layout",          str(K_LAYOUT,                  "minimal"))
