@@ -44,6 +44,7 @@
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
+        quran_marquee_speed: 50, // seconds per full marquee loop (longer = slower)
         show_gear: true,        // gear icon always visible (very faint until focused)
         // Imam schedule: per-prayer name, plus Jum'at-specific imam & khatib.
         // Empty strings ⇒ row hidden in the adzan overlay.
@@ -243,19 +244,65 @@
         const addrEl = $('#masjidAddress');
         if (addrEl) addrEl.textContent = cfg.masjid_address || '';
 
-        // Logo (only when URL provided AND box still in DOM)
-        if (cfg.masjid_logo) {
-            const box = $('#logoBox');
-            if (box && !box.dataset.replaced) {
-                box.dataset.replaced = '1';
-                const img = document.createElement('img');
-                img.src = cfg.masjid_logo;
-                img.alt = 'logo';
-                img.className = 'object-contain rounded-xl';
-                img.style.width = box.offsetWidth + 'px' || '48px';
-                img.style.height = box.offsetHeight + 'px' || '48px';
-                img.onerror = () => { /* keep placeholder */ };
-                box.replaceChildren(img);
+        // Logo. When the user provides one, the request is "show what
+        // I uploaded, exactly as I uploaded it" — so we strip the
+        // decorative chrome from #logoBox (background colour, rounded
+        // corners, shadow, border) and let the image render as-is,
+        // transparency and all.
+        const box = $('#logoBox');
+        if (box) {
+            const desired = cfg.masjid_logo || '';
+            if (box.dataset.logoSrc !== desired) {
+                box.dataset.logoSrc = desired;
+                if (desired) {
+                    // Capture a definite pixel size before we wipe the
+                    // styles — some layouts (mosque, classic) put the
+                    // size on the inline SVG instead of the box, so
+                    // offsetWidth/Height on the empty box can be 0.
+                    const cs = getComputedStyle(box);
+                    const measured = Math.max(
+                        box.offsetWidth || 0,
+                        box.offsetHeight || 0,
+                        parseFloat(cs.width)  || 0,
+                        parseFloat(cs.height) || 0
+                    );
+                    const size = measured > 0 ? measured : 48;
+
+                    box.style.background    = 'transparent';
+                    box.style.backgroundColor = 'transparent';
+                    box.style.boxShadow     = 'none';
+                    box.style.border        = 'none';
+                    box.style.padding       = '0';
+                    box.style.borderRadius  = '0';
+                    box.style.width         = size + 'px';
+                    box.style.height        = size + 'px';
+
+                    const img = document.createElement('img');
+                    img.src = desired;
+                    img.alt = 'logo';
+                    img.draggable = false;
+                    img.style.width        = '100%';
+                    img.style.height       = '100%';
+                    img.style.objectFit    = 'contain';
+                    img.style.background   = 'transparent';
+                    img.style.borderRadius = '0';
+                    img.onerror = () => {
+                        // Image failed to load — drop the marker so the
+                        // next config push can retry, and leave the box
+                        // empty (better a blank gap than a broken-image
+                        // glyph next to "Masjid Al-Hidayah").
+                        box.removeAttribute('data-logo-src');
+                        box.replaceChildren();
+                    };
+                    box.replaceChildren(img);
+                }
+                // If `desired` is empty we deliberately leave whatever
+                // the layout template provided in place (the default
+                // crescent/star). We don't try to undo the strip-styles
+                // path because, having gone down it, the template's
+                // original chrome is already gone for this DOM node;
+                // the template gets re-cloned cleanly on the next
+                // layout switch.
             }
         }
 
@@ -635,11 +682,11 @@
         }).join('');
         track.innerHTML = parts;
 
-        // Scale animation duration with interval setting (longer interval =
-        // slower scroll). Roughly 2.5s per ayat at default 30s setting.
-        const interval = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30);
-        const dur = Math.max(30, QURAN_AYAT.length * (interval / 12));
-        track.style.animationDuration = dur + 's';
+        // Scroll duration is the user's marquee_speed setting (seconds for
+        // one full loop). Smaller = faster scroll. Clamp to a sane range
+        // so we never trip into a freeze (0s) or imperceptible crawl.
+        const speed = Math.max(10, Math.min(300, parseInt(state.cfg.quran_marquee_speed, 10) || 50));
+        track.style.animationDuration = speed + 's';
 
         reserveQuranSpace(document.getElementById('quranBar'));
     }

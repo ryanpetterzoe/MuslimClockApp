@@ -27,8 +27,8 @@ object SlideStorage {
     /** Cap for still-image imports — keeps the APK responsive on TV boxes. */
     private const val MAX_IMAGE_BYTES = 8L  * 1024 * 1024  // 8 MB
 
-    /** Larger cap for video imports — short masjid promo clips run ~10-30 MB. */
-    private const val MAX_VIDEO_BYTES = 64L * 1024 * 1024  // 64 MB
+    /** Larger cap for video imports — masjid promo clips in HD/4K can be big. */
+    private const val MAX_VIDEO_BYTES = 512L * 1024 * 1024  // 512 MB
 
     private val ALLOWED_IMAGE_MIME = setOf(
         "image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"

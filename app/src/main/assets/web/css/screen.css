@@ -51,6 +51,35 @@ body {
 .font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
 .font-arabic  { font-family: 'Amiri', 'Traditional Arabic', serif; }
 
+/* ---------- Digital clock breathing room ----------
+ * Templates declare the giant `#digital` time element with Tailwind's
+ * `leading-none` (line-height: 1) to keep the layout tight at 100% size.
+ * That works for Orbitron at default weight, but display fonts with
+ * tall ascenders (Press Start 2P, Major Mono Display, JetBrains Mono Bold,
+ * etc.) bleed past the line-box and get clipped — especially when an
+ * ancestor uses `overflow-hidden` (classic layout's glass card does).
+ *
+ * Relax the line-height a touch and reserve a sliver of vertical
+ * padding (in `em` so it scales with the font size). `overflow: visible`
+ * on `#digital` itself lets the glyphs render even if a sibling caps
+ * height. Layout impact at the default font is < 5% taller, which the
+ * surrounding flex containers absorb without reflowing the prayer row.
+ */
+#digital {
+    line-height: 1.15;
+    padding-block: 0.06em;
+    overflow: visible;
+}
+
+/* Classic layout wraps #digital in a `.glass.shadow-deep` card with
+ * `overflow-hidden` to clip the rounded corners. That clip used to crop
+ * the top of any digital font with a tall ascender. Enlarge the rounded
+ * card just enough to fit the relaxed line-height, and let the contents
+ * paint outside the rounded radius (the radius is purely visual). */
+.layout-classic .glass:has(> #digital) {
+    overflow: visible;
+}
+
 /* ---------- Slideshow fade ---------- */
 .slide {
     opacity: 0;

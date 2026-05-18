@@ -41,6 +41,7 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
 
         private lateinit var pickImagesLauncher: ActivityResultLauncher<Array<String>>
+        private lateinit var pickLogoLauncher: ActivityResultLauncher<Array<String>>
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -50,6 +51,13 @@ class SettingsActivity : AppCompatActivity() {
             pickImagesLauncher = registerForActivityResult(
                 ActivityResultContracts.OpenMultipleDocuments()
             ) { uris -> if (!uris.isNullOrEmpty()) onImagesPicked(uris) }
+
+            // Single-select picker for the masjid logo. Different contract
+            // (OpenDocument, not OpenMultipleDocuments) so users can't
+            // accidentally pick five logos at once.
+            pickLogoLauncher = registerForActivityResult(
+                ActivityResultContracts.OpenDocument()
+            ) { uri -> if (uri != null) onLogoPicked(uri) }
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -63,11 +71,24 @@ class SettingsActivity : AppCompatActivity() {
                 confirmClearSlides()
                 true
             }
+            findPreference<Preference>("pick_logo")?.setOnPreferenceClickListener {
+                // Accept all common image MIME types incl. SVG. We *don't*
+                // include svg+xml in the array directly because some
+                // pickers misfile it; "image/*" covers it on every device
+                // we tested.
+                pickLogoLauncher.launch(arrayOf("image/*"))
+                true
+            }
+            findPreference<Preference>("clear_logo")?.setOnPreferenceClickListener {
+                confirmClearLogo()
+                true
+            }
             findPreference<Preference>("reset_layout")?.setOnPreferenceClickListener {
                 confirmResetLayout()
                 true
             }
             updateClearSummary()
+            updateLogoSummary()
         }
 
         /**
@@ -168,6 +189,73 @@ class SettingsActivity : AppCompatActivity() {
             val files = SlideStorage.dir(ctx).listFiles()?.size ?: 0
             findPreference<Preference>("clear_slides")?.summary =
                 resources.getQuantityString(R.plurals.stored_slides_count, files, files)
+        }
+
+        /**
+         * Logo picker callback. Copies the picked image into private
+         * storage and writes the resulting `appassets://.../logo/<uuid>`
+         * URL straight into the [Settings.K_MASJID_LOGO] EditText pref so
+         * the existing JSON config flow picks it up — no extra plumbing.
+         *
+         * We replace any previous logo (handled inside [LogoStorage]) so
+         * uploading a new file always supersedes the old one cleanly.
+         */
+        private fun onLogoPicked(uri: Uri) {
+            val ctx = requireContext()
+            val url = LogoStorage.importLogo(ctx, uri)
+            if (url == null) {
+                Toast.makeText(ctx, R.string.logo_import_failed, Toast.LENGTH_LONG).show()
+                return
+            }
+            findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)?.text = url
+            Toast.makeText(ctx, R.string.logo_imported, Toast.LENGTH_SHORT).show()
+            updateLogoSummary()
+        }
+
+        /**
+         * Confirm + wipe the locally stored logo. Also clears the
+         * `masjid_logo` preference *iff* it was pointing at our local
+         * URL — external http(s) URLs typed in by the user are left
+         * alone so we don't surprise them.
+         */
+        private fun confirmClearLogo() {
+            val ctx = requireContext()
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.clear_logo_title)
+                .setMessage(R.string.clear_logo_message)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val removed = LogoStorage.clear(ctx)
+                    val pref = findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)
+                    if (pref != null && LogoStorage.isLocalLogoUrl(pref.text)) {
+                        pref.text = ""
+                    }
+                    Toast.makeText(
+                        ctx,
+                        if (removed) R.string.logo_cleared else R.string.logo_nothing_to_clear,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateLogoSummary()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        /**
+         * Show a friendly hint under the "Upload Logo" button so users
+         * can tell whether a logo is currently set without diving into
+         * the URL field.
+         */
+        private fun updateLogoSummary() {
+            val ctx = context ?: return
+            val current = Settings.prefs(ctx).getString(Settings.K_MASJID_LOGO, "").orEmpty()
+            findPreference<Preference>("pick_logo")?.summary = when {
+                current.isBlank() ->
+                    ctx.getString(R.string.pref_pick_logo_sum_empty)
+                LogoStorage.isLocalLogoUrl(current) ->
+                    ctx.getString(R.string.pref_pick_logo_sum_local)
+                else ->
+                    ctx.getString(R.string.pref_pick_logo_sum_url)
+            }
         }
 
         /**
