@@ -206,59 +206,72 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_MENU,
-            KeyEvent.KEYCODE_SETTINGS -> {
+    // ─── Key event handling ────────────────────────────────────────────
+    //
+    // WebView is the sole focusable View and it consumes DPAD_CENTER /
+    // ENTER internally, so Activity.onKeyDown is never reached for those
+    // keys. We override dispatchKeyEvent() — which fires BEFORE the View
+    // hierarchy sees the event — to intercept OK/Enter at the Activity
+    // level. This lets us implement the long-press dance (startTracking +
+    // onKeyLongPress + onKeyUp) reliably regardless of WebView focus.
+
+    /** Track whether we are currently managing DPAD_CENTER/ENTER. */
+    private var trackingOkKey = false
+    /** Set to true when onKeyLongPress fires so onKeyUp doesn't also fire a tap. */
+    private var longPressConsumed = false
+
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        if (event == null) return super.dispatchKeyEvent(event)
+        val keyCode = event.keyCode
+
+        // MENU / SETTINGS: open settings immediately on down.
+        if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_SETTINGS) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                 openSettings()
-                return true
             }
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                // Same key serves two purposes via the long-press dance:
-                //   - tap   → forward Enter to the WebView so JS handlers
-                //             (e.g. dismiss adzan overlay) still work.
-                //   - hold  → cycle to the next layout/theme.
-                // Settings stays reachable via MENU on the remote and the
-                // floating gear button in the WebView.
-                if (event != null && event.repeatCount == 0) {
+            return true
+        }
+
+        // Only intercept OK / Enter.
+        if (keyCode != KeyEvent.KEYCODE_DPAD_CENTER && keyCode != KeyEvent.KEYCODE_ENTER) {
+            return super.dispatchKeyEvent(event)
+        }
+
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> {
+                if (event.repeatCount == 0) {
+                    // First press: arm tracking for long-press detection.
+                    trackingOkKey = true
+                    longPressConsumed = false
                     event.startTracking()
-                    return true
                 }
-                // Subsequent repeats while the key is held: swallow them
-                // so the WebView doesn't see a flood of Enter events.
+                // Check if held long enough for a long-press (500ms default).
+                // Android fires repeat events while held; after the long-press
+                // threshold the framework sets FLAG_LONG_PRESS internally, but
+                // since we intercept at dispatchKeyEvent we implement our own
+                // threshold using repeatCount. ~20 repeats ≈ 500ms on most
+                // devices (key repeat starts at ~50ms intervals after initial
+                // delay of ~400ms, so repeatCount >= 1 after ~450ms).
+                if (event.repeatCount == 1 && trackingOkKey && !longPressConsumed) {
+                    longPressConsumed = true
+                    webView.post { cycleToNextLayout() }
+                }
+                return true // consume, don't let WebView see it
+            }
+            KeyEvent.ACTION_UP -> {
+                if (trackingOkKey && !longPressConsumed) {
+                    // Short tap: forward synthetic Enter to JS so handlers
+                    // (e.g. dismiss adzan overlay) still work.
+                    webView.evaluateJavascript(
+                        "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
+                        null
+                    )
+                }
+                trackingOkKey = false
                 return true
             }
         }
-        return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-            keyCode == KeyEvent.KEYCODE_ENTER) {
-            // Defer the actual cycle one frame so we don't run JS eval
-            // / Toast inflation directly inside the input dispatcher
-            // callback. That keeps the key event lifecycle tidy on
-            // older WebView builds and avoids feedback loops if the
-            // WebView is in the middle of layout.
-            webView.post { cycleToNextLayout() }
-            return true
-        }
-        return super.onKeyLongPress(keyCode, event)
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if ((keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-             keyCode == KeyEvent.KEYCODE_ENTER)
-            && event != null && event.isTracking && !event.isCanceled) {
-            // Tracked AND not cancelled by a long-press → genuine tap.
-            // Forward synthetic Enter to JS so adzan dismiss etc. work.
-            webView.evaluateJavascript(
-                "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
-                null
-            )
-            return true
-        }
-        return super.onKeyUp(keyCode, event)
+        return true // swallow any other action (ACTION_MULTIPLE etc.)
     }
 
     /**
