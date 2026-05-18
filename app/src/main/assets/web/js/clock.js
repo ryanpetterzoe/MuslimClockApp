@@ -66,6 +66,7 @@
         digital_size: 100, digital_x_pct: 0, digital_y_pct: 0,
         prayers_size: 100, prayers_x_pct: 0, prayers_y_pct: 0,
         quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
+        date_size:    100, date_x_pct:    0, date_y_pct:    0,
     };
 
     const PRAYER_LABEL_ID = {
@@ -781,6 +782,19 @@
         // float the card up off-screen.
         apply('#quranBar', cfg.quran_size, cfg.quran_x_pct, cfg.quran_y_pct,
               'center bottom');
+
+        // Date block (Gregorian + Hijri). Each layout has its own
+        // wrapper — `#greg-date` and `#hij-date` are siblings inside a
+        // small text-right div in the header. We find that common
+        // ancestor and transform it as a unit so both lines move /
+        // resize together. Origin: top right, since most layouts pin
+        // the date to the right edge of the header.
+        const dateWrap = findDateContainer();
+        if (dateWrap) {
+            apply(uniqueDateSelector(dateWrap),
+                  cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
+                  'top right');
+        }
     }
 
     /**
@@ -818,6 +832,38 @@
         if (!el) return null;
         if (!el.dataset.mcEditorSlot) {
             el.dataset.mcEditorSlot = 'prayers';
+        }
+        return `[data-mc-editor-slot="${el.dataset.mcEditorSlot}"]`;
+    }
+
+    /**
+     * Find the wrapper that contains both `#greg-date` and `#hij-date`
+     * in the active layout. They're always siblings inside a small
+     * text-right div in the header; we walk up from the Gregorian
+     * date until we reach a node that contains the Hijri one too.
+     */
+    function findDateContainer() {
+        const host = document.getElementById('layoutHost');
+        if (!host) return null;
+        const greg = host.querySelector('#greg-date');
+        const hij  = host.querySelector('#hij-date');
+        if (!greg) return null;
+        // Some templates use only one of the two. Fall back to the
+        // single element's parent so the user can still resize it.
+        if (!hij) return greg.parentElement;
+        let node = greg.parentElement;
+        while (node && node !== host) {
+            if (node.contains(hij)) return node;
+            node = node.parentElement;
+        }
+        return greg.parentElement;
+    }
+
+    /** Same idea as [uniqueSelectorFor] but for the date wrapper. */
+    function uniqueDateSelector(el) {
+        if (!el) return null;
+        if (!el.dataset.mcEditorSlot) {
+            el.dataset.mcEditorSlot = 'date';
         }
         return `[data-mc-editor-slot="${el.dataset.mcEditorSlot}"]`;
     }
@@ -1259,10 +1305,37 @@
         checkAdzanTrigger(now);
     }
 
-    /* ===== Hijri date ===== */
+    /* ===== Hijri date =====
+     *
+     * Two sources, in priority order:
+     *   1. Aladhan monthly calendar entry (already cached by
+     *      [loadPrayerTimes]). It carries an authoritative
+     *      `date.hijri` object with numeric month + year, so it
+     *      doesn't depend on the WebView's Intl backend.
+     *   2. Intl.DateTimeFormat with `islamic-umalqura`, as a fallback
+     *      when no calendar data is available yet (first launch
+     *      before the network call returns).
+     *
+     * The historical bug — "1 Desember 1447 H" — came from older
+     * Android WebViews that accept the calendar tag but silently fall
+     * back to Gregorian month names. We detect that here by checking
+     * that the parsed month name matches a known Hijri month; if it
+     * doesn't, we drop the result and try the cache (which is the
+     * common case once the prayer-time fetch completes).
+     */
     function loadHijri() {
         const el = $('#hij-date');
         if (!el) return;
+
+        // 1. Try Aladhan cache first — most reliable on Android.
+        const fromCache = hijriFromCalendarCache(new Date());
+        if (fromCache) {
+            el.textContent = fromCache;
+            return;
+        }
+
+        // 2. Intl fallback. Guarded against the Gregorian-month-name
+        //    fallback bug seen on some Android WebViews.
         try {
             const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
                 day: 'numeric', month: 'long', year: 'numeric'
@@ -1273,16 +1346,75 @@
                 if (p.type === 'month') monthName = p.value;
                 if (p.type === 'year')  year = p.value.replace(/\D/g, '');
             }
-            const key = monthName.toLowerCase().replace(/['‘’`\s\-_.]/g, '');
-            let idx = HIJRI_MAP[key];
+            const idx = hijriMonthIndex(monthName);
             if (idx === undefined) {
-                for (const [m, i] of Object.entries(HIJRI_MAP)) {
-                    if (key.includes(m)) { idx = i; break; }
-                }
+                // WebView returned a Gregorian month → unreliable.
+                // Leave the existing text alone (or blank if none yet)
+                // and wait for the calendar fetch to deliver real data.
+                if (!el.textContent || el.textContent === '—') el.textContent = '';
+                return;
             }
-            const monthId = (idx !== undefined) ? HIJRI_MONTHS_ID[idx] : monthName;
-            el.textContent = `${day} ${monthId} ${year} H`;
-        } catch (e) { el.textContent = ''; }
+            el.textContent = `${day} ${HIJRI_MONTHS_ID[idx]} ${year} H`;
+        } catch (e) {
+            if (!el.textContent || el.textContent === '—') el.textContent = '';
+        }
+    }
+
+    /**
+     * Look up a Hijri month index (0..11) from a month name string.
+     * Tolerant of transliteration variants — strips spaces, dashes,
+     * and apostrophes before matching against [HIJRI_MAP], and also
+     * tries a contains-check for partial transliterations.
+     */
+    function hijriMonthIndex(monthName) {
+        if (!monthName) return undefined;
+        const key = String(monthName).toLowerCase().replace(/['‘’`\s\-_.]/g, '');
+        if (HIJRI_MAP[key] !== undefined) return HIJRI_MAP[key];
+        for (const [m, i] of Object.entries(HIJRI_MAP)) {
+            if (key.includes(m)) return i;
+        }
+        return undefined;
+    }
+
+    /**
+     * Build the Indonesian Hijri date string from the cached Aladhan
+     * monthly calendar. Returns null if the cache hasn't been
+     * populated yet, or if the entry for [now] is missing the hijri
+     * sub-object.
+     *
+     * Aladhan's payload shape (per day):
+     *   date: {
+     *     hijri: { day, month: { number, en, ar }, year, ... },
+     *     gregorian: { day, ... }
+     *   }
+     */
+    function hijriFromCalendarCache(now) {
+        try {
+            const days = readCachedCalendar(now.getFullYear(), now.getMonth() + 1);
+            if (!Array.isArray(days)) return null;
+            const dayNum = now.getDate();
+            const entry = days.find(d => {
+                const dn = d && d.date && d.date.gregorian
+                    && parseInt(d.date.gregorian.day, 10);
+                return dn === dayNum;
+            }) || days[dayNum - 1];
+            const h = entry && entry.date && entry.date.hijri;
+            if (!h) return null;
+            const day = parseInt(h.day, 10);
+            const year = parseInt(h.year, 10);
+            // Prefer the numeric month; fall back to the English name
+            // through our own mapper for older payloads.
+            let idx;
+            if (h.month && h.month.number != null) {
+                idx = parseInt(h.month.number, 10) - 1;
+            }
+            if (idx === undefined || idx < 0 || idx > 11) {
+                idx = hijriMonthIndex(h.month && (h.month.en || h.month.ar));
+            }
+            if (!Number.isFinite(day) || !Number.isFinite(year) ||
+                idx === undefined) return null;
+            return `${day} ${HIJRI_MONTHS_ID[idx]} ${year} H`;
+        } catch (e) { return null; }
     }
 
     /* ===== Prayer times via Aladhan =====
@@ -1398,6 +1530,10 @@
         if (days) {
             const t = timingsFromCalendar(days, dayNum);
             if (t) { state.times = normalizeTimes(t); renderTimes(); }
+            // Cache had hijri info too — refresh the displayed date so
+            // any earlier Intl fallback is replaced by the authoritative
+            // Aladhan value.
+            loadHijri();
         }
 
         if (!days) {
@@ -1406,6 +1542,7 @@
                 writeCachedCalendar(year, month, days);
                 const t = timingsFromCalendar(days, dayNum);
                 if (t) { state.times = normalizeTimes(t); renderTimes(); }
+                loadHijri();
             } catch (e) {
                 console.warn('Monthly calendar fetch failed:', e);
             }
