@@ -10,6 +10,13 @@
             app:summary="@string/pref_start_on_boot_sum"
             app:icon="@android:drawable/ic_lock_power_off"
             app:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            app:key="longpress_theme"
+            app:title="@string/pref_longpress_theme"
+            app:summary="@string/pref_longpress_theme_sum"
+            app:icon="@android:drawable/ic_menu_rotate"
+            app:defaultValue="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_masjid">

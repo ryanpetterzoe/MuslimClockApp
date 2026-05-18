@@ -253,7 +253,14 @@ class MainActivity : AppCompatActivity() {
                 // delay of ~400ms, so repeatCount >= 1 after ~450ms).
                 if (event.repeatCount == 1 && trackingOkKey && !longPressConsumed) {
                     longPressConsumed = true
-                    webView.post { cycleToNextLayout() }
+                    // Respect the user's toggle: long-press cycle is opt-in.
+                    // Read the pref each time so changing the setting takes
+                    // effect immediately without restarting the app.
+                    val enabled = Settings.prefs(this)
+                        .getBoolean(Settings.K_LONGPRESS_THEME, true)
+                    if (enabled) {
+                        webView.post { cycleToNextLayout() }
+                    }
                 }
                 return true // consume, don't let WebView see it
             }

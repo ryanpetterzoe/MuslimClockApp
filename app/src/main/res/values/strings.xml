@@ -12,6 +12,8 @@
     <string name="cat_system">Sistem</string>
     <string name="pref_start_on_boot">Mulai Otomatis Saat Hidupkan TV</string>
     <string name="pref_start_on_boot_sum">Buka aplikasi otomatis saat TV/perangkat dinyalakan setelah mati listrik. Catatan: di sebagian TV (Xiaomi/Realme/Oppo) Anda perlu mengaktifkan \"Autostart\" di pengaturan sistem juga.</string>
+    <string name="pref_longpress_theme">Tahan OK untuk Ganti Tema</string>
+    <string name="pref_longpress_theme_sum">Tahan tombol OK pada remote ~0.5 detik untuk cycle ke tema berikutnya. Matikan jika tidak ingin tema berubah tanpa sengaja.</string>
 
     <string name="pref_masjid_name">Nama Masjid</string>
     <string name="pref_masjid_name_sum">Misal: Masjid Al-Hidayah</string>
