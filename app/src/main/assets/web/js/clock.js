@@ -32,6 +32,10 @@
         adzan_message: 'Saatnya Waktu Sholat',
         adzan_duration: 600,
         iqomah_duration: 600,
+        // Adzan alarm audio. Empty URL = silent (visual overlay only).
+        // Loops controls how many full plays to chain — 1 = once, 2+ = repeat.
+        adzan_audio_url: '',
+        adzan_audio_loops: 1,
         show_analog: true,
         show_countdown: true,
         layout: 'minimal',
@@ -62,6 +66,8 @@
         digital_size: 100, digital_x_pct: 0, digital_y_pct: 0,
         prayers_size: 100, prayers_x_pct: 0, prayers_y_pct: 0,
         quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
+        date_size:    100, date_x_pct:    0, date_y_pct:    0,
+        next_size:    100, next_x_pct:    0, next_y_pct:    0,
     };
 
     const PRAYER_LABEL_ID = {
@@ -94,7 +100,15 @@
         'theater', 'showcase', 'split', 'polaroid',
         'window', 'festival', 'portrait',
         'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset',
-        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise'
+        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
+        'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
+        'celestial', 'rumi', 'andalusia', 'medina', 'batik',
+        // New: 5 photo-frame themes (foto + jam besar + jadwal horizontal)
+        'gallery', 'journal', 'studio', 'canvas', 'memory',
+        // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
+        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
+        // New: 5 vertical prayer-card themes (jadwal sholat tersusun tegak)
+        'vertical', 'pillar', 'stack', 'rack', 'column'
     ];
 
     /* ===== State (mutable) ===== */
@@ -316,6 +330,10 @@
         document.body.dataset.adzanMsg     = cfg.adzan_message || 'Saatnya Waktu Sholat';
         document.body.dataset.adzanDur     = String(cfg.adzan_duration || 600);
         document.body.dataset.iqomahDur    = String(cfg.iqomah_duration || 600);
+        document.body.dataset.adzanAudio   = cfg.adzan_audio_url || '';
+        document.body.dataset.adzanLoops   = String(
+            Math.max(1, Math.min(20, parseInt(cfg.adzan_audio_loops, 10) || 1))
+        );
         document.body.dataset.showAnalog   = cfg.show_analog    ? '1' : '0';
         document.body.dataset.showCountdown= cfg.show_countdown ? '1' : '0';
 
@@ -348,6 +366,9 @@
         // Font selection — load the chosen Google Font on demand and
         // apply it via CSS custom properties.
         applyFonts();
+
+        // License watermark — show "DEMO VERSION" overlay when not Pro.
+        applyLicenseWatermark();
     }
 
     /**
@@ -768,6 +789,26 @@
         // float the card up off-screen.
         apply('#quranBar', cfg.quran_size, cfg.quran_x_pct, cfg.quran_y_pct,
               'center bottom');
+
+        // "Menuju Sholat" countdown pill — every layout exposes it under
+        // #nextPill. We transform it independently of the digital clock
+        // (which lives under #digital) so users can enlarge the
+        // countdown without resizing the time.
+        apply('#nextPill', cfg.next_size, cfg.next_x_pct, cfg.next_y_pct,
+              'center center');
+
+        // Date block (Gregorian + Hijri). Each layout has its own
+        // wrapper — `#greg-date` and `#hij-date` are siblings inside a
+        // small text-right div in the header. We find that common
+        // ancestor and transform it as a unit so both lines move /
+        // resize together. Origin: top right, since most layouts pin
+        // the date to the right edge of the header.
+        const dateWrap = findDateContainer();
+        if (dateWrap) {
+            apply(uniqueDateSelector(dateWrap),
+                  cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
+                  'top right');
+        }
     }
 
     /**
@@ -805,6 +846,38 @@
         if (!el) return null;
         if (!el.dataset.mcEditorSlot) {
             el.dataset.mcEditorSlot = 'prayers';
+        }
+        return `[data-mc-editor-slot="${el.dataset.mcEditorSlot}"]`;
+    }
+
+    /**
+     * Find the wrapper that contains both `#greg-date` and `#hij-date`
+     * in the active layout. They're always siblings inside a small
+     * text-right div in the header; we walk up from the Gregorian
+     * date until we reach a node that contains the Hijri one too.
+     */
+    function findDateContainer() {
+        const host = document.getElementById('layoutHost');
+        if (!host) return null;
+        const greg = host.querySelector('#greg-date');
+        const hij  = host.querySelector('#hij-date');
+        if (!greg) return null;
+        // Some templates use only one of the two. Fall back to the
+        // single element's parent so the user can still resize it.
+        if (!hij) return greg.parentElement;
+        let node = greg.parentElement;
+        while (node && node !== host) {
+            if (node.contains(hij)) return node;
+            node = node.parentElement;
+        }
+        return greg.parentElement;
+    }
+
+    /** Same idea as [uniqueSelectorFor] but for the date wrapper. */
+    function uniqueDateSelector(el) {
+        if (!el) return null;
+        if (!el.dataset.mcEditorSlot) {
+            el.dataset.mcEditorSlot = 'date';
         }
         return `[data-mc-editor-slot="${el.dataset.mcEditorSlot}"]`;
     }
@@ -860,6 +933,52 @@
             '--font-digital',
             `"${digital}", "Orbitron", monospace`
         );
+
+        // Re-run the prayer-card auto-fit once the chosen fonts actually
+        // arrive over the network. Without this, switching to a wider
+        // font would leave clipped text on screen until the next clock
+        // tick (or layout change) triggered renderTimes() again.
+        if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+            document.fonts.ready.then(() => {
+                requestAnimationFrame(autoFitPrayerCards);
+            }).catch(() => {});
+        } else {
+            // Older WebView fallback: defer 250ms so the @font-face has
+            // had a chance to load before we measure.
+            setTimeout(autoFitPrayerCards, 250);
+        }
+    }
+
+    /**
+     * Show or hide the "DEMO VERSION" watermark depending on cfg.is_pro.
+     * When not Pro, a fixed overlay covers the screen with a semi-transparent
+     * banner reminding the user to purchase a license.
+     */
+    function applyLicenseWatermark() {
+        const cfg = state.cfg;
+        const isPro = cfg.is_pro === true;
+        let overlay = document.getElementById('demoWatermark');
+
+        if (isPro) {
+            // Pro user: remove watermark if present
+            if (overlay) overlay.remove();
+            return;
+        }
+
+        // Demo mode: create watermark if not already present
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'demoWatermark';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:rgba(0,0,0,0.75);padding:24px 48px;border-radius:16px;text-align:center;border:2px solid rgba(255,255,255,0.3);">
+                    <div style="font-size:clamp(24px,4vw,48px);font-weight:900;color:#ff4444;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,0.5);">DEMO VERSION</div>
+                    <div style="margin-top:12px;font-size:clamp(14px,2vw,24px);color:#ffffff;font-weight:600;">Hubungi 082325942017</div>
+                    <div style="margin-top:6px;font-size:clamp(11px,1.5vw,16px);color:rgba(255,255,255,0.7);">untuk membeli lisensi Pro</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
     }
 
     /* ===== Slideshow =====
@@ -1214,10 +1333,37 @@
         checkAdzanTrigger(now);
     }
 
-    /* ===== Hijri date ===== */
+    /* ===== Hijri date =====
+     *
+     * Two sources, in priority order:
+     *   1. Aladhan monthly calendar entry (already cached by
+     *      [loadPrayerTimes]). It carries an authoritative
+     *      `date.hijri` object with numeric month + year, so it
+     *      doesn't depend on the WebView's Intl backend.
+     *   2. Intl.DateTimeFormat with `islamic-umalqura`, as a fallback
+     *      when no calendar data is available yet (first launch
+     *      before the network call returns).
+     *
+     * The historical bug — "1 Desember 1447 H" — came from older
+     * Android WebViews that accept the calendar tag but silently fall
+     * back to Gregorian month names. We detect that here by checking
+     * that the parsed month name matches a known Hijri month; if it
+     * doesn't, we drop the result and try the cache (which is the
+     * common case once the prayer-time fetch completes).
+     */
     function loadHijri() {
         const el = $('#hij-date');
         if (!el) return;
+
+        // 1. Try Aladhan cache first — most reliable on Android.
+        const fromCache = hijriFromCalendarCache(new Date());
+        if (fromCache) {
+            el.textContent = fromCache;
+            return;
+        }
+
+        // 2. Intl fallback. Guarded against the Gregorian-month-name
+        //    fallback bug seen on some Android WebViews.
         try {
             const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
                 day: 'numeric', month: 'long', year: 'numeric'
@@ -1228,16 +1374,75 @@
                 if (p.type === 'month') monthName = p.value;
                 if (p.type === 'year')  year = p.value.replace(/\D/g, '');
             }
-            const key = monthName.toLowerCase().replace(/['‘’`\s\-_.]/g, '');
-            let idx = HIJRI_MAP[key];
+            const idx = hijriMonthIndex(monthName);
             if (idx === undefined) {
-                for (const [m, i] of Object.entries(HIJRI_MAP)) {
-                    if (key.includes(m)) { idx = i; break; }
-                }
+                // WebView returned a Gregorian month → unreliable.
+                // Leave the existing text alone (or blank if none yet)
+                // and wait for the calendar fetch to deliver real data.
+                if (!el.textContent || el.textContent === '—') el.textContent = '';
+                return;
             }
-            const monthId = (idx !== undefined) ? HIJRI_MONTHS_ID[idx] : monthName;
-            el.textContent = `${day} ${monthId} ${year} H`;
-        } catch (e) { el.textContent = ''; }
+            el.textContent = `${day} ${HIJRI_MONTHS_ID[idx]} ${year} H`;
+        } catch (e) {
+            if (!el.textContent || el.textContent === '—') el.textContent = '';
+        }
+    }
+
+    /**
+     * Look up a Hijri month index (0..11) from a month name string.
+     * Tolerant of transliteration variants — strips spaces, dashes,
+     * and apostrophes before matching against [HIJRI_MAP], and also
+     * tries a contains-check for partial transliterations.
+     */
+    function hijriMonthIndex(monthName) {
+        if (!monthName) return undefined;
+        const key = String(monthName).toLowerCase().replace(/['‘’`\s\-_.]/g, '');
+        if (HIJRI_MAP[key] !== undefined) return HIJRI_MAP[key];
+        for (const [m, i] of Object.entries(HIJRI_MAP)) {
+            if (key.includes(m)) return i;
+        }
+        return undefined;
+    }
+
+    /**
+     * Build the Indonesian Hijri date string from the cached Aladhan
+     * monthly calendar. Returns null if the cache hasn't been
+     * populated yet, or if the entry for [now] is missing the hijri
+     * sub-object.
+     *
+     * Aladhan's payload shape (per day):
+     *   date: {
+     *     hijri: { day, month: { number, en, ar }, year, ... },
+     *     gregorian: { day, ... }
+     *   }
+     */
+    function hijriFromCalendarCache(now) {
+        try {
+            const days = readCachedCalendar(now.getFullYear(), now.getMonth() + 1);
+            if (!Array.isArray(days)) return null;
+            const dayNum = now.getDate();
+            const entry = days.find(d => {
+                const dn = d && d.date && d.date.gregorian
+                    && parseInt(d.date.gregorian.day, 10);
+                return dn === dayNum;
+            }) || days[dayNum - 1];
+            const h = entry && entry.date && entry.date.hijri;
+            if (!h) return null;
+            const day = parseInt(h.day, 10);
+            const year = parseInt(h.year, 10);
+            // Prefer the numeric month; fall back to the English name
+            // through our own mapper for older payloads.
+            let idx;
+            if (h.month && h.month.number != null) {
+                idx = parseInt(h.month.number, 10) - 1;
+            }
+            if (idx === undefined || idx < 0 || idx > 11) {
+                idx = hijriMonthIndex(h.month && (h.month.en || h.month.ar));
+            }
+            if (!Number.isFinite(day) || !Number.isFinite(year) ||
+                idx === undefined) return null;
+            return `${day} ${HIJRI_MONTHS_ID[idx]} ${year} H`;
+        } catch (e) { return null; }
     }
 
     /* ===== Prayer times via Aladhan =====
@@ -1353,6 +1558,10 @@
         if (days) {
             const t = timingsFromCalendar(days, dayNum);
             if (t) { state.times = normalizeTimes(t); renderTimes(); }
+            // Cache had hijri info too — refresh the displayed date so
+            // any earlier Intl fallback is replaced by the authoritative
+            // Aladhan value.
+            loadHijri();
         }
 
         if (!days) {
@@ -1361,6 +1570,7 @@
                 writeCachedCalendar(year, month, days);
                 const t = timingsFromCalendar(days, dayNum);
                 if (t) { state.times = normalizeTimes(t); renderTimes(); }
+                loadHijri();
             } catch (e) {
                 console.warn('Monthly calendar fetch failed:', e);
             }
@@ -1436,6 +1646,71 @@
         if (!nextKey) nextKey = 'fajr';
         const next = document.querySelector(`.prayer[data-key="${nextKey}"]`);
         if (next) next.classList.add('next');
+
+        // Cross-font safety: shrink any prayer-card text that overflows
+        // its container. Defer one frame so the DOM has measurable
+        // dimensions (especially after a layout swap).
+        requestAnimationFrame(autoFitPrayerCards);
+    }
+
+    /**
+     * Make sure every prayer-card label and time digit fits its container,
+     * regardless of which Google Font the user picked. The clamp() font
+     * sizes baked into each layout template are tuned for the default
+     * Inter / Orbitron pair; wider-glyph fonts (Press Start 2P, Major
+     * Mono Display, Bungee, Cinzel, Audiowide) and tall-ascender fonts
+     * (Playfair Display, Merriweather) routinely overflow those bounds.
+     *
+     * For each `.prayer` we walk every text-bearing inline / block child
+     * and incrementally shrink its `font-size` until `scrollWidth` no
+     * longer exceeds `clientWidth`. Bounded by a minimum so we never
+     * shrink to illegibility. Idempotent — resets `font-size` first so a
+     * later font swap (or layout change) measures from the baseline.
+     */
+    function autoFitPrayerCards() {
+        const cards = document.querySelectorAll('.prayer');
+        if (!cards.length) return;
+        cards.forEach(card => {
+            // 1) The time digit cell. Strict no-wrap, must fit horizontally.
+            const tEl = card.querySelector('[data-time]');
+            if (tEl) shrinkOneLineToWidth(tEl, 11);
+            // 2) Any other text-bearing leaf inside the card (label /
+            //    pname / ptime / arrow / bullet etc.). We target only
+            //    elements that own direct text nodes so we don't try to
+            //    shrink purely structural wrappers.
+            const candidates = card.querySelectorAll('div, span, strong, p');
+            candidates.forEach(el => {
+                if (el === tEl) return;
+                if (tEl && (tEl.contains(el) || el.contains(tEl))) return;
+                const hasOwnText = Array.from(el.childNodes).some(n =>
+                    n.nodeType === 3 && n.textContent.trim().length > 0);
+                if (!hasOwnText) return;
+                shrinkOneLineToWidth(el, 8);
+            });
+        });
+    }
+
+    /**
+     * Shrink [el]'s font-size step-by-step until its content no longer
+     * overflows horizontally. Bounded by [minPx]. Resets the inline
+     * `font-size` before measuring so we always start from the
+     * stylesheet-defined baseline (re-runnable / idempotent).
+     */
+    function shrinkOneLineToWidth(el, minPx) {
+        if (!el) return;
+        // Reset previous adjustment; we want fresh CSS-defined size.
+        el.style.fontSize = '';
+        // Bail early if the element has no measurable width yet (e.g.
+        // hidden or display:none container). Otherwise the loop would
+        // spin until safety expires.
+        if (!el.clientWidth) return;
+        let safety = 16;
+        while ((el.scrollWidth > el.clientWidth + 1) && safety-- > 0) {
+            const cur = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+            const next = Math.max(minPx, cur - 1);
+            if (next === cur) break;
+            el.style.fontSize = next + 'px';
+        }
     }
 
     function updateNextCountdown(now) {
@@ -1511,15 +1786,118 @@
         applyImamToOverlay(key);
         overlay.classList.remove('hidden');
 
+        // Kick off the alarm sound (no-op if no audio URL configured).
+        // We start playback BEFORE the visual countdown so a long
+        // intro/takbir sound aligns with the overlay appearing.
+        playAdzanAlarm();
+
         startCountdown(dur, () => {
             state.adzanActive = false;
             state.iqomahActive = true;
             $('#ovSub').textContent = 'IQOMAH';
+            // Iqomah is a different phase from adzan — no audio loop;
+            // most masjids handle iqomah with a live caller, not a
+            // recording. Stopping here also covers the case where the
+            // configured loops outlast the adzan window itself.
+            stopAdzanAlarm();
             startCountdown(iqDur, () => {
                 state.iqomahActive = false;
                 overlay.classList.add('hidden');
             });
         });
+    }
+
+    /* ===== Adzan alarm audio =====
+     *
+     * Plays the user's chosen audio file (cfg.adzan_audio_url) `loops`
+     * times back-to-back when the prayer time hits. Implementation
+     * notes:
+     *
+     *   - We deliberately do NOT use HTMLMediaElement.loop because that
+     *     would loop forever / can't be used for "play exactly N times".
+     *     Instead we hook `ended` and replay until the configured count
+     *     is reached.
+     *   - Android WebView's autoplay rules: with
+     *     `mediaPlaybackRequiresUserGesture=false` set in MainActivity
+     *     (it is), unmuted programmatic play is allowed. If a future
+     *     build flips that flag back, we attempt to play and silently
+     *     fall back to muted-then-unmute on the first canplay.
+     *   - The adzan duration timer in showAdzan stops audio when the
+     *     user moves into iqomah, so we don't need a separate timeout.
+     */
+    let _adzanPlayState = null;
+
+    function playAdzanAlarm() {
+        const audio = document.getElementById('adzanAudio');
+        if (!audio) return;
+        const url = (document.body.dataset.adzanAudio || '').trim();
+        if (!url) return;   // silent mode: no file configured
+        const loops = Math.max(1, Math.min(20,
+            parseInt(document.body.dataset.adzanLoops, 10) || 1));
+
+        // If we're already mid-play (e.g. somebody fired showAdzan twice
+        // in quick succession), reset and start fresh rather than stack
+        // ended-handlers.
+        stopAdzanAlarm();
+
+        _adzanPlayState = { remaining: loops, src: url };
+
+        const onEnded = () => {
+            // Defensive: bail if we got here after stopAdzanAlarm() ran.
+            if (!_adzanPlayState) return;
+            _adzanPlayState.remaining -= 1;
+            if (_adzanPlayState.remaining > 0) {
+                // Replay with a small delay to avoid WebView race condition
+                // where setting currentTime=0 + play() on the same tick
+                // can fire 'ended' again immediately on some Android builds.
+                setTimeout(() => {
+                    if (!_adzanPlayState) return;
+                    try { audio.currentTime = 0; } catch (e) { /* readonly while loading */ }
+                    audio.play().catch(() => { /* device denied; give up silently */ });
+                }, 100);
+            } else {
+                // All loops done — release the slot so the next adzan
+                // starts cleanly.
+                stopAdzanAlarm();
+            }
+        };
+
+        // Clean up any stale listener from a previous play cycle
+        if (_adzanPlayState._onEndedAttached) {
+            audio.removeEventListener('ended', _adzanPlayState._onEndedAttached);
+        }
+        audio.addEventListener('ended', onEnded);
+        _adzanPlayState._onEndedAttached = onEnded;
+
+        // Fresh src triggers a load() automatically. Setting muted=false
+        // explicitly because WebView's previous slideshow video may have
+        // left the global audio context muted on some builds.
+        audio.muted = false;
+        audio.volume = 1.0;
+        audio.src = url;
+
+        const attempt = audio.play();
+        if (attempt && typeof attempt.catch === 'function') {
+            attempt.catch(() => {
+                // First play rejected. Wait for canplay then retry once.
+                audio.addEventListener('canplay', () => {
+                    audio.play().catch(() => { /* give up — silent adzan */ });
+                }, { once: true });
+            });
+        }
+    }
+
+    function stopAdzanAlarm() {
+        const audio = document.getElementById('adzanAudio');
+        if (!audio) return;
+        if (_adzanPlayState && _adzanPlayState._onEndedAttached) {
+            audio.removeEventListener('ended', _adzanPlayState._onEndedAttached);
+        }
+        _adzanPlayState = null;
+        try {
+            audio.pause();
+            audio.currentTime = 0;
+        } catch (e) { /* not yet loaded */ }
     }
 
     /**
@@ -1586,6 +1964,11 @@
     function hideAdzan() {
         state.adzanActive = false;
         state.iqomahActive = false;
+        // Also kill any in-flight audio so dismissing the overlay
+        // really does silence the alarm. If the user only meant to
+        // hide the visual and keep listening they can let it run on
+        // its own — they won't hit hideAdzan in that flow.
+        stopAdzanAlarm();
         $('#adzanOverlay').classList.add('hidden');
     }
     function startCountdown(seconds, onDone) {
@@ -1656,6 +2039,23 @@
         // system bars animate in/out.
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', syncViewportHeight);
+        }
+
+        // Prayer-card auto-fit must also re-run on viewport changes
+        // because every clamp() inside the templates is `vw`-relative.
+        // Debounced so we don't burn cycles during a continuous resize.
+        let _autoFitTimer = null;
+        const scheduleAutoFit = () => {
+            if (_autoFitTimer) clearTimeout(_autoFitTimer);
+            _autoFitTimer = setTimeout(() => {
+                _autoFitTimer = null;
+                autoFitPrayerCards();
+            }, 120);
+        };
+        window.addEventListener('resize', scheduleAutoFit);
+        window.addEventListener('orientationchange', scheduleAutoFit);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', scheduleAutoFit);
         }
 
         loadHijri();

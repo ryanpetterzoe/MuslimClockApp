@@ -47,6 +47,11 @@ class MainActivity : AppCompatActivity() {
 
         Settings.ensureDefaults(this)
 
+        // Re-validate license on every cold start. If the license was
+        // revoked server-side (admin override, or device_id mismatch
+        // from someone sharing the APK), revert to demo mode immediately.
+        revalidateLicense()
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -65,6 +70,11 @@ class MainActivity : AppCompatActivity() {
             .addPathHandler(
                 "/logo/",
                 WebViewAssetLoader.InternalStoragePathHandler(this, LogoStorage.dir(this))
+            )
+            // User-uploaded adzan alarm audio: filesDir/audio/* -> /audio/*
+            .addPathHandler(
+                "/audio/",
+                WebViewAssetLoader.InternalStoragePathHandler(this, AudioStorage.dir(this))
             )
             .build()
 
@@ -201,58 +211,165 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_MENU,
-            KeyEvent.KEYCODE_SETTINGS -> {
+    // ─── Key event handling ────────────────────────────────────────────
+    //
+    // WebView is the sole focusable View and it consumes DPAD_CENTER /
+    // ENTER internally, so Activity.onKeyDown is never reached for those
+    // keys. We override dispatchKeyEvent() — which fires BEFORE the View
+    // hierarchy sees the event — to intercept OK/Enter at the Activity
+    // level. This lets us implement the long-press dance (startTracking +
+    // onKeyLongPress + onKeyUp) reliably regardless of WebView focus.
+
+    /** Track whether we are currently managing DPAD_CENTER/ENTER. */
+    private var trackingOkKey = false
+    /** Set to true when onKeyLongPress fires so onKeyUp doesn't also fire a tap. */
+    private var longPressConsumed = false
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val keyCode = event.keyCode
+
+        // MENU / SETTINGS: open settings immediately on down.
+        if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_SETTINGS) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                 openSettings()
-                return true
             }
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                // We use the long-press / short-press dance so the same
-                // key serves two purposes:
-                //   - tap   → forward Enter to the WebView (dismisses
-                //             the adzan overlay etc.)
-                //   - hold  → open native Settings
-                // Calling startTracking() on the first down event arms
-                // both onKeyLongPress and the "is this a deliberate
-                // press?" check we use in onKeyUp.
-                if (event != null && event.repeatCount == 0) {
+            return true
+        }
+
+        // Only intercept OK / Enter.
+        if (keyCode != KeyEvent.KEYCODE_DPAD_CENTER && keyCode != KeyEvent.KEYCODE_ENTER) {
+            return super.dispatchKeyEvent(event)
+        }
+
+        when (event.action) {
+            KeyEvent.ACTION_DOWN -> {
+                if (event.repeatCount == 0) {
+                    // First press: arm tracking for long-press detection.
+                    trackingOkKey = true
+                    longPressConsumed = false
                     event.startTracking()
-                    return true
                 }
-                // Subsequent repeats while the key is held: swallow them
-                // so the WebView doesn't see a flood of Enter events.
+                // Check if held long enough for a long-press (500ms default).
+                // Android fires repeat events while held; after the long-press
+                // threshold the framework sets FLAG_LONG_PRESS internally, but
+                // since we intercept at dispatchKeyEvent we implement our own
+                // threshold using repeatCount. ~20 repeats ≈ 500ms on most
+                // devices (key repeat starts at ~50ms intervals after initial
+                // delay of ~400ms, so repeatCount >= 1 after ~450ms).
+                if (event.repeatCount == 1 && trackingOkKey && !longPressConsumed) {
+                    longPressConsumed = true
+                    // Respect the user's toggle: long-press cycle is opt-in.
+                    // Read the pref each time so changing the setting takes
+                    // effect immediately without restarting the app.
+                    val enabled = Settings.prefs(this)
+                        .getBoolean(Settings.K_LONGPRESS_THEME, true)
+                    if (enabled) {
+                        webView.post { cycleToNextLayout() }
+                    }
+                }
+                return true // consume, don't let WebView see it
+            }
+            KeyEvent.ACTION_UP -> {
+                if (trackingOkKey && !longPressConsumed) {
+                    // Short tap: we consumed the down event so WebView never
+                    // saw it, which means the focused element (e.g. gear
+                    // button) won't auto-fire its click handler. Manually
+                    // click the active element AND dispatch a synthetic Enter
+                    // on document so keyboard listeners (adzan overlay
+                    // dismiss etc.) still receive their cue.
+                    webView.evaluateJavascript(
+                        "(function(){" +
+                        "  try {" +
+                        "    var el = document.activeElement;" +
+                        "    if (el && el !== document.body && typeof el.click === 'function') {" +
+                        "      el.click();" +
+                        "    }" +
+                        "  } catch(e) {}" +
+                        "  document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));" +
+                        "})();",
+                        null
+                    )
+                }
+                trackingOkKey = false
                 return true
             }
         }
-        return super.onKeyDown(keyCode, event)
+        return true // swallow any other action (ACTION_MULTIPLE etc.)
     }
 
-    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-            keyCode == KeyEvent.KEYCODE_ENTER) {
-            openSettings()
-            return true
-        }
-        return super.onKeyLongPress(keyCode, event)
+    /**
+     * Pick the next layout in [R.array.layout_values], save it to
+     * preferences, push the config to the WebView so the new theme
+     * mounts immediately, and surface a Toast so the user sees which
+     * theme they just landed on.
+     *
+     * Wraps around at the end of the list. If the current value isn't
+     * found (corrupted prefs) we start from the top.
+     */
+    private fun cycleToNextLayout() {
+        val values  = resources.getStringArray(R.array.layout_values)
+        val entries = resources.getStringArray(R.array.layout_entries)
+        if (values.isEmpty()) return
+
+        val prefs = Settings.prefs(this)
+        val current = prefs.getString(Settings.K_LAYOUT, values[0]) ?: values[0]
+        val curIdx = values.indexOf(current).takeIf { it >= 0 } ?: -1
+        val nextIdx = (curIdx + 1) % values.size
+        val nextKey = values[nextIdx]
+        val nextLabel = if (nextIdx < entries.size) entries[nextIdx] else nextKey
+
+        prefs.edit().putString(Settings.K_LAYOUT, nextKey).apply()
+
+        // Force a config push even if pushConfigToWeb's snapshot check
+        // would otherwise short-circuit.
+        lastConfigSnapshot = null
+        pushConfigToWeb()
+
+        android.widget.Toast.makeText(
+            this,
+            getString(R.string.theme_switched_to, nextLabel),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if ((keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-             keyCode == KeyEvent.KEYCODE_ENTER)
-            && event != null && event.isTracking && !event.isCanceled) {
-            // The press was tracked AND it wasn't cancelled by a
-            // long-press → it's a genuine tap. Forward the synthetic
-            // Enter to the WebView so JS handlers (e.g. dismiss adzan)
-            // still work as before.
-            webView.evaluateJavascript(
-                "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
-                null
-            )
-            return true
+    /**
+     * Check with Firebase whether the locally stored license is still
+     * valid for this device. If not (device_id mismatch or record deleted),
+     * revert to demo mode and push the updated config so the watermark
+     * reappears immediately.
+     *
+     * Called once per cold start. If the network is unavailable we keep
+     * the current state (offline grace) so the clock keeps running
+     * normally without internet — it'll re-check next time.
+     */
+    private fun revalidateLicense() {
+        val prefs = Settings.prefs(this)
+        val isPro = prefs.getBoolean(Settings.K_IS_PRO, false)
+        if (!isPro) return // nothing to validate
+
+        val key = prefs.getString(Settings.K_LICENSE_KEY, "") ?: ""
+        if (key.isBlank()) return
+
+        LicenseManager.revalidate(this, key) { stillValid ->
+            if (!stillValid) {
+                // Revoke locally
+                prefs.edit()
+                    .putBoolean(Settings.K_IS_PRO, false)
+                    .putString(Settings.K_LICENSE_KEY, "")
+                    .apply()
+
+                // Push config to WebView so watermark reappears
+                runOnUiThread {
+                    lastConfigSnapshot = null
+                    pushConfigToWeb()
+                    android.widget.Toast.makeText(
+                        this,
+                        getString(R.string.license_revoked),
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
-        return super.onKeyUp(keyCode, event)
     }
 
     override fun onPause() {

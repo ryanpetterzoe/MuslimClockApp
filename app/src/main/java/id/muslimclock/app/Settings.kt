@@ -30,6 +30,12 @@ object Settings {
     const val K_ADZAN_MESSAGE  = "adzan_message"
     const val K_ADZAN_DURATION = "adzan_duration"
     const val K_IQOMAH_DURATION = "iqomah_duration"
+    // Adzan alarm audio. URL points either to a user-imported file
+    // served via WebViewAssetLoader (appassets://...) or an external
+    // http(s) URL. Loop count: how many times to play the clip in a row
+    // when the prayer time hits; 1 = play once, ≥2 repeats.
+    const val K_ADZAN_AUDIO_URL = "adzan_audio_url"
+    const val K_ADZAN_AUDIO_LOOPS = "adzan_audio_loops"
     const val K_SHOW_ANALOG    = "show_analog"
     const val K_SHOW_COUNTDOWN = "show_countdown"
     const val K_LAYOUT         = "layout"
@@ -75,6 +81,37 @@ object Settings {
     const val K_QURAN_X_PCT   = "quran_x_pct"
     const val K_QURAN_Y_PCT   = "quran_y_pct"
 
+    const val K_DATE_SIZE     = "date_size"
+    const val K_DATE_X_PCT    = "date_x_pct"
+    const val K_DATE_Y_PCT    = "date_y_pct"
+
+    // "Menuju Sholat" countdown pill — same triple of knobs (size + X/Y).
+    // Useful when users want to enlarge / reposition the prayer-countdown
+    // independently of the digital clock above it.
+    const val K_NEXT_SIZE     = "next_size"
+    const val K_NEXT_X_PCT    = "next_x_pct"
+    const val K_NEXT_Y_PCT    = "next_y_pct"
+
+    // System: auto-launch the app after the device finishes booting.
+    // Default ON because the primary deployment is a TV permanently
+    // mounted on a masjid wall — when power blinks the user expects
+    // the clock to come back by itself.
+    const val K_START_ON_BOOT = "start_on_boot"
+
+    // Long-press OK on the remote = cycle to the next layout/theme.
+    // Default ON because the gesture is designed for masjid admins to
+    // try out themes from across the room without a keyboard. Some
+    // venues prefer to disable it (e.g. a kid keeps holding OK), so
+    // we surface a toggle in Settings → Sistem.
+    const val K_LONGPRESS_THEME = "longpress_theme"
+
+    // License system: 1 code = 1 device. When is_pro is false the
+    // WebView shows a "DEMO VERSION" watermark. Once the user enters
+    // a valid code and Firebase confirms it, is_pro flips to true and
+    // the watermark disappears.
+    const val K_IS_PRO      = "is_pro"
+    const val K_LICENSE_KEY = "license_key"
+
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
 
@@ -84,6 +121,24 @@ object Settings {
      */
     fun ensureDefaults(ctx: Context) {
         val p = prefs(ctx)
+
+        // Migration: an older build (alarm-adzan PR) wrote
+        // K_ADZAN_AUDIO_LOOPS as a String, but preferences.xml declares
+        // the key as a SeekBarPreference which reads it via getInt().
+        // On devices that ran the buggy build, opening Settings throws
+        // ClassCastException ("String cannot be cast to Integer") the
+        // moment the framework tries to inflate the slider. Detect any
+        // String-typed value here and rewrite it as an Int so the next
+        // Settings open succeeds.
+        runCatching {
+            val raw = p.all[K_ADZAN_AUDIO_LOOPS]
+            if (raw is String) {
+                val n = raw.toIntOrNull()?.coerceIn(1, 20) ?: 1
+                p.edit().remove(K_ADZAN_AUDIO_LOOPS).apply()
+                p.edit().putInt(K_ADZAN_AUDIO_LOOPS, n).apply()
+            }
+        }
+
         if (p.getBoolean("__initialized", false)) return
         p.edit()
             .putString(K_MASJID_NAME,    "Masjid Muslim Clock")
@@ -100,6 +155,8 @@ object Settings {
             .putString(K_ADZAN_MESSAGE,  "Saatnya Waktu Sholat")
             .putString(K_ADZAN_DURATION, "600")
             .putString(K_IQOMAH_DURATION,"600")
+            .putString(K_ADZAN_AUDIO_URL, "")
+            .putInt(K_ADZAN_AUDIO_LOOPS, 1)
             .putBoolean(K_SHOW_ANALOG,   true)
             .putBoolean(K_SHOW_COUNTDOWN,true)
             .putString(K_LAYOUT,         "minimal")
@@ -133,6 +190,16 @@ object Settings {
             .putInt(K_QURAN_SIZE,     100)
             .putInt(K_QURAN_X_PCT,    0)
             .putInt(K_QURAN_Y_PCT,    0)
+            .putInt(K_DATE_SIZE,      100)
+            .putInt(K_DATE_X_PCT,     0)
+            .putInt(K_DATE_Y_PCT,     0)
+            .putInt(K_NEXT_SIZE,      100)
+            .putInt(K_NEXT_X_PCT,     0)
+            .putInt(K_NEXT_Y_PCT,     0)
+            .putBoolean(K_START_ON_BOOT, true)
+            .putBoolean(K_LONGPRESS_THEME, true)
+            .putBoolean(K_IS_PRO, false)
+            .putString(K_LICENSE_KEY, "")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -160,6 +227,12 @@ object Settings {
             put("adzan_message",   str(K_ADZAN_MESSAGE,  "Saatnya Waktu Sholat"))
             put("adzan_duration",  int(K_ADZAN_DURATION,  600))
             put("iqomah_duration", int(K_IQOMAH_DURATION, 600))
+            put("adzan_audio_url",   str(K_ADZAN_AUDIO_URL, ""))
+            // Loops are clamped to a sane band: at minimum once (you
+            // wouldn't pick an alarm sound to never play it), at most
+            // 20 — a 5-min clip × 20 = ~100 minutes, well past the
+            // adzan window even at the longest practical setting.
+            put("adzan_audio_loops", p.getInt(K_ADZAN_AUDIO_LOOPS, 1).coerceIn(1, 20))
             put("show_analog",     p.getBoolean(K_SHOW_ANALOG,    true))
             put("show_countdown",  p.getBoolean(K_SHOW_COUNTDOWN, true))
             put("layout",          str(K_LAYOUT,                  "minimal"))
@@ -197,6 +270,15 @@ object Settings {
             put("quran_size",      p.getInt(K_QURAN_SIZE,    100).coerceIn(50, 200))
             put("quran_x_pct",     p.getInt(K_QURAN_X_PCT,   0).coerceIn(-50, 50))
             put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
+            put("date_size",       p.getInt(K_DATE_SIZE,     100).coerceIn(50, 200))
+            put("date_x_pct",      p.getInt(K_DATE_X_PCT,    0).coerceIn(-50, 50))
+            put("date_y_pct",      p.getInt(K_DATE_Y_PCT,    0).coerceIn(-50, 50))
+            put("next_size",       p.getInt(K_NEXT_SIZE,     100).coerceIn(50, 200))
+            put("next_x_pct",      p.getInt(K_NEXT_X_PCT,    0).coerceIn(-50, 50))
+            put("next_y_pct",      p.getInt(K_NEXT_Y_PCT,    0).coerceIn(-50, 50))
+            put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
+            put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
+            put("is_pro",          p.getBoolean(K_IS_PRO, false))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }

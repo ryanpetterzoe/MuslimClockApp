@@ -28,7 +28,7 @@ object SlideStorage {
     private const val MAX_IMAGE_BYTES = 8L  * 1024 * 1024  // 8 MB
 
     /** Larger cap for video imports — masjid promo clips in HD/4K can be big. */
-    private const val MAX_VIDEO_BYTES = 512L * 1024 * 1024  // 512 MB
+    private const val MAX_VIDEO_BYTES = 2049L * 1024 * 1024  // 2048 MB
 
     private val ALLOWED_IMAGE_MIME = setOf(
         "image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"

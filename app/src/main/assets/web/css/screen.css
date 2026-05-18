@@ -730,3 +730,367 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-sunrise .prayer.next::before {
     display: none;
 }
+
+
+
+/* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas / memory) ===================== */
+
+/* Shared base for the prayer-row cards in photo layouts. Each layout has
+ * its own .*-card class that picks distinct colours / borders. */
+.layout-gallery .gal-card,
+.layout-studio  .studio-tile {
+    background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.layout-gallery .prayer.next .gal-card,
+.layout-gallery .gal-card.next,
+.layout-studio  .prayer.next .studio-tile,
+.layout-studio  .studio-tile.next {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 4%, transparent));
+    box-shadow: 0 12px 36px -10px var(--accent);
+    transform: translateY(-2px);
+}
+.layout-gallery .prayer.next .gal-card [data-time],
+.layout-studio  .prayer.next .studio-tile [data-time] { color: var(--accent); }
+
+.layout-journal .journal-tag {
+    background: rgba(253,230,138,0.06);
+    border: 1px dashed rgba(218,165,32,0.45);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-journal .prayer.next .journal-tag,
+.layout-journal .journal-tag.next {
+    background: rgba(218,165,32,0.18);
+    border-color: #daa520;
+    border-style: solid;
+    box-shadow: 0 6px 20px -6px rgba(218,165,32,0.6);
+}
+.layout-journal .prayer.next .journal-tag [data-time] { color: #fff8e1; }
+
+.layout-canvas .canvas-cell {
+    background: #fff;
+    border: 1px solid rgba(28,25,23,0.15);
+    border-bottom: 3px solid var(--primary);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-canvas .prayer.next .canvas-cell,
+.layout-canvas .canvas-cell.next {
+    background: #1c1917;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.4);
+}
+.layout-canvas .prayer.next .canvas-cell [data-time],
+.layout-canvas .prayer.next .canvas-cell > div:first-child {
+    color: var(--accent) !important;
+}
+
+.layout-memory .mem-card {
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 10px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-memory .prayer.next .mem-card,
+.layout-memory .mem-card.next {
+    background: linear-gradient(180deg, rgba(251,191,36,0.22), rgba(180,83,9,0.12));
+    border-color: #fbbf24;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px -8px rgba(251,191,36,0.55);
+}
+
+/* ===================== BIG-SCHEDULE LAYOUTS (bigboard / pulpit / bulletin / tower / beacon) ===================== */
+
+.layout-bigboard .bb-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-bigboard .prayer.next .bb-card,
+.layout-bigboard .bb-card.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px -8px var(--accent);
+}
+.layout-bigboard .prayer.next .bb-card [data-time] { color: var(--accent); }
+
+.layout-pulpit .pulp-card {
+    background: rgba(218,165,32,0.06);
+    border: 1px solid rgba(218,165,32,0.3);
+    border-top: 3px solid #daa520;
+    border-radius: 8px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-pulpit .prayer.next .pulp-card,
+.layout-pulpit .pulp-card.next {
+    background: linear-gradient(180deg, rgba(218,165,32,0.25), rgba(218,165,32,0.08));
+    border-color: #fef3c7;
+    border-top-color: #fef3c7;
+    box-shadow: 0 12px 36px -10px rgba(218,165,32,0.7), inset 0 0 18px rgba(218,165,32,0.15);
+}
+.layout-pulpit .prayer.next .pulp-card [data-time] { color: #daa520; text-shadow: 0 0 12px rgba(218,165,32,0.6); }
+
+.layout-bulletin .bul-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 4px solid var(--primary);
+    border-radius: 4px;
+    transition: background .3s ease, border-color .3s ease;
+}
+.layout-bulletin .prayer.next .bul-card,
+.layout-bulletin .bul-card.next {
+    background: var(--primary);
+    border-color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+.layout-bulletin .prayer.next .bul-card [data-time] { color: var(--accent); }
+
+.layout-tower .tw-card {
+    background: rgba(99,102,241,0.07);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-left: 4px solid #6366f1;
+    border-radius: 10px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.layout-tower .prayer.next .tw-card,
+.layout-tower .tw-card.next {
+    background: linear-gradient(180deg, rgba(99,102,241,0.3), rgba(99,102,241,0.1));
+    border-color: #a5b4fc;
+    border-left-color: #c7d2fe;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -8px rgba(99,102,241,0.7);
+}
+.layout-tower .prayer.next .tw-card [data-time] { color: #c7d2fe; text-shadow: 0 0 12px rgba(165,180,252,0.6); }
+
+.layout-beacon .bc-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    transition: background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+.layout-beacon .prayer.next .bc-card,
+.layout-beacon .bc-card.next {
+    background: rgba(0,0,0,0.5);
+    border-color: var(--accent);
+    transform: scale(1.03);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 30px var(--accent-shadow), inset 0 0 18px var(--accent-shadow);
+}
+.layout-beacon .prayer.next .bc-card [data-time] {
+    color: var(--accent);
+    text-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-shadow);
+}
+
+/* Override the universal left-bar highlight for layouts that own theirs */
+.layout-gallery .prayer.next::before,
+.layout-journal .prayer.next::before,
+.layout-studio .prayer.next::before,
+.layout-canvas .prayer.next::before,
+.layout-memory .prayer.next::before,
+.layout-bigboard .prayer.next::before,
+.layout-pulpit .prayer.next::before,
+.layout-bulletin .prayer.next::before,
+.layout-tower .prayer.next::before,
+.layout-beacon .prayer.next::before {
+    display: none;
+}
+
+/* Ensure the photo-layout slideshow-host inside the inner frame element
+ * fills its container (the layouts inject .slideshow-host as direct
+ * children of the inner photo frame, so default `position:absolute`
+ * inset:0 already does the job — these are kept as no-op safety nets). */
+.layout-gallery .slideshow-host,
+.layout-journal .slideshow-host,
+.layout-studio  .slideshow-host,
+.layout-canvas  .slideshow-host,
+.layout-memory  .slideshow-host {
+    inset: 0;
+}
+
+
+
+/* ===================== PRAYER-CARD CROSS-FONT SAFETY =====================
+ *
+ * Fonts vary wildly in glyph width and ascender height. Wide-glyph picks
+ * (Press Start 2P, Major Mono Display, Bungee, Cinzel, Audiowide) and
+ * tall-ascender picks (Playfair Display, Merriweather) routinely overflow
+ * the prayer-time cards baked with `clamp(...)` font sizes and Tailwind's
+ * `truncate` (which adds an ellipsis the moment text doesn't fit).
+ *
+ * The combo below — paired with the JS auto-fit pass in clock.js —
+ * guarantees the user never sees clipped prayer labels or digits at the
+ * default settings, no matter which font is selected.
+ *
+ *   1. Loosen line-height + add a sliver of vertical padding so glyph
+ *      ascenders / descenders aren't clipped by a tight `leading-none`.
+ *   2. Replace ellipsis with `clip` on prayer-card labels — partial chars
+ *      are far more readable than "..." on a public masjid screen.
+ *      JS auto-fit will further shrink the font to remove the partiality.
+ *   3. `min-width: 0` on flex/grid children inside prayer cards so they
+ *      can actually shrink below their intrinsic content size.
+ */
+.prayer [data-time].digit-cell,
+.prayer .digit-cell[data-time] {
+    line-height: 1.15;
+    padding-block: 0.06em;
+    /* Keep horizontal clipping (overflow:hidden from .digit-cell) so
+     * digits never spill into adjacent cards, but allow vertical
+     * overflow so tall ascenders aren't sliced off.
+     */
+    overflow-x: hidden;
+    overflow-y: visible;
+    text-overflow: clip;
+}
+.prayer .truncate,
+.prayer .label,
+.prayer [class*="truncate"] {
+    text-overflow: clip !important;
+}
+.prayer,
+.prayer > *,
+.prayer-col .prayer,
+.prayer-col .prayer > * {
+    min-width: 0;
+}
+
+
+
+/* ===================== VERTICAL PRAYER-CARD LAYOUTS =====================
+ *
+ * Five layouts that arrange the six prayer cards in a single vertical
+ * column instead of the traditional horizontal grid. Each picks a
+ * distinct visual language so users can match the masjid's aesthetic.
+ *
+ *   - vertical : modern dark glass cards, sidebar on the left
+ *   - pillar   : premium gold gradient pillar on the right
+ *   - stack    : centered modern stack with bullet-dot accents
+ *   - rack     : rustic wood-shelf with horizontal divider lines
+ *   - column   : classic Islamic ornament dividers, gold trim
+ *
+ * Per-layout CSS below; the shared markup pattern is each card
+ * occupying `flex: 1 1 0` so all six prayers split the available
+ * vertical space evenly regardless of viewport height. Override the
+ * universal `.prayer.next::before` left-bar where the layout owns its
+ * own next-state highlight.
+ */
+
+/* ----- VERTICAL ----- */
+.layout-vertical .vc-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.layout-vertical .prayer.next .vc-card,
+.layout-vertical .vc-card.next {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    border-color: var(--accent);
+    transform: translateX(4px);
+    box-shadow: 0 10px 30px -8px var(--accent-shadow);
+}
+.layout-vertical .prayer.next .vc-card .vc-name { color: var(--accent); }
+.layout-vertical .prayer.next .vc-card [data-time] { color: var(--accent); }
+
+/* ----- PILLAR ----- */
+.layout-pillar .pillar-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.06);
+    border-left: 3px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.layout-pillar .prayer.next .pillar-card,
+.layout-pillar .pillar-card.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 6%, transparent));
+    border-color: var(--accent);
+    border-left-color: var(--accent);
+    box-shadow: 0 10px 30px -8px var(--accent), inset 0 0 18px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.layout-pillar .prayer.next .pillar-card [data-time] {
+    color: var(--accent);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* ----- STACK ----- */
+.layout-stack .stack-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.layout-stack .stack-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-shadow);
+}
+.layout-stack .prayer.next .stack-card,
+.layout-stack .stack-card.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 90%);
+    border-color: var(--accent);
+    transform: translateX(2px);
+    box-shadow: 0 8px 26px -8px var(--accent-shadow);
+}
+.layout-stack .prayer.next .stack-dot {
+    width: 10px;
+    height: 10px;
+    box-shadow: 0 0 14px var(--accent);
+}
+.layout-stack .prayer.next .stack-card [data-time] { color: var(--accent); }
+
+/* ----- RACK ----- */
+.layout-rack .rack-row {
+    border-bottom: 1px dashed rgba(230,184,92,0.20);
+    transition: background .25s ease;
+}
+.layout-rack .prayer:last-child .rack-row { border-bottom: 0; }
+.layout-rack .prayer.next .rack-row,
+.layout-rack .rack-row.next {
+    background: linear-gradient(90deg, rgba(230,184,92,0.18), transparent 80%);
+    border-bottom-color: rgba(230,184,92,0.55);
+    box-shadow: inset 3px 0 0 0 #e6b85c;
+}
+.layout-rack .prayer.next .rack-row [data-time] {
+    color: #fde6ad;
+    text-shadow: 0 0 10px rgba(230,184,92,0.55);
+}
+
+/* ----- COLUMN ----- */
+.layout-column .col-row {
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+    position: relative;
+    transition: background .25s ease;
+}
+.layout-column .prayer:last-child .col-row { border-bottom: 0; }
+.layout-column .col-orn {
+    color: var(--accent);
+    opacity: 0.55;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.layout-column .prayer.next .col-row,
+.layout-column .col-row.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+    border-bottom-color: var(--accent);
+}
+.layout-column .prayer.next .col-row .col-name,
+.layout-column .prayer.next .col-row [data-time] {
+    color: var(--accent);
+}
+.layout-column .prayer.next .col-row .col-orn {
+    opacity: 1;
+    text-shadow: 0 0 8px var(--accent);
+}
+
+/* Override the universal left-bar highlight for layouts that own theirs */
+.layout-vertical .prayer.next::before,
+.layout-pillar   .prayer.next::before,
+.layout-stack    .prayer.next::before,
+.layout-rack     .prayer.next::before,
+.layout-column   .prayer.next::before {
+    display: none;
+}

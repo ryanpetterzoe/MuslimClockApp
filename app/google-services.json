@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "332766068152",
+    "project_id": "muslimclockapp",
+    "storage_bucket": "muslimclockapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332766068152:android:18e7f4df4ec38deae9e34d",
+        "android_client_info": {
+          "package_name": "id.muslimclock.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmkvu3fcYcoUhnlFKUqbFruUADt6YcjLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

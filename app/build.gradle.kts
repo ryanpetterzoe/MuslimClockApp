@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -58,4 +59,8 @@ dependencies {
     // for a more native TV look.
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.fragment:fragment-ktx:1.8.2")
+
+    // Firebase — license validation via Realtime Database
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-database-ktx")
 }
