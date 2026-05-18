@@ -61,6 +61,11 @@ class MainActivity : AppCompatActivity() {
                 "/slides/",
                 WebViewAssetLoader.InternalStoragePathHandler(this, SlideStorage.dir(this))
             )
+            // User-uploaded masjid logo: filesDir/logo/* -> /logo/*
+            .addPathHandler(
+                "/logo/",
+                WebViewAssetLoader.InternalStoragePathHandler(this, LogoStorage.dir(this))
+            )
             .build()
 
         webView = WebView(this).apply {

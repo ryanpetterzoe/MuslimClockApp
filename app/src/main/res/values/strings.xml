@@ -12,7 +12,20 @@
     <string name="pref_masjid_name_sum">Misal: Masjid Al-Hidayah</string>
     <string name="pref_masjid_address">Alamat</string>
     <string name="pref_masjid_logo">URL Logo (opsional)</string>
-    <string name="pref_masjid_logo_sum">Kosongkan untuk pakai bulan-bintang default</string>
+    <string name="pref_masjid_logo_sum">Bisa diisi manual dengan URL gambar, atau pakai tombol Upload Logo di atas</string>
+
+    <string name="pref_pick_logo">Upload Logo dari Galeri</string>
+    <string name="pref_pick_logo_sum_empty">Pilih file gambar logo masjid (PNG/JPG/WEBP/SVG). Logo akan ditampilkan apa adanya — transparan tetap transparan.</string>
+    <string name="pref_pick_logo_sum_local">Logo aktif: file lokal dari galeri. Tap untuk ganti.</string>
+    <string name="pref_pick_logo_sum_url">Logo aktif: URL eksternal (di field di bawah). Tap untuk upload file dari galeri sebagai gantinya.</string>
+    <string name="pref_clear_logo">Hapus Logo</string>
+    <string name="pref_clear_logo_sum">Kembali ke ikon bulan-bintang default</string>
+    <string name="clear_logo_title">Hapus Logo Masjid?</string>
+    <string name="clear_logo_message">File logo yang sudah di-upload akan dihapus dari penyimpanan aplikasi. URL eksternal yang Anda ketik manual tidak akan ikut terhapus.</string>
+    <string name="logo_imported">Logo berhasil diupload</string>
+    <string name="logo_import_failed">File logo ditolak (terlalu besar atau format tidak didukung)</string>
+    <string name="logo_cleared">Logo dihapus</string>
+    <string name="logo_nothing_to_clear">Tidak ada logo tersimpan</string>
 
     <string name="pref_lat">Latitude</string>
     <string name="pref_lat_sum">Contoh: -6.2 (Jakarta)</string>
