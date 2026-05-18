@@ -47,6 +47,11 @@ class MainActivity : AppCompatActivity() {
 
         Settings.ensureDefaults(this)
 
+        // Re-validate license on every cold start. If the license was
+        // revoked server-side (admin override, or device_id mismatch
+        // from someone sharing the APK), revert to demo mode immediately.
+        revalidateLicense()
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -325,6 +330,46 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.theme_switched_to, nextLabel),
             android.widget.Toast.LENGTH_SHORT
         ).show()
+    }
+
+    /**
+     * Check with Firebase whether the locally stored license is still
+     * valid for this device. If not (device_id mismatch or record deleted),
+     * revert to demo mode and push the updated config so the watermark
+     * reappears immediately.
+     *
+     * Called once per cold start. If the network is unavailable we keep
+     * the current state (offline grace) so the clock keeps running
+     * normally without internet — it'll re-check next time.
+     */
+    private fun revalidateLicense() {
+        val prefs = Settings.prefs(this)
+        val isPro = prefs.getBoolean(Settings.K_IS_PRO, false)
+        if (!isPro) return // nothing to validate
+
+        val key = prefs.getString(Settings.K_LICENSE_KEY, "") ?: ""
+        if (key.isBlank()) return
+
+        LicenseManager.revalidate(this, key) { stillValid ->
+            if (!stillValid) {
+                // Revoke locally
+                prefs.edit()
+                    .putBoolean(Settings.K_IS_PRO, false)
+                    .putString(Settings.K_LICENSE_KEY, "")
+                    .apply()
+
+                // Push config to WebView so watermark reappears
+                runOnUiThread {
+                    lastConfigSnapshot = null
+                    pushConfigToWeb()
+                    android.widget.Toast.makeText(
+                        this,
+                        getString(R.string.license_revoked),
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     override fun onPause() {

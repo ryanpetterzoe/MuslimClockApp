@@ -358,6 +358,9 @@
         // Font selection — load the chosen Google Font on demand and
         // apply it via CSS custom properties.
         applyFonts();
+
+        // License watermark — show "DEMO VERSION" overlay when not Pro.
+        applyLicenseWatermark();
     }
 
     /**
@@ -870,6 +873,38 @@
             '--font-digital',
             `"${digital}", "Orbitron", monospace`
         );
+    }
+
+    /**
+     * Show or hide the "DEMO VERSION" watermark depending on cfg.is_pro.
+     * When not Pro, a fixed overlay covers the screen with a semi-transparent
+     * banner reminding the user to purchase a license.
+     */
+    function applyLicenseWatermark() {
+        const cfg = state.cfg;
+        const isPro = cfg.is_pro === true;
+        let overlay = document.getElementById('demoWatermark');
+
+        if (isPro) {
+            // Pro user: remove watermark if present
+            if (overlay) overlay.remove();
+            return;
+        }
+
+        // Demo mode: create watermark if not already present
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'demoWatermark';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:rgba(0,0,0,0.75);padding:24px 48px;border-radius:16px;text-align:center;border:2px solid rgba(255,255,255,0.3);">
+                    <div style="font-size:clamp(24px,4vw,48px);font-weight:900;color:#ff4444;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,0.5);">DEMO VERSION</div>
+                    <div style="margin-top:12px;font-size:clamp(14px,2vw,24px);color:#ffffff;font-weight:600;">Hubungi 082325942017</div>
+                    <div style="margin-top:6px;font-size:clamp(11px,1.5vw,16px);color:rgba(255,255,255,0.7);">untuk membeli lisensi Pro</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
     }
 
     /* ===== Slideshow =====

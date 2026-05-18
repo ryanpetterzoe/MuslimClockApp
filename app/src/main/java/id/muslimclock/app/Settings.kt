@@ -94,6 +94,13 @@ object Settings {
     // we surface a toggle in Settings → Sistem.
     const val K_LONGPRESS_THEME = "longpress_theme"
 
+    // License system: 1 code = 1 device. When is_pro is false the
+    // WebView shows a "DEMO VERSION" watermark. Once the user enters
+    // a valid code and Firebase confirms it, is_pro flips to true and
+    // the watermark disappears.
+    const val K_IS_PRO      = "is_pro"
+    const val K_LICENSE_KEY = "license_key"
+
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
 
@@ -174,6 +181,8 @@ object Settings {
             .putInt(K_QURAN_Y_PCT,    0)
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
+            .putBoolean(K_IS_PRO, false)
+            .putString(K_LICENSE_KEY, "")
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -246,6 +255,7 @@ object Settings {
             put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
+            put("is_pro",          p.getBoolean(K_IS_PRO, false))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }

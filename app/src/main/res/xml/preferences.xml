@@ -17,6 +17,12 @@
             app:summary="@string/pref_longpress_theme_sum"
             app:icon="@android:drawable/ic_menu_rotate"
             app:defaultValue="true" />
+
+        <Preference
+            app:key="activate_license"
+            app:title="@string/pref_activate_license"
+            app:summary="@string/pref_activate_license_sum"
+            app:icon="@android:drawable/ic_menu_manage" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_masjid">
