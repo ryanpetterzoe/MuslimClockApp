@@ -81,6 +81,10 @@ object Settings {
     const val K_QURAN_X_PCT   = "quran_x_pct"
     const val K_QURAN_Y_PCT   = "quran_y_pct"
 
+    const val K_DATE_SIZE     = "date_size"
+    const val K_DATE_X_PCT    = "date_x_pct"
+    const val K_DATE_Y_PCT    = "date_y_pct"
+
     // System: auto-launch the app after the device finishes booting.
     // Default ON because the primary deployment is a TV permanently
     // mounted on a masjid wall — when power blinks the user expects
@@ -179,6 +183,9 @@ object Settings {
             .putInt(K_QURAN_SIZE,     100)
             .putInt(K_QURAN_X_PCT,    0)
             .putInt(K_QURAN_Y_PCT,    0)
+            .putInt(K_DATE_SIZE,      100)
+            .putInt(K_DATE_X_PCT,     0)
+            .putInt(K_DATE_Y_PCT,     0)
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -253,6 +260,9 @@ object Settings {
             put("quran_size",      p.getInt(K_QURAN_SIZE,    100).coerceIn(50, 200))
             put("quran_x_pct",     p.getInt(K_QURAN_X_PCT,   0).coerceIn(-50, 50))
             put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
+            put("date_size",       p.getInt(K_DATE_SIZE,     100).coerceIn(50, 200))
+            put("date_x_pct",      p.getInt(K_DATE_X_PCT,    0).coerceIn(-50, 50))
+            put("date_y_pct",      p.getInt(K_DATE_Y_PCT,    0).coerceIn(-50, 50))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))
