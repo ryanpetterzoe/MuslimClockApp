@@ -213,8 +213,87 @@ class MainActivity : AppCompatActivity() {
                 openSettings()
                 return true
             }
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
+                // Same key serves two purposes via the long-press dance:
+                //   - tap   → forward Enter to the WebView so JS handlers
+                //             (e.g. dismiss adzan overlay) still work.
+                //   - hold  → cycle to the next layout/theme.
+                // Settings stays reachable via MENU on the remote and the
+                // floating gear button in the WebView.
+                if (event != null && event.repeatCount == 0) {
+                    event.startTracking()
+                    return true
+                }
+                // Subsequent repeats while the key is held: swallow them
+                // so the WebView doesn't see a flood of Enter events.
+                return true
+            }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+            keyCode == KeyEvent.KEYCODE_ENTER) {
+            // Defer the actual cycle one frame so we don't run JS eval
+            // / Toast inflation directly inside the input dispatcher
+            // callback. That keeps the key event lifecycle tidy on
+            // older WebView builds and avoids feedback loops if the
+            // WebView is in the middle of layout.
+            webView.post { cycleToNextLayout() }
+            return true
+        }
+        return super.onKeyLongPress(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if ((keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+             keyCode == KeyEvent.KEYCODE_ENTER)
+            && event != null && event.isTracking && !event.isCanceled) {
+            // Tracked AND not cancelled by a long-press → genuine tap.
+            // Forward synthetic Enter to JS so adzan dismiss etc. work.
+            webView.evaluateJavascript(
+                "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));",
+                null
+            )
+            return true
+        }
+        return super.onKeyUp(keyCode, event)
+    }
+
+    /**
+     * Pick the next layout in [R.array.layout_values], save it to
+     * preferences, push the config to the WebView so the new theme
+     * mounts immediately, and surface a Toast so the user sees which
+     * theme they just landed on.
+     *
+     * Wraps around at the end of the list. If the current value isn't
+     * found (corrupted prefs) we start from the top.
+     */
+    private fun cycleToNextLayout() {
+        val values  = resources.getStringArray(R.array.layout_values)
+        val entries = resources.getStringArray(R.array.layout_entries)
+        if (values.isEmpty()) return
+
+        val prefs = Settings.prefs(this)
+        val current = prefs.getString(Settings.K_LAYOUT, values[0]) ?: values[0]
+        val curIdx = values.indexOf(current).takeIf { it >= 0 } ?: -1
+        val nextIdx = (curIdx + 1) % values.size
+        val nextKey = values[nextIdx]
+        val nextLabel = if (nextIdx < entries.size) entries[nextIdx] else nextKey
+
+        prefs.edit().putString(Settings.K_LAYOUT, nextKey).apply()
+
+        // Force a config push even if pushConfigToWeb's snapshot check
+        // would otherwise short-circuit.
+        lastConfigSnapshot = null
+        pushConfigToWeb()
+
+        android.widget.Toast.makeText(
+            this,
+            getString(R.string.theme_switched_to, nextLabel),
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onPause() {
