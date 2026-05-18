@@ -420,25 +420,29 @@ class SettingsActivity : AppCompatActivity() {
 
                     Toast.makeText(ctx, R.string.license_activating, Toast.LENGTH_SHORT).show()
 
+                    // Capture application context so callback works even
+                    // if the fragment/activity is gone by the time Firebase
+                    // responds (which explains the "stuck at validating" bug).
+                    val appCtx = ctx.applicationContext
+                    val handler = android.os.Handler(android.os.Looper.getMainLooper())
+
                     LicenseManager.activate(ctx, code) { result ->
-                        // Callback may arrive on background thread depending on
-                        // Firebase SDK version; post to main to be safe.
-                        activity?.runOnUiThread {
+                        handler.post {
                             when (result) {
                                 LicenseManager.Result.SUCCESS -> {
-                                    Settings.prefs(ctx).edit()
+                                    Settings.prefs(appCtx).edit()
                                         .putBoolean(Settings.K_IS_PRO, true)
                                         .putString(Settings.K_LICENSE_KEY, code.uppercase())
                                         .apply()
-                                    Toast.makeText(ctx, R.string.license_success, Toast.LENGTH_LONG).show()
-                                    updateLicenseSummary()
+                                    Toast.makeText(appCtx, R.string.license_success, Toast.LENGTH_LONG).show()
+                                    try { updateLicenseSummary() } catch (_: Throwable) {}
                                 }
                                 LicenseManager.Result.ERROR_INVALID ->
-                                    Toast.makeText(ctx, R.string.license_error_invalid, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(appCtx, R.string.license_error_invalid, Toast.LENGTH_LONG).show()
                                 LicenseManager.Result.ERROR_USED ->
-                                    Toast.makeText(ctx, R.string.license_error_used, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(appCtx, R.string.license_error_used, Toast.LENGTH_LONG).show()
                                 LicenseManager.Result.ERROR_NETWORK ->
-                                    Toast.makeText(ctx, R.string.license_error_network, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(appCtx, R.string.license_error_network, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
