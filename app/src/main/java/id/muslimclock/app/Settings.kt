@@ -81,11 +81,6 @@ object Settings {
     const val K_QURAN_X_PCT   = "quran_x_pct"
     const val K_QURAN_Y_PCT   = "quran_y_pct"
 
-    // Auto-launch on device boot. Default ON because the kiosk use case
-    // (TV mounted on a wall, plugged in 24/7) wants the display to come
-    // back automatically after a power cut.
-    const val K_START_ON_BOOT = "start_on_boot"
-
     fun prefs(ctx: Context): SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
 
@@ -146,7 +141,6 @@ object Settings {
             .putInt(K_QURAN_SIZE,     100)
             .putInt(K_QURAN_X_PCT,    0)
             .putInt(K_QURAN_Y_PCT,    0)
-            .putBoolean(K_START_ON_BOOT, true)
             .putBoolean("__initialized", true)
             .apply()
     }
@@ -217,7 +211,6 @@ object Settings {
             put("quran_size",      p.getInt(K_QURAN_SIZE,    100).coerceIn(50, 200))
             put("quran_x_pct",     p.getInt(K_QURAN_X_PCT,   0).coerceIn(-50, 50))
             put("quran_y_pct",     p.getInt(K_QURAN_Y_PCT,   0).coerceIn(-50, 50))
-            put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("show_running",    p.getBoolean(K_SHOW_TICKER, true))
         }.toString()
     }

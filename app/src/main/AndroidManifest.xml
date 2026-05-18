@@ -7,11 +7,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Auto-launch on device power-on (toggleable in Settings).
-         Granted at install time on Android <= 7; later versions still
-         honour it implicitly for the BOOT_COMPLETED broadcast. -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <!-- Declare TV support; touchscreen NOT required for Android TV. -->
     <uses-feature
         android:name="android.software.leanback"
@@ -59,24 +54,5 @@
             android:label="@string/settings_title"
             android:theme="@style/Theme.MuslimClock.Settings"
             android:parentActivityName=".MainActivity" />
-
-        <!--
-          Auto-start on boot. Listens for the standard BOOT_COMPLETED
-          plus two OEM-specific quick-poweron actions (HTC and the
-          unprefixed legacy form some Samsung / Android TV boxes use).
-          The receiver itself bails out if the user disabled the
-          start_on_boot pref, so we can keep it always-enabled here.
-        -->
-        <receiver
-            android:name=".BootReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:directBootAware="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>
