@@ -1164,6 +1164,18 @@ window.MC_CONFIG = {
 </div>
 </template>
 
+<!--
+  Hidden audio element for the adzan alarm. Kept outside the
+  layout host so it survives layout swaps without re-creating
+  (preserving any in-flight playback). preload="none" — we only
+  load when the user actually triggers playback.
+  - playsinline + muted-by-default workaround: WebView allows
+    autoplay only after `mediaPlaybackRequiresUserGesture=false`
+    is set natively (which we do in MainActivity), so we don't
+    need a poster click to start.
+-->
+<audio id="adzanAudio" preload="none" style="display:none"></audio>
+
 <script src="js/clock.js"></script>
 </body>
 </html>
