@@ -107,9 +107,14 @@ class SettingsActivity : AppCompatActivity() {
                 confirmResetLayout()
                 true
             }
+            findPreference<Preference>("activate_license")?.setOnPreferenceClickListener {
+                showLicenseInputDialog()
+                true
+            }
             updateClearSummary()
             updateLogoSummary()
             updateAdzanAudioSummary()
+            updateLicenseSummary()
         }
 
         /**
@@ -384,6 +389,73 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
+        }
+
+        /**
+         * Show a dialog for the user to enter their license code.
+         * On OK, calls [LicenseManager.activate] and updates prefs on success.
+         */
+        private fun showLicenseInputDialog() {
+            val ctx = requireContext()
+            val isPro = Settings.prefs(ctx).getBoolean(Settings.K_IS_PRO, false)
+            if (isPro) {
+                Toast.makeText(ctx, R.string.pref_activate_license_sum_pro, Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val input = android.widget.EditText(ctx).apply {
+                hint = ctx.getString(R.string.license_input_hint)
+                isSingleLine = true
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+                setPadding(48, 32, 48, 32)
+            }
+
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.license_input_title)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    val code = input.text.toString().trim()
+                    if (code.isEmpty()) return@setPositiveButton
+
+                    Toast.makeText(ctx, R.string.license_activating, Toast.LENGTH_SHORT).show()
+
+                    LicenseManager.activate(ctx, code) { result ->
+                        // Callback may arrive on background thread depending on
+                        // Firebase SDK version; post to main to be safe.
+                        activity?.runOnUiThread {
+                            when (result) {
+                                LicenseManager.Result.SUCCESS -> {
+                                    Settings.prefs(ctx).edit()
+                                        .putBoolean(Settings.K_IS_PRO, true)
+                                        .putString(Settings.K_LICENSE_KEY, code.uppercase())
+                                        .apply()
+                                    Toast.makeText(ctx, R.string.license_success, Toast.LENGTH_LONG).show()
+                                    updateLicenseSummary()
+                                }
+                                LicenseManager.Result.ERROR_INVALID ->
+                                    Toast.makeText(ctx, R.string.license_error_invalid, Toast.LENGTH_LONG).show()
+                                LicenseManager.Result.ERROR_USED ->
+                                    Toast.makeText(ctx, R.string.license_error_used, Toast.LENGTH_LONG).show()
+                                LicenseManager.Result.ERROR_NETWORK ->
+                                    Toast.makeText(ctx, R.string.license_error_network, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        /**
+         * Update the "Aktivasi Lisensi" summary to show current status.
+         */
+        private fun updateLicenseSummary() {
+            val ctx = context ?: return
+            val isPro = Settings.prefs(ctx).getBoolean(Settings.K_IS_PRO, false)
+            findPreference<Preference>("activate_license")?.summary =
+                if (isPro) ctx.getString(R.string.pref_activate_license_sum_pro)
+                else ctx.getString(R.string.pref_activate_license_sum)
         }
     }
 }
