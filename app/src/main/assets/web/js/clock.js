@@ -39,7 +39,9 @@
         show_analog: true,
         show_countdown: true,
         layout: 'minimal',
-        digital_style: 'classic',   // classic | split | neon | flip | dualtone
+        digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave
+        hide_seconds: false,        // hide seconds display on digital clock
+        analog_style: 'classic',    // classic | modern | minimal | roman | arabic | dots | skeleton | luxury | sport | radar
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
         slide_duration: 8,      // seconds per slide
         slideshow_opacity: 100, // 0..100 — visual intensity of the slideshow background (default: full)
@@ -387,6 +389,15 @@
         const wantedLayout = state.cfg.layout || 'minimal';
         if (state.mountedLayout !== wantedLayout) {
             mountLayout(wantedLayout);
+        }
+
+        // Rebuild analog clock face if the style changed.
+        if (prev.analog_style !== state.cfg.analog_style) {
+            const ticks = $('#ticks');
+            const nums  = $('#numerals');
+            if (ticks) ticks.innerHTML = '';
+            if (nums) nums.innerHTML = '';
+            buildAnalogStatic();
         }
 
         applyConfigToDom();
@@ -1273,36 +1284,350 @@
     }
 
     /* ===== Analog clock ===== */
+
+    const ANALOG_STYLES = ['classic', 'modern', 'minimal', 'roman', 'arabic', 'dots', 'skeleton', 'luxury', 'sport', 'radar'];
+
     function buildAnalogStatic() {
         const ticks = $('#ticks');
         const nums  = $('#numerals');
         if (!ticks || !nums) return;
-        // Idempotent: only build once per mount.
-        if (ticks.childNodes.length || nums.childNodes.length) return;
+
+        const analogStyle = ANALOG_STYLES.includes(state.cfg.analog_style) ? state.cfg.analog_style : 'classic';
         const svgNS = 'http://www.w3.org/2000/svg';
-        for (let i = 0; i < 60; i++) {
-            const angle = i * 6;
-            const isHour = i % 5 === 0;
-            const r1 = isHour ? 75 : 80;
-            const r2 = 84;
-            const sw = isHour ? 2.4 : 0.7;
-            const rad = (angle - 90) * Math.PI / 180;
-            const line = document.createElementNS(svgNS, 'line');
-            line.setAttribute('x1', (r1 * Math.cos(rad)).toFixed(2));
-            line.setAttribute('y1', (r1 * Math.sin(rad)).toFixed(2));
-            line.setAttribute('x2', (r2 * Math.cos(rad)).toFixed(2));
-            line.setAttribute('y2', (r2 * Math.sin(rad)).toFixed(2));
-            line.setAttribute('stroke-width', String(sw));
-            ticks.appendChild(line);
+
+        // Apply analog style class to the SVG root for CSS targeting
+        const svg = document.getElementById('analog');
+        if (svg) {
+            // Skip rebuild if already built for this style
+            if (svg.dataset.analogStyle === analogStyle && ticks.childNodes.length) return;
+            svg.dataset.analogStyle = analogStyle;
+            // Remove previous style classes
+            ANALOG_STYLES.forEach(s => svg.classList.remove('analog-' + s));
+            svg.classList.add('analog-' + analogStyle);
         }
-        for (let n = 1; n <= 12; n++) {
-            const a = n * 30;
-            const rad = (a - 90) * Math.PI / 180;
-            const t = document.createElementNS(svgNS, 'text');
-            t.setAttribute('x', (65 * Math.cos(rad)).toFixed(2));
-            t.setAttribute('y', (65 * Math.sin(rad)).toFixed(2));
-            t.textContent = String(n);
-            nums.appendChild(t);
+
+        // Clear existing content for rebuild
+        ticks.innerHTML = '';
+        nums.innerHTML = '';
+
+        buildAnalogByStyle(analogStyle, ticks, nums, svgNS);
+    }
+
+    function buildAnalogByStyle(style, ticks, nums, svgNS) {
+        switch (style) {
+            case 'modern':
+                // Clean modern: only hour markers, no numerals, thick bars
+                for (let i = 0; i < 12; i++) {
+                    const angle = i * 30;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', (74 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', (74 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', '3');
+                    line.setAttribute('stroke', '#ffffff');
+                    line.setAttribute('stroke-linecap', 'round');
+                    ticks.appendChild(line);
+                }
+                break;
+
+            case 'minimal':
+                // Only 4 markers at 12, 3, 6, 9
+                [0, 90, 180, 270].forEach(angle => {
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', (72 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', (72 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', '2.5');
+                    line.setAttribute('stroke', '#ffffff');
+                    line.setAttribute('stroke-linecap', 'round');
+                    ticks.appendChild(line);
+                });
+                break;
+
+            case 'roman':
+                // Roman numerals
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    if (!isHour) {
+                        const rad = (angle - 90) * Math.PI / 180;
+                        const line = document.createElementNS(svgNS, 'line');
+                        line.setAttribute('x1', (80 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y1', (80 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('stroke-width', '0.5');
+                        ticks.appendChild(line);
+                    }
+                }
+                const romanNums = ['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+                for (let n = 0; n < 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (65 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (65 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '9');
+                    t.setAttribute('font-weight', '700');
+                    t.setAttribute('fill', '#0f172a');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.setAttribute('font-family', 'serif');
+                    t.textContent = romanNums[n];
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'arabic':
+                // Arabic/Eastern Arabic numerals
+                const arabicNums = ['١٢','١','٢','٣','٤','٥','٦','٧','٨','٩','١٠','١١'];
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', ((isHour ? 75 : 80) * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', ((isHour ? 75 : 80) * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', isHour ? '2' : '0.7');
+                    ticks.appendChild(line);
+                }
+                for (let n = 0; n < 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (62 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (62 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '11');
+                    t.setAttribute('font-weight', '700');
+                    t.setAttribute('fill', '#0f172a');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.setAttribute('font-family', "'Amiri', serif");
+                    t.textContent = arabicNums[n];
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'dots':
+                // Dot markers instead of lines
+                for (let i = 0; i < 12; i++) {
+                    const angle = i * 30;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('cx', (78 * Math.cos(rad)).toFixed(2));
+                    circle.setAttribute('cy', (78 * Math.sin(rad)).toFixed(2));
+                    circle.setAttribute('r', i === 0 ? '4' : '2.5');
+                    circle.setAttribute('fill', i === 0 ? 'var(--accent)' : '#0f172a');
+                    ticks.appendChild(circle);
+                }
+                break;
+
+            case 'skeleton':
+                // Open/skeleton style — no face fill, thin markers
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', ((isHour ? 70 : 78) * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', ((isHour ? 70 : 78) * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', isHour ? '1.5' : '0.3');
+                    line.setAttribute('stroke', isHour ? 'var(--accent)' : 'rgba(255,255,255,0.4)');
+                    ticks.appendChild(line);
+                }
+                for (let n = 1; n <= 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (58 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (58 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '11');
+                    t.setAttribute('font-weight', '600');
+                    t.setAttribute('fill', '#ffffff');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.textContent = String(n);
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'luxury':
+                // Gold-toned luxury with diamond markers at quarters
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const isQuarter = i % 15 === 0;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    if (isQuarter) {
+                        // Diamond shape for quarters
+                        const cx = 78 * Math.cos(rad);
+                        const cy = 78 * Math.sin(rad);
+                        const diamond = document.createElementNS(svgNS, 'polygon');
+                        diamond.setAttribute('points', `${cx},${cy-4} ${cx+3},${cy} ${cx},${cy+4} ${cx-3},${cy}`);
+                        diamond.setAttribute('fill', '#d4af37');
+                        ticks.appendChild(diamond);
+                    } else if (isHour) {
+                        const line = document.createElementNS(svgNS, 'line');
+                        line.setAttribute('x1', (74 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y1', (74 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('stroke-width', '2');
+                        line.setAttribute('stroke', '#d4af37');
+                        line.setAttribute('stroke-linecap', 'round');
+                        ticks.appendChild(line);
+                    } else {
+                        const line = document.createElementNS(svgNS, 'line');
+                        line.setAttribute('x1', (81 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y1', (81 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                        line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                        line.setAttribute('stroke-width', '0.5');
+                        line.setAttribute('stroke', '#d4af37');
+                        ticks.appendChild(line);
+                    }
+                }
+                for (let n = 1; n <= 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (62 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (62 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '12');
+                    t.setAttribute('font-weight', '800');
+                    t.setAttribute('fill', '#d4af37');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.setAttribute('font-family', "'Playfair Display', serif");
+                    t.textContent = String(n);
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'sport':
+                // Bold sporty look with thick markers and 5-min intervals highlighted
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', ((isHour ? 70 : 79) * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', ((isHour ? 70 : 79) * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', isHour ? '4' : '1');
+                    line.setAttribute('stroke', isHour ? '#ff4444' : '#333333');
+                    line.setAttribute('stroke-linecap', 'butt');
+                    ticks.appendChild(line);
+                }
+                for (let n = 1; n <= 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (56 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (56 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '14');
+                    t.setAttribute('font-weight', '900');
+                    t.setAttribute('fill', '#0f172a');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.setAttribute('font-family', "'Orbitron', sans-serif");
+                    t.textContent = String(n);
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'radar':
+                // Radar/military style with concentric rings and degree ticks
+                // Add concentric circles
+                [30, 50, 70].forEach(r => {
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('cx', '0');
+                    circle.setAttribute('cy', '0');
+                    circle.setAttribute('r', String(r));
+                    circle.setAttribute('fill', 'none');
+                    circle.setAttribute('stroke', 'rgba(74,222,128,0.15)');
+                    circle.setAttribute('stroke-width', '0.5');
+                    ticks.appendChild(circle);
+                });
+                // Cross-hair lines
+                [0, 90, 180, 270].forEach(angle => {
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', '0');
+                    line.setAttribute('y1', '0');
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke', 'rgba(74,222,128,0.2)');
+                    line.setAttribute('stroke-width', '0.5');
+                    ticks.appendChild(line);
+                });
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', ((isHour ? 76 : 81) * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', ((isHour ? 76 : 81) * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (84 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (84 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', isHour ? '1.5' : '0.5');
+                    line.setAttribute('stroke', '#4ade80');
+                    ticks.appendChild(line);
+                }
+                for (let n = 1; n <= 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (66 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (66 * Math.sin(rad)).toFixed(2));
+                    t.setAttribute('font-size', '10');
+                    t.setAttribute('font-weight', '700');
+                    t.setAttribute('fill', '#4ade80');
+                    t.setAttribute('text-anchor', 'middle');
+                    t.setAttribute('dominant-baseline', 'central');
+                    t.setAttribute('font-family', "'Share Tech Mono', monospace");
+                    t.textContent = String(n * 5).padStart(2, '0');
+                    nums.appendChild(t);
+                }
+                break;
+
+            case 'classic':
+            default:
+                // Default classic style
+                for (let i = 0; i < 60; i++) {
+                    const angle = i * 6;
+                    const isHour = i % 5 === 0;
+                    const r1 = isHour ? 75 : 80;
+                    const r2 = 84;
+                    const sw = isHour ? 2.4 : 0.7;
+                    const rad = (angle - 90) * Math.PI / 180;
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', (r1 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y1', (r1 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('x2', (r2 * Math.cos(rad)).toFixed(2));
+                    line.setAttribute('y2', (r2 * Math.sin(rad)).toFixed(2));
+                    line.setAttribute('stroke-width', String(sw));
+                    ticks.appendChild(line);
+                }
+                for (let n = 1; n <= 12; n++) {
+                    const a = n * 30;
+                    const rad = (a - 90) * Math.PI / 180;
+                    const t = document.createElementNS(svgNS, 'text');
+                    t.setAttribute('x', (65 * Math.cos(rad)).toFixed(2));
+                    t.setAttribute('y', (65 * Math.sin(rad)).toFixed(2));
+                    t.textContent = String(n);
+                    nums.appendChild(t);
+                }
+                break;
         }
     }
 
@@ -1321,7 +1646,7 @@
 
     /* ===== Digital clock + date ===== */
 
-    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone'];
+    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone', 'matrix', 'retro', 'minimal', 'gradient', 'outline', 'shadow', 'lcd', 'binary', 'dots', 'wave'];
 
     function tickDigital() {
         const now = new Date();
@@ -1330,7 +1655,8 @@
         if (main) {
             const style = DIGITAL_STYLES.includes(state.cfg.digital_style)
                 ? state.cfg.digital_style : 'classic';
-            main.innerHTML = renderDigitalStyle(style, h, m, s);
+            const hideSeconds = state.cfg.hide_seconds === true;
+            main.innerHTML = renderDigitalStyle(style, h, m, s, hideSeconds);
             // Ensure the container has the style class for CSS targeting
             main.dataset.digitalStyle = style;
         }
@@ -1345,16 +1671,17 @@
 
     /**
      * Render the digital clock HTML based on the selected style.
-     * All styles receive h, m, s as integers.
+     * All styles receive h, m, s as integers. hideSeconds controls
+     * whether the seconds portion is displayed.
      */
-    function renderDigitalStyle(style, h, m, s) {
+    function renderDigitalStyle(style, h, m, s, hideSeconds) {
         switch (style) {
             case 'split':
                 // Hours giant, minutes:seconds below in a smaller line
                 return `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">` +
                     `<span style="font-size:1em;">${pad(h)}</span>` +
                     `<span style="font-size:0.45em;color:var(--accent);letter-spacing:0.1em;margin-top:0.1em;">` +
-                    `${pad(m)} <span style="color:rgba(255,255,255,0.5);">:</span> ${pad(s)}</span>` +
+                    `${pad(m)}${hideSeconds ? '' : ` <span style="color:rgba(255,255,255,0.5);">:</span> ${pad(s)}`}</span>` +
                     `</div>`;
 
             case 'neon':
@@ -1362,32 +1689,106 @@
                 return `<span class="digi-neon-glow">${pad(h)}</span>` +
                     `<span class="digi-neon-sep">:</span>` +
                     `<span class="digi-neon-glow">${pad(m)}</span>` +
-                    `<span class="digi-neon-sep">:</span>` +
-                    `<span class="digi-neon-glow" style="font-size:0.65em;">${pad(s)}</span>`;
+                    (hideSeconds ? '' : `<span class="digi-neon-sep">:</span><span class="digi-neon-glow" style="font-size:0.65em;">${pad(s)}</span>`);
 
             case 'flip':
                 // Each digit in its own flip-card-style box
-                return renderFlipDigits(h, m, s);
+                return renderFlipDigits(h, m, s, hideSeconds);
 
             case 'dualtone':
                 // Hours in accent, minutes white, seconds dimmed
                 return `<span style="color:var(--accent);">${pad(h)}</span>` +
                     `<span style="color:rgba(255,255,255,0.4);margin:0 0.05em;">:</span>` +
                     `<span style="color:#ffffff;">${pad(m)}</span>` +
-                    `<span style="color:rgba(255,255,255,0.4);margin:0 0.05em;">:</span>` +
-                    `<span style="color:rgba(255,255,255,0.45);font-size:0.55em;vertical-align:top;margin-left:0.1em;">${pad(s)}</span>`;
+                    (hideSeconds ? '' : `<span style="color:rgba(255,255,255,0.4);margin:0 0.05em;">:</span><span style="color:rgba(255,255,255,0.45);font-size:0.55em;vertical-align:top;margin-left:0.1em;">${pad(s)}</span>`);
+
+            case 'matrix':
+                // Matrix/hacker green style with trailing glow
+                return `<span class="digi-matrix">${pad(h)}</span>` +
+                    `<span class="digi-matrix-sep">:</span>` +
+                    `<span class="digi-matrix">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-matrix-sep">:</span><span class="digi-matrix" style="font-size:0.65em;">${pad(s)}</span>`);
+
+            case 'retro':
+                // Retro CRT/VHS look with scanlines
+                return `<span class="digi-retro-wrap">` +
+                    `<span class="digi-retro">${pad(h)}:${pad(m)}${hideSeconds ? '' : ':' + pad(s)}</span>` +
+                    `</span>`;
+
+            case 'minimal':
+                // Clean, thin with only hours and minutes large, seconds tiny superscript
+                return `<span style="font-weight:300;letter-spacing:0.15em;">${pad(h)}<span style="opacity:0.4;">:</span>${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span style="font-size:0.3em;opacity:0.5;vertical-align:super;margin-left:0.15em;font-weight:400;">${pad(s)}</span>`);
+
+            case 'gradient':
+                // Gradient text from accent to white
+                return `<span class="digi-gradient">${pad(h)}<span class="digi-gradient-sep">:</span>${pad(m)}${hideSeconds ? '' : `<span class="digi-gradient-sep">:</span>${pad(s)}`}</span>`;
+
+            case 'outline':
+                // Outlined/stroke text, no fill
+                return `<span class="digi-outline">${pad(h)}</span>` +
+                    `<span class="digi-outline-sep">:</span>` +
+                    `<span class="digi-outline">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-outline-sep">:</span><span class="digi-outline" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'shadow':
+                // Deep 3D shadow/emboss effect
+                return `<span class="digi-shadow">${pad(h)}</span>` +
+                    `<span class="digi-shadow-sep">:</span>` +
+                    `<span class="digi-shadow">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-shadow-sep">:</span><span class="digi-shadow" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'lcd':
+                // LCD/segment display style
+                return `<span class="digi-lcd-wrap">` +
+                    `<span class="digi-lcd">${pad(h)}</span>` +
+                    `<span class="digi-lcd-sep">:</span>` +
+                    `<span class="digi-lcd">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-lcd-sep">:</span><span class="digi-lcd" style="font-size:0.65em;">${pad(s)}</span>`) +
+                    `</span>`;
+
+            case 'binary':
+                // Show time in binary representation below decimal
+                return `<span class="digi-binary-wrap">` +
+                    `<span class="digi-binary-decimal">${pad(h)}<span style="color:var(--accent);">:</span>${pad(m)}${hideSeconds ? '' : `<span style="color:var(--accent);">:</span>${pad(s)}`}</span>` +
+                    `<span class="digi-binary-row">${h.toString(2).padStart(5,'0')} ${m.toString(2).padStart(6,'0')}${hideSeconds ? '' : ' ' + s.toString(2).padStart(6,'0')}</span>` +
+                    `</span>`;
+
+            case 'dots':
+                // Dotted/pixelated separator with rounded pill background
+                return `<span class="digi-dots-wrap">` +
+                    `<span class="digi-dots-digit">${pad(h)}</span>` +
+                    `<span class="digi-dots-sep">●<br>●</span>` +
+                    `<span class="digi-dots-digit">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-dots-sep">●<br>●</span><span class="digi-dots-digit" style="font-size:0.65em;">${pad(s)}</span>`) +
+                    `</span>`;
+
+            case 'wave':
+                // Each digit has a wave animation offset
+                const timeStr = hideSeconds ? `${pad(h)}:${pad(m)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
+                let waveHtml = '<span class="digi-wave-wrap">';
+                for (let i = 0; i < timeStr.length; i++) {
+                    const ch = timeStr[i];
+                    if (ch === ':') {
+                        waveHtml += `<span class="digi-wave-sep">:</span>`;
+                    } else {
+                        waveHtml += `<span class="digi-wave-char" style="animation-delay:${i * 0.1}s;">${ch}</span>`;
+                    }
+                }
+                waveHtml += '</span>';
+                return waveHtml;
 
             case 'classic':
             default:
                 // Original style
                 return `${pad(h)}<span style="color: var(--accent);">:</span>${pad(m)}` +
-                    `<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">${pad(s)}</span>`;
+                    (hideSeconds ? '' : `<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">${pad(s)}</span>`);
         }
     }
 
     /** Render flip-card style: each digit gets a rounded box behind it */
-    function renderFlipDigits(h, m, s) {
-        const digits = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    function renderFlipDigits(h, m, s, hideSeconds) {
+        const digits = hideSeconds ? `${pad(h)}:${pad(m)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
         let html = '<span class="digi-flip-wrap">';
         for (let i = 0; i < digits.length; i++) {
             const ch = digits[i];

@@ -179,5 +179,13 @@
 
     <!-- Digital clock style -->
     <string name="pref_digital_style">Gaya Jam Digital</string>
-    <string name="pref_digital_style_sum">Pilih tampilan angka jam digital. Classic, Split, Neon, Flip, atau Dual-tone.</string>
+    <string name="pref_digital_style_sum">Pilih tampilan angka jam digital. 15 pilihan gaya tersedia.</string>
+
+    <!-- Hide seconds -->
+    <string name="pref_hide_seconds">Sembunyikan Detik</string>
+    <string name="pref_hide_seconds_sum">Sembunyikan tampilan detik pada jam digital. Hanya tampilkan jam dan menit.</string>
+
+    <!-- Analog clock style -->
+    <string name="pref_analog_style">Gaya Jam Analog</string>
+    <string name="pref_analog_style_sum">Pilih tampilan muka jam analog. 10 pilihan gaya tersedia.</string>
 </resources>
