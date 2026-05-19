@@ -108,7 +108,10 @@
         // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
         'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
         // New: 5 vertical prayer-card themes (jadwal sholat tersusun tegak)
-        'vertical', 'pillar', 'stack', 'rack', 'column'
+        'vertical', 'pillar', 'stack', 'rack', 'column',
+        // New: 10 ornament-rich themes (Islamic visual languages, set v2)
+        'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
+        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah'
     ];
 
     /* ===== State (mutable) ===== */

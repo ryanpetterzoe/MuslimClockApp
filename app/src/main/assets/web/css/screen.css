@@ -43,10 +43,36 @@ body {
 /* The flex helper ensures direct children of a column-flex layout root
  * have predictable shrink behaviour: header/footer rows never shrink,
  * the main row absorbs all leftover space and may overflow into a
- * hidden region rather than push siblings off-screen. */
+ * hidden region rather than push siblings off-screen.
+ *
+ * Stacking guarantee (slideshow z-index fix):
+ * Every direct row of a flex layout gets `position: relative; z-index: 1`
+ * by default. The slideshow-host is forced to `z-index: 0` (see below).
+ * That way, even templates that forgot to add `relative z-10` on their
+ * header/main/section will still render their content ABOVE the
+ * slideshow background — never the other way around. Templates that
+ * already declare `relative z-10` keep working because z-10 > z-1. */
 .flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; }
-.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; }
+.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; position: relative; z-index: 1; }
+.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+
+/* ---------- Slideshow stacking guarantee ----------
+ * The slideshow-host (and its inner .slide/<video> children) must
+ * ALWAYS render at the bottom of the layout stack. Without an explicit
+ * z-index, an `absolute`-positioned slideshow-host paints above any
+ * non-positioned siblings (header/main/section that forgot to declare
+ * `relative z-10`), which causes the slideshow to cover content when
+ * opacity is high — the bug users see at slideshow_opacity=100%.
+ *
+ * Pinning to z-index: 0 (combined with z-index: 1 on .row-fixed/.row-fill
+ * above and z-index: 10+ in templates) means a positioned slideshow will
+ * always sit beneath content, regardless of which template mounts. */
+.slideshow-host {
+    z-index: 0;
+}
+.slide {
+    z-index: 0;
+}
 
 .font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
 .font-arabic  { font-family: 'Amiri', 'Traditional Arabic', serif; }
@@ -578,6 +604,13 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-window .prayer.next::before,
 .layout-festival .prayer.next::before,
 .layout-portrait .prayer.next::before {
+    /* These slideshow-centric themes own their own next-state
+     * highlight (border / box-shadow on the inner card), so the
+     * universal accent left-bar would be redundant and visually
+     * cramped against the existing border. Hide it. */
+    display: none;
+}
+
 /* ===================== EXTRA LAYOUTS NEXT-STATE ===================== */
 
 /* Galaxy */
@@ -1092,5 +1125,239 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-stack    .prayer.next::before,
 .layout-rack     .prayer.next::before,
 .layout-column   .prayer.next::before {
+    display: none;
+}
+
+
+
+/* ===================== ORNAMENT-RICH LAYOUTS (set v2) =====================
+ *
+ * Card / next-state styling for the 10 ornament-heavy layouts in
+ * index.html. Each layout has its own scoped class so theme palettes
+ * don't bleed into one another. The shared pattern: a quiet base
+ * card with a low-opacity accent border, and a louder next-state
+ * highlight that fits the theme's colour story.
+ *
+ * The universal `.prayer.next::before` left-bar is suppressed for
+ * every layout in this set because each owns a richer highlight.
+ */
+
+/* ----- MIHRAB (deep teal + gold) ----- */
+.layout-mihrab .mh-card {
+    padding: 12px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-mihrab .prayer.next .mh-card,
+.layout-mihrab .mh-card.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, rgba(0,0,0,0.45)), color-mix(in srgb, var(--accent) 4%, rgba(0,0,0,0.25)));
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -10px var(--accent);
+}
+.layout-mihrab .prayer.next .mh-card [data-time] { color: var(--accent); }
+
+/* ----- LANTERN (warm bronze + cream) ----- */
+.layout-lantern .ln-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(58, 31, 8, 0.55);
+    border: 1px solid rgba(212, 163, 106, 0.45);
+    border-radius: 10px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-lantern .prayer.next .ln-card,
+.layout-lantern .ln-card.next {
+    background: linear-gradient(180deg, rgba(212, 163, 106, 0.25), rgba(58, 31, 8, 0.6));
+    border-color: #fde68a;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -10px rgba(212, 163, 106, 0.7), inset 0 0 16px rgba(253, 230, 138, 0.18);
+}
+
+/* ----- MOSAIC (cobalt + ivory + terracotta) ----- */
+.layout-mosaic .ms-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(14, 42, 74, 0.85);
+    border: 2px solid #f5e6c4;
+    border-radius: 8px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.layout-mosaic .prayer.next .ms-card,
+.layout-mosaic .ms-card.next {
+    background: #c84a32;
+    border-color: #fcd34d;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.4), 0 12px 36px -10px rgba(200, 74, 50, 0.7);
+}
+.layout-mosaic .prayer.next .ms-card [style*="color:#fcd34d"] { color: #f5e6c4 !important; }
+.layout-mosaic .prayer.next .ms-card [data-time] { color: #fcd34d !important; }
+
+/* ----- CRESCENT (navy + warm gold) ----- */
+.layout-crescent .cr-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(7, 10, 26, 0.62);
+    border: 1px solid rgba(253, 230, 138, 0.30);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-crescent .prayer.next .cr-card,
+.layout-crescent .cr-card.next {
+    background: rgba(7, 10, 26, 0.85);
+    border-color: #fde68a;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px #fde68a, 0 12px 36px -8px #d4a36a, inset 0 0 16px rgba(253, 230, 138, 0.12);
+}
+.layout-crescent .prayer.next .cr-card [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(253, 230, 138, 0.6);
+}
+
+/* ----- DAMASCUS (brass + bronze) ----- */
+.layout-damascus .dm-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(58, 38, 20, 0.55);
+    border: 1px solid #d4a36a;
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(184, 144, 96, 0.25);
+    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.layout-damascus .prayer.next .dm-card,
+.layout-damascus .dm-card.next {
+    background: linear-gradient(180deg, rgba(212, 163, 106, 0.30), rgba(58, 38, 20, 0.65));
+    border-color: #fde68a;
+    box-shadow: 0 0 0 1px #fde68a, 0 12px 32px -10px #d4a36a, inset 0 0 14px rgba(253, 230, 138, 0.18);
+}
+
+/* ----- PERSIAN (wine + ivory + gold) ----- */
+.layout-persian .ps-card2 {
+    padding: 12px;
+    text-align: center;
+    background: rgba(91, 14, 34, 0.50);
+    border: 1px solid #daa520;
+    border-radius: 6px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-persian .prayer.next .ps-card2,
+.layout-persian .ps-card2.next {
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.28), rgba(91, 14, 34, 0.7));
+    border-color: #f3e0c2;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -10px #daa520;
+}
+.layout-persian .prayer.next .ps-card2 [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 10px rgba(218, 165, 32, 0.55);
+}
+
+/* ----- MECCA (deep black + radiant gold) ----- */
+.layout-mecca .mc-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.65);
+    border: 1px solid rgba(218, 165, 32, 0.45);
+    border-radius: 10px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-mecca .prayer.next .mc-card,
+.layout-mecca .mc-card.next {
+    background: rgba(10, 10, 10, 0.9);
+    border-color: #fde68a;
+    transform: scale(1.04);
+    box-shadow: 0 0 30px #daa520, 0 0 0 1px #fde68a, inset 0 0 18px rgba(218, 165, 32, 0.22);
+}
+.layout-mecca .prayer.next .mc-card [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 14px #daa520;
+}
+
+/* ----- MARRAKESH (multicoloured zellige) ----- */
+.layout-marrakesh .mk-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(16, 42, 58, 0.85);
+    border: 2px solid #f4d35e;
+    border-radius: 6px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-marrakesh .prayer.next .mk-card,
+.layout-marrakesh .mk-card.next {
+    background: #e63946;
+    border-color: #f4d35e;
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px #3a86ff, 0 12px 36px -8px rgba(230, 57, 70, 0.7);
+}
+.layout-marrakesh .prayer.next .mk-card > div:first-child {
+    color: #102a3a !important;
+}
+.layout-marrakesh .prayer.next .mk-card [data-time] {
+    color: #f4d35e !important;
+}
+
+/* ----- IMPERIAL (deep red + gold) ----- */
+.layout-imperial .im-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(91, 14, 14, 0.55);
+    border: 1px solid #daa520;
+    border-top: 2px solid #fde68a;
+    border-bottom: 2px solid #fde68a;
+    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.layout-imperial .prayer.next .im-card,
+.layout-imperial .im-card.next {
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.30), rgba(91, 14, 14, 0.7));
+    border-color: #fde68a;
+    box-shadow: 0 0 0 1px #fde68a, 0 12px 36px -10px #daa520, inset 0 0 18px rgba(218, 165, 32, 0.20);
+}
+.layout-imperial .prayer.next .im-card [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 10px #daa520;
+}
+
+/* ----- JANNAH (emerald + gold) ----- */
+.layout-jannah .jn-card {
+    padding: 12px;
+    text-align: center;
+    background: rgba(10, 64, 48, 0.55);
+    border: 1px solid rgba(218, 165, 32, 0.40);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.layout-jannah .prayer.next .jn-card,
+.layout-jannah .jn-card.next {
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.25), rgba(10, 64, 48, 0.8));
+    border-color: #fde68a;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px -10px #daa520, inset 0 0 18px rgba(253, 230, 138, 0.16);
+}
+.layout-jannah .prayer.next .jn-card [data-time] {
+    color: #fde68a;
+    text-shadow: 0 0 12px rgba(218, 165, 32, 0.55);
+}
+
+/* Suppress the universal `.prayer.next::before` left-bar for every
+ * ornament-rich theme — each one supplies its own next-state. */
+.layout-mihrab    .prayer.next::before,
+.layout-lantern   .prayer.next::before,
+.layout-mosaic    .prayer.next::before,
+.layout-crescent  .prayer.next::before,
+.layout-damascus  .prayer.next::before,
+.layout-persian   .prayer.next::before,
+.layout-mecca     .prayer.next::before,
+.layout-marrakesh .prayer.next::before,
+.layout-imperial  .prayer.next::before,
+.layout-jannah    .prayer.next::before {
     display: none;
 }
