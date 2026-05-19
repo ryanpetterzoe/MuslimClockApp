@@ -1636,3 +1636,17 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 #analog.analog-dots circle:nth-child(3) {
     fill: #ffffff;
 }
+
+
+
+/* ===================== DIGITAL CLOCK AUTOFIT =====================
+ * Ensure #digital never overflows its parent container when switching
+ * between styles that produce wider output (Binary, Dots, LCD, etc.).
+ * The parent gets max-width and overflow-visible so the JS autofit
+ * can measure scrollWidth accurately and shrink font-size to fit.
+ */
+#digital {
+    max-width: 100%;
+    word-break: keep-all;
+    white-space: nowrap;
+}
