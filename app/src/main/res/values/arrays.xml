@@ -120,6 +120,8 @@
         <item>Imperial (Tugra Utsmani) ★ ORNAMEN</item>
         <item>Jannah (Kebun Surga) ★ ORNAMEN</item>
         <item>Spesial A1 (Custom Background)</item>
+        <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
+        <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -187,6 +189,8 @@
         <item>imperial</item>
         <item>jannah</item>
         <item>special1</item>
+        <item>special2</item>
+        <item>special3</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->

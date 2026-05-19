@@ -2876,6 +2876,154 @@ window.MC_CONFIG = {
 </div>
 </template>
 
+<!-- ============== LAYOUT: SPECIAL2 (Vertical Prayer Right) ============== -->
+<template id="layout-special2">
+<div class="layout-special2 app-screen flex-layout relative" style="background:#000;">
+    <div class="special2-bg absolute inset-0" style="background: url('img/temaspesial/a1/bg.png') center/cover no-repeat;"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.7) 100%);"></div>
+
+    <header class="row-fixed relative z-10 flex items-center justify-between px-8 py-3">
+        <div class="flex items-center gap-3">
+            <div id="logoBox" class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-soft" style="background: rgba(0,0,0,0.5); color: var(--accent);">&#x262A;</div>
+            <div>
+                <div class="text-base font-bold tracking-tight" style="text-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                    <span style="color: var(--accent);" id="masjidPrefix">Masjid</span>
+                    <span class="text-white" id="masjidName">Muslim Clock</span>
+                </div>
+                <div class="text-[10px] text-slate-200" id="masjidAddress" style="text-shadow: 0 1px 4px rgba(0,0,0,0.8);">Jakarta, Indonesia</div>
+            </div>
+        </div>
+        <div class="text-right" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 6px 12px;">
+            <div id="greg-date" class="text-xs font-bold text-white">-</div>
+            <div id="hij-date" class="text-[10px] mt-0.5" style="color: var(--accent);">-</div>
+        </div>
+    </header>
+
+    <main class="row-fill relative z-10 px-8 py-4" style="display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: center;">
+        <!-- Left column: clock info -->
+        <div class="flex flex-col items-center justify-center gap-4">
+            <div id="nextPill" class="rounded-full px-5 py-1.5 flex items-center gap-2.5 shadow-soft" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);">
+                <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background: var(--accent);"></span>
+                <span class="text-[10px] uppercase tracking-[3px] text-slate-200 font-semibold">Menuju</span>
+                <span id="nextLabel" class="text-sm font-bold uppercase" style="color: var(--accent);">-</span>
+                <span class="text-slate-400">|</span>
+                <span id="nextCountdown" class="font-digital text-sm font-semibold text-white">--:--:--</span>
+            </div>
+            <div class="text-center">
+                <div id="digital" class="font-digital font-black tracking-[0.06em] text-white leading-none digit-cell"
+                     style="font-size: clamp(56px, min(13vw, 22vh), 180px); text-shadow: 0 4px 20px rgba(0,0,0,0.8);">
+                    --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-2">--</span>
+                </div>
+            </div>
+            <div id="analogWrap" class="flex items-center gap-4">
+                <div data-analog style="width: clamp(80px, 12vh, 128px); height: clamp(80px, 12vh, 128px);"></div>
+            </div>
+        </div>
+        <!-- Right column: vertical prayer cards -->
+        <div class="flex flex-col gap-2" style="height: 100%; justify-content: center;">
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="fajr">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Subuh</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="sunrise">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Syuruq</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="dhuhr">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" id="dhuhrLabel" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Dzuhur</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="asr">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Ashar</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="maghrib">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Maghrib</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special2-card px-4 py-2 text-center" data-key="isha">
+                <div class="label text-[10px] uppercase tracking-[3px] font-bold text-white truncate" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Isya</div>
+                <div class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size: clamp(16px, 2vw, 28px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+        </div>
+    </main>
+</div>
+</template>
+
+<!-- ============== LAYOUT: SPECIAL3 (Vertical Prayer Left) ============== -->
+<template id="layout-special3">
+<div class="layout-special3 app-screen flex-layout relative" style="background:#000;">
+    <div class="special3-bg absolute inset-0" style="background: url('img/temaspesial/a1/bg.png') center/cover no-repeat;"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.7) 100%);"></div>
+
+    <header class="row-fixed relative z-10 flex items-center justify-between px-8 py-3">
+        <div class="flex items-center gap-3">
+            <div id="logoBox" class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-soft" style="background: rgba(0,0,0,0.5); color: var(--accent);">&#x262A;</div>
+            <div>
+                <div class="text-base font-bold tracking-tight" style="text-shadow: 0 2px 8px rgba(0,0,0,0.8);">
+                    <span style="color: var(--accent);" id="masjidPrefix">Masjid</span>
+                    <span class="text-white" id="masjidName">Muslim Clock</span>
+                </div>
+                <div class="text-[10px] text-slate-200" id="masjidAddress" style="text-shadow: 0 1px 4px rgba(0,0,0,0.8);">Jakarta, Indonesia</div>
+            </div>
+        </div>
+        <div class="text-right" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 6px 12px;">
+            <div id="greg-date" class="text-xs font-bold text-white">-</div>
+            <div id="hij-date" class="text-[10px] mt-0.5" style="color: var(--accent);">-</div>
+        </div>
+    </header>
+
+    <main class="row-fill relative z-10 px-8 py-4" style="display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: center;">
+        <!-- Left column: vertical prayer cards (wider, horizontal card layout) -->
+        <div class="flex flex-col gap-2" style="height: 100%; justify-content: center;">
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="fajr">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Subuh</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="sunrise">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Syuruq</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="dhuhr">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" id="dhuhrLabel" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Dzuhur</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="asr">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Ashar</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="maghrib">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Maghrib</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+            <div class="prayer special3-card px-5 py-3 flex items-center justify-between" data-key="isha">
+                <div class="label text-xs uppercase tracking-[2px] font-bold text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,0.6);">Isya</div>
+                <div class="font-digital font-bold text-white digit-cell" data-time style="font-size: clamp(18px, 2.2vw, 32px); text-shadow: 0 2px 8px rgba(0,0,0,0.6);">--:--</div>
+            </div>
+        </div>
+        <!-- Right column: clock info -->
+        <div class="flex flex-col items-center justify-center gap-4">
+            <div id="nextPill" class="rounded-full px-5 py-1.5 flex items-center gap-2.5 shadow-soft" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);">
+                <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background: var(--accent);"></span>
+                <span class="text-[10px] uppercase tracking-[3px] text-slate-200 font-semibold">Menuju</span>
+                <span id="nextLabel" class="text-sm font-bold uppercase" style="color: var(--accent);">-</span>
+                <span class="text-slate-400">|</span>
+                <span id="nextCountdown" class="font-digital text-sm font-semibold text-white">--:--:--</span>
+            </div>
+            <div class="text-center">
+                <div id="digital" class="font-digital font-black tracking-[0.06em] text-white leading-none digit-cell"
+                     style="font-size: clamp(56px, min(13vw, 22vh), 180px); text-shadow: 0 4px 20px rgba(0,0,0,0.8);">
+                    --<span style="color: var(--accent);">:</span>--<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-2">--</span>
+                </div>
+            </div>
+            <div id="analogWrap" class="flex items-center gap-4">
+                <div data-analog style="width: clamp(80px, 12vh, 128px); height: clamp(80px, 12vh, 128px);"></div>
+            </div>
+        </div>
+    </main>
+</div>
+</template>
+
 
 <!--
   Hidden audio element for the adzan alarm. Kept outside the
