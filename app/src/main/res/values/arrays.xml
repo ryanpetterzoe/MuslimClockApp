@@ -211,6 +211,16 @@
         <item>Neon (Efek Glow)</item>
         <item>Flip (Kartu Digit)</item>
         <item>Dual-Tone (Dua Warna)</item>
+        <item>Matrix (Hijau Hacker)</item>
+        <item>Retro (CRT/VHS Vintage)</item>
+        <item>Minimal (Tipis Bersih)</item>
+        <item>Gradient (Gradasi Warna)</item>
+        <item>Outline (Garis Tepi)</item>
+        <item>Shadow (Bayangan 3D)</item>
+        <item>LCD (Layar Segmen)</item>
+        <item>Binary (Desimal + Biner)</item>
+        <item>Dots (Titik Pemisah)</item>
+        <item>Wave (Gelombang Animasi)</item>
     </string-array>
 
     <string-array name="digital_style_values">
@@ -219,6 +229,43 @@
         <item>neon</item>
         <item>flip</item>
         <item>dualtone</item>
+        <item>matrix</item>
+        <item>retro</item>
+        <item>minimal</item>
+        <item>gradient</item>
+        <item>outline</item>
+        <item>shadow</item>
+        <item>lcd</item>
+        <item>binary</item>
+        <item>dots</item>
+        <item>wave</item>
+    </string-array>
+
+    <!-- Analog clock display styles -->
+    <string-array name="analog_style_entries">
+        <item>Classic (Standar)</item>
+        <item>Modern (Bersih Minimalis)</item>
+        <item>Minimal (Hanya 4 Titik)</item>
+        <item>Roman (Angka Romawi)</item>
+        <item>Arabic (Angka Arab)</item>
+        <item>Dots (Titik Penanda)</item>
+        <item>Skeleton (Transparan)</item>
+        <item>Luxury (Emas Mewah)</item>
+        <item>Sport (Tebal Sporty)</item>
+        <item>Radar (Militer/Radar)</item>
+    </string-array>
+
+    <string-array name="analog_style_values">
+        <item>classic</item>
+        <item>modern</item>
+        <item>minimal</item>
+        <item>roman</item>
+        <item>arabic</item>
+        <item>dots</item>
+        <item>skeleton</item>
+        <item>luxury</item>
+        <item>sport</item>
+        <item>radar</item>
     </string-array>
 
     <!--

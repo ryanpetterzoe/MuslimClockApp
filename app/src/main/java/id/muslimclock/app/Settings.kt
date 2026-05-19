@@ -37,6 +37,8 @@ object Settings {
     const val K_ADZAN_AUDIO_URL = "adzan_audio_url"
     const val K_ADZAN_AUDIO_LOOPS = "adzan_audio_loops"
     const val K_DIGITAL_STYLE  = "digital_style"
+    const val K_HIDE_SECONDS   = "hide_seconds"
+    const val K_ANALOG_STYLE   = "analog_style"
     const val K_SHOW_ANALOG    = "show_analog"
     const val K_SHOW_COUNTDOWN = "show_countdown"
     const val K_LAYOUT         = "layout"
@@ -162,6 +164,8 @@ object Settings {
             .putBoolean(K_SHOW_COUNTDOWN,true)
             .putString(K_LAYOUT,         "minimal")
             .putString(K_DIGITAL_STYLE,  "classic")
+            .putBoolean(K_HIDE_SECONDS,  false)
+            .putString(K_ANALOG_STYLE,   "classic")
             .putString(K_SLIDESHOW_URLS, "")
             .putString(K_SLIDE_DURATION, "8")
             .putInt(K_SLIDESHOW_OPACITY, 100)
@@ -239,6 +243,8 @@ object Settings {
             put("show_countdown",  p.getBoolean(K_SHOW_COUNTDOWN, true))
             put("layout",          str(K_LAYOUT,                  "minimal"))
             put("digital_style",   str(K_DIGITAL_STYLE,           "classic"))
+            put("hide_seconds",    p.getBoolean(K_HIDE_SECONDS,   false))
+            put("analog_style",    str(K_ANALOG_STYLE,            "classic"))
             put("slideshow_urls",  str(K_SLIDESHOW_URLS,          ""))
             put("slide_duration",  int(K_SLIDE_DURATION,           8))
             put("slideshow_opacity", p.getInt(K_SLIDESHOW_OPACITY, 100).coerceIn(0, 100))
