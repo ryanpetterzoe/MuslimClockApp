@@ -2212,16 +2212,14 @@
     let _digitalFitSize = '';
 
     function autoFitDigital(el) {
-        // Autofit disabled — let the clock use its natural CSS size.
+        // Autofit completely disabled — do nothing.
         // The digital clock was becoming too small on many layouts
-        // because the shrink loop was too aggressive. Instead we rely
-        // on CSS overflow:hidden / text-overflow or the layout's own
-        // flex/grid constraints to keep things tidy.
-        if (!el) return;
-        el.style.fontSize = '';
-        _digitalFitSize = 'default';
-        _lastDigitalStyle = (state.cfg.digital_style || 'classic') +
-            (state.cfg.hide_seconds === true ? '-ns' : '');
+        // because the old shrink loop was too aggressive. We now let
+        // the clock use its natural CSS/inline size from the template.
+        // IMPORTANT: Do NOT clear el.style.fontSize here because the
+        // layout templates set the size via inline style attribute
+        // (e.g. "font-size: clamp(56px, min(13vw, 22vh), 180px)")
+        // and clearing it would remove that definition entirely.
     }
 
     function updateNextCountdown(now) {
