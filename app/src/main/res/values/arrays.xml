@@ -119,6 +119,7 @@
         <item>Marrakesh (Tile Multi-Warna) ★ ORNAMEN</item>
         <item>Imperial (Tugra Utsmani) ★ ORNAMEN</item>
         <item>Jannah (Kebun Surga) ★ ORNAMEN</item>
+        <item>Spesial A1 (Custom Background)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -185,6 +186,7 @@
         <item>marrakesh</item>
         <item>imperial</item>
         <item>jannah</item>
+        <item>special1</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -326,6 +328,10 @@
         <item>Libre Baskerville (Classic Serif)</item>
         <item>Noto Kufi Arabic (Kufi Arab)</item>
         <item>El Messiri (Arab Modern)</item>
+        <item>Impact (Bold Condensed)</item>
+        <item>Anton (Bold Condensed)</item>
+        <item>Oswald (Bold Condensed)</item>
+        <item>Black Ops One (Military Bold)</item>
     </string-array>
 
     <string-array name="font_display_values">
@@ -352,6 +358,10 @@
         <item>Libre Baskerville</item>
         <item>Noto Kufi Arabic</item>
         <item>El Messiri</item>
+        <item>Impact</item>
+        <item>Anton</item>
+        <item>Oswald</item>
+        <item>Black Ops One</item>
     </string-array>
 
     <!--
@@ -376,6 +386,8 @@
         <item>Bungee (Bold Display)</item>
         <item>Silkscreen (Pixel)</item>
         <item>Doto (LED Dots)</item>
+        <item>Impact (Bold Condensed)</item>
+        <item>Anton (Bold Display)</item>
     </string-array>
 
     <string-array name="font_digital_values">
@@ -395,5 +407,7 @@
         <item>Bungee</item>
         <item>Silkscreen</item>
         <item>Doto</item>
+        <item>Impact</item>
+        <item>Anton</item>
     </string-array>
 </resources>

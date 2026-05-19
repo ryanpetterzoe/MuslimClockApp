@@ -115,7 +115,9 @@
         'vertical', 'pillar', 'stack', 'rack', 'column',
         // New: 10 ornament-rich themes (Islamic visual languages, set v2)
         'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
-        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah'
+        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
+        // Special themed layouts with custom assets
+        'special1'
     ];
 
     /* ===== State (mutable) ===== */
