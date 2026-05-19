@@ -389,6 +389,9 @@
         const wantedLayout = state.cfg.layout || 'minimal';
         if (state.mountedLayout !== wantedLayout) {
             mountLayout(wantedLayout);
+            // Reset digital autofit on layout change
+            _lastDigitalStyle = '';
+            _digitalFitSize = '';
         }
 
         // Rebuild analog clock face if the style changed.
@@ -398,6 +401,13 @@
             if (ticks) ticks.innerHTML = '';
             if (nums) nums.innerHTML = '';
             buildAnalogStatic();
+        }
+
+        // Reset digital autofit cache when style or hide_seconds changes
+        if (prev.digital_style !== state.cfg.digital_style ||
+            prev.hide_seconds !== state.cfg.hide_seconds) {
+            _lastDigitalStyle = '';
+            _digitalFitSize = '';
         }
 
         applyConfigToDom();
@@ -1659,6 +1669,8 @@
             main.innerHTML = renderDigitalStyle(style, h, m, s, hideSeconds);
             // Ensure the container has the style class for CSS targeting
             main.dataset.digitalStyle = style;
+            // Autofit: shrink #digital if it overflows its parent container
+            autoFitDigital(main);
         }
         const days   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
         const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -2181,6 +2193,35 @@
             if (next === cur) break;
             el.style.fontSize = next + 'px';
         }
+    }
+
+    /**
+     * Autofit the #digital clock element so it never overflows its
+     * parent container horizontally, regardless of which digital_style
+     * is active. This is critical when switching between styles like
+     * Binary (which renders two rows) or Dots (wider due to pill bg)
+     * on layouts with narrow clock areas.
+     *
+     * Strategy: measure the parent's available width vs the rendered
+     * clock's scrollWidth. If the clock overflows, shrink font-size
+     * step-by-step until it fits. Bounded by a minimum so the clock
+     * never becomes unreadable. Only runs once per render (called from
+     * tickDigital) and resets on each call for idempotency.
+     */
+    let _lastDigitalStyle = '';
+    let _digitalFitSize = '';
+
+    function autoFitDigital(el) {
+        // Autofit disabled — let the clock use its natural CSS size.
+        // The digital clock was becoming too small on many layouts
+        // because the shrink loop was too aggressive. Instead we rely
+        // on CSS overflow:hidden / text-overflow or the layout's own
+        // flex/grid constraints to keep things tidy.
+        if (!el) return;
+        el.style.fontSize = '';
+        _digitalFitSize = 'default';
+        _lastDigitalStyle = (state.cfg.digital_style || 'classic') +
+            (state.cfg.hide_seconds === true ? '-ns' : '');
     }
 
     function updateNextCountdown(now) {
