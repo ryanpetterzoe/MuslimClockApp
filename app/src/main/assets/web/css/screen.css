@@ -1650,3 +1650,170 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     word-break: keep-all;
     white-space: nowrap;
 }
+
+
+
+/* ===================== TICKER STYLES ===================== */
+
+/* Bounce: back and forth instead of infinite scroll */
+@keyframes tickerBounce {
+    0%   { transform: translateX(100%); }
+    45%  { transform: translateX(-100%); }
+    55%  { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Fade: text fades in, stays, fades out (no horizontal movement) */
+@keyframes tickerFade {
+    0%   { opacity: 0; transform: translateX(0); }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(0); }
+}
+
+/* Typewriter: step-based reveal */
+@keyframes tickerTypewriter {
+    0%   { transform: translateX(0); max-width: 0; overflow: hidden; }
+    100% { transform: translateX(0); max-width: 100vw; overflow: hidden; }
+}
+
+/* Neon: glowing text effect */
+.ticker-neon {
+    color: var(--accent) !important;
+    text-shadow:
+        0 0 7px var(--accent),
+        0 0 15px var(--accent),
+        0 0 30px var(--accent);
+}
+
+/* Data-attribute styling for ticker bar */
+#tickerBar[data-ticker-style="neon"] {
+    background: rgba(0,0,0,0.85) !important;
+    border-top: 1px solid var(--accent);
+}
+
+#tickerBar[data-ticker-style="bounce"] .marquee-inner {
+    padding-left: 0 !important;
+}
+
+/* ===================== NEW QURAN MODES CSS ===================== */
+
+/* Shared base card for new modes that reuse the .q-card skeleton.
+ * Without this, modes that aren't explicitly styled (fade, flip, glow,
+ * scroll) have no background/padding and the text floats bare on screen. */
+#quranBar[data-mode="fade"] #quranInner,
+#quranBar[data-mode="flip"] #quranInner,
+#quranBar[data-mode="glow"] #quranInner,
+#quranBar[data-mode="scroll"] #quranInner {
+    display: flex;
+    justify-content: center;
+    padding: 6px 32px 10px;
+}
+#quranBar[data-mode="fade"] .q-card,
+#quranBar[data-mode="flip"] .q-card,
+#quranBar[data-mode="glow"] .q-card,
+#quranBar[data-mode="scroll"] .q-card {
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 10px 22px;
+    text-align: center;
+    max-width: 80%;
+    width: auto;
+}
+#quranBar[data-mode="fade"] .q-arab,
+#quranBar[data-mode="flip"] .q-arab,
+#quranBar[data-mode="glow"] .q-arab,
+#quranBar[data-mode="scroll"] .q-arab  { font-size: clamp(16px, 1.6vw, 22px); margin-bottom: 4px; }
+#quranBar[data-mode="fade"] .q-trans,
+#quranBar[data-mode="flip"] .q-trans,
+#quranBar[data-mode="glow"] .q-trans,
+#quranBar[data-mode="scroll"] .q-trans { font-size: clamp(11px, 1.0vw, 13px); }
+#quranBar[data-mode="fade"] .q-ref,
+#quranBar[data-mode="flip"] .q-ref,
+#quranBar[data-mode="glow"] .q-ref,
+#quranBar[data-mode="scroll"] .q-ref   { font-size: 10px; margin-top: 4px; letter-spacing: 0.5px; }
+
+/* Fade mode: smooth opacity transition */
+#quranBar[data-mode="fade"] .q-card {
+    transition: opacity 0.4s ease;
+}
+
+/* Flip mode: perspective for 3D flip */
+#quranBar[data-mode="flip"] #quranInner {
+    perspective: 600px;
+}
+#quranBar[data-mode="flip"] .q-card {
+    transition: transform 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+/* Glow mode: accent-coloured glow pulse */
+#quranBar[data-mode="glow"] .q-card {
+    transition: box-shadow 0.6s ease;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Minimal card mode: bare text with a subtle bottom line */
+#quranBar[data-mode="minimalcard"] #quranInner {
+    display: flex;
+    justify-content: center;
+    padding: 6px 32px 10px;
+}
+#quranBar[data-mode="minimalcard"] .q-card {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 8px 22px 10px;
+    text-align: center;
+    max-width: 85%;
+}
+#quranBar[data-mode="minimalcard"] .q-arab  { font-size: clamp(16px, 1.8vw, 24px); margin-bottom: 4px; }
+#quranBar[data-mode="minimalcard"] .q-trans { font-size: clamp(11px, 1.0vw, 14px); }
+#quranBar[data-mode="minimalcard"] .q-ref   { font-size: 10px; margin-top: 4px; }
+
+/* Scroll mode: vertical slide in/out */
+#quranBar[data-mode="scroll"] #quranInner {
+    overflow: hidden;
+}
+#quranBar[data-mode="scroll"] .q-card {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* ===================== SPECIAL1 LAYOUT (Custom Background) ===================== */
+
+/* Full-screen background via bg.png */
+.layout-special1 .special1-bg {
+    z-index: 0;
+}
+
+/* Prayer cards use card.png as background */
+.layout-special1 .special1-card {
+    background: url('../img/temaspesial/a1/card.png') center/cover no-repeat;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+/* Next-prayer highlight for special1 */
+.layout-special1 .special1-card.next {
+    transform: translateY(-3px);
+    box-shadow: 0 0 24px var(--accent), 0 8px 30px -6px rgba(0,0,0,0.5);
+    border-color: var(--accent);
+}
+.layout-special1 .special1-card.next .label {
+    color: var(--accent) !important;
+}
+.layout-special1 .special1-card.next [data-time] {
+    color: var(--accent) !important;
+    text-shadow: 0 0 12px var(--accent);
+}
+
+/* Override universal left-bar for special1 (layout has its own highlight) */
+.layout-special1 .prayer.next::before {
+    display: none;
+}

@@ -219,7 +219,31 @@ class ColorPickerDialogFragment : PreferenceDialogFragmentCompat() {
                 )
                 isClickable = true
                 isFocusable = true
+                isFocusableInTouchMode = false
                 contentDescription = preset
+                // Focus highlight for TV remote / D-pad navigation:
+                // show a thick white ring + accent glow around the
+                // focused swatch so users know which colour they're
+                // about to select.
+                setOnFocusChangeListener { v, hasFocus ->
+                    if (hasFocus) {
+                        v.scaleX = 1.25f
+                        v.scaleY = 1.25f
+                        v.elevation = dp(8).toFloat()
+                        // Add a bright ring via foreground (API 23+)
+                        val ring = GradientDrawable().apply {
+                            shape = GradientDrawable.OVAL
+                            setColor(0x00000000)
+                            setStroke(dp(3), 0xFFFFFFFF.toInt())
+                        }
+                        v.foreground = ring
+                    } else {
+                        v.scaleX = 1.0f
+                        v.scaleY = 1.0f
+                        v.elevation = 0f
+                        v.foreground = null
+                    }
+                }
                 setOnClickListener {
                     pendingValue = preset
                     updatePreview(previewLabel)

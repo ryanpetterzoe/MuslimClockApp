@@ -48,6 +48,7 @@
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
+        ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
@@ -114,7 +115,9 @@
         'vertical', 'pillar', 'stack', 'rack', 'column',
         // New: 10 ornament-rich themes (Islamic visual languages, set v2)
         'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
-        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah'
+        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
+        // Special themed layouts with custom assets
+        'special1'
     ];
 
     /* ===== State (mutable) ===== */
@@ -468,6 +471,36 @@
             // Set animation speed
             const speed = Math.max(5, parseInt(cfg.ticker_speed, 10) || 30);
             content.style.animationDuration = speed + 's';
+
+            // Apply ticker style
+            const style = cfg.ticker_style || 'classic';
+            bar.dataset.tickerStyle = style;
+            content.className = 'marquee-inner';  // reset
+            switch (style) {
+                case 'bounce':
+                    content.style.animationName = 'tickerBounce';
+                    content.style.animationTimingFunction = 'ease-in-out';
+                    break;
+                case 'fade':
+                    content.style.animationName = 'tickerFade';
+                    content.style.animationTimingFunction = 'ease';
+                    content.style.paddingLeft = '0';
+                    break;
+                case 'neon':
+                    content.classList.add('ticker-neon');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'typewriter':
+                    content.style.animationName = 'tickerTypewriter';
+                    content.style.animationTimingFunction = 'steps(60, end)';
+                    break;
+                case 'classic':
+                default:
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+            }
         }
     }
 
@@ -504,7 +537,7 @@
     let quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
     let quranBuilt = '';        // last-built mode signature
 
-    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee'];
+    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee', 'fade', 'flip', 'glow', 'minimalcard', 'scroll'];
 
     function clearQuranTimers() {
         if (quranTimer)       { clearInterval(quranTimer);     quranTimer = null; }
@@ -601,6 +634,11 @@
             case 'typewriter': renderTypewriter(ayat); break;
             case 'slide':      renderSlide(ayat);      break;
             case 'fullcard':   renderFullCard(ayat);   break;
+            case 'fade':       renderFade(ayat);       break;
+            case 'flip':       renderFlip(ayat);       break;
+            case 'glow':       renderGlow(ayat);       break;
+            case 'minimalcard':renderMinimalCard(ayat); break;
+            case 'scroll':     renderScroll(ayat);     break;
             case 'card':
             default:           renderCard(ayat);       break;
         }
@@ -744,6 +782,74 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
+    }
+
+    /* ===== New Quran modes: fade, flip, glow, minimalcard, scroll ===== */
+
+    function renderFade(ayat) {
+        const card = document.querySelector('#quranBar .q-card');
+        if (!card) { setAyatText(ayat); return; }
+        // Fade out, swap text, fade in
+        card.style.transition = 'opacity 0.4s ease';
+        card.style.opacity = '0';
+        setTimeout(() => {
+            setAyatText(ayat);
+            card.style.opacity = '1';
+        }, 400);
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderFlip(ayat) {
+        const card = document.querySelector('#quranBar .q-card');
+        if (!card) { setAyatText(ayat); return; }
+        // Flip animation: rotate out on Y axis, swap text, rotate back
+        card.style.transition = 'transform 0.3s ease';
+        card.style.transform = 'rotateX(90deg)';
+        setTimeout(() => {
+            setAyatText(ayat);
+            card.style.transform = 'rotateX(0deg)';
+        }, 300);
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderGlow(ayat) {
+        const card = document.querySelector('#quranBar .q-card');
+        if (!card) { setAyatText(ayat); return; }
+        setAyatText(ayat);
+        // Pulse glow effect on the card
+        card.style.transition = 'box-shadow 0.6s ease';
+        card.style.boxShadow = '0 0 30px var(--accent), 0 0 60px var(--accent)';
+        setTimeout(() => {
+            card.style.boxShadow = '';
+        }, 1200);
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderMinimalCard(ayat) {
+        setAyatText(ayat);
+        // Minimal mode: CSS handles the transparent look via data-mode attr.
+        // No inline style manipulation needed — keeps card tidy.
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderScroll(ayat) {
+        const card = document.querySelector('#quranBar .q-card');
+        if (!card) { setAyatText(ayat); return; }
+        // Scroll up out, then scroll up in from below
+        card.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+        card.style.transform = 'translateY(-100%)';
+        card.style.opacity = '0';
+        setTimeout(() => {
+            setAyatText(ayat);
+            card.style.transition = 'none';
+            card.style.transform = 'translateY(100%)';
+            // Force reflow
+            void card.offsetWidth;
+            card.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+            card.style.transform = 'translateY(0)';
+            card.style.opacity = '1';
+        }, 350);
+        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     /* ===== Layout editor =====
@@ -2212,16 +2318,14 @@
     let _digitalFitSize = '';
 
     function autoFitDigital(el) {
-        // Autofit disabled — let the clock use its natural CSS size.
+        // Autofit completely disabled — do nothing.
         // The digital clock was becoming too small on many layouts
-        // because the shrink loop was too aggressive. Instead we rely
-        // on CSS overflow:hidden / text-overflow or the layout's own
-        // flex/grid constraints to keep things tidy.
-        if (!el) return;
-        el.style.fontSize = '';
-        _digitalFitSize = 'default';
-        _lastDigitalStyle = (state.cfg.digital_style || 'classic') +
-            (state.cfg.hide_seconds === true ? '-ns' : '');
+        // because the old shrink loop was too aggressive. We now let
+        // the clock use its natural CSS/inline size from the template.
+        // IMPORTANT: Do NOT clear el.style.fontSize here because the
+        // layout templates set the size via inline style attribute
+        // (e.g. "font-size: clamp(56px, min(13vw, 22vh), 180px)")
+        // and clearing it would remove that definition entirely.
     }
 
     function updateNextCountdown(now) {
