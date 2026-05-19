@@ -204,6 +204,23 @@
         <item>marquee</item>
     </string-array>
 
+    <!-- Digital clock display styles -->
+    <string-array name="digital_style_entries">
+        <item>Classic (Standar)</item>
+        <item>Split (Jam Besar + Menit Kecil)</item>
+        <item>Neon (Efek Glow)</item>
+        <item>Flip (Kartu Digit)</item>
+        <item>Dual-Tone (Dua Warna)</item>
+    </string-array>
+
+    <string-array name="digital_style_values">
+        <item>classic</item>
+        <item>split</item>
+        <item>neon</item>
+        <item>flip</item>
+        <item>dualtone</item>
+    </string-array>
+
     <!--
       Display fonts (UI text — masjid name, prayer labels, dates).
       Each entry is a Google Font that's already preloaded by index.html

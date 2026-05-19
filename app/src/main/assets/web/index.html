@@ -39,6 +39,7 @@ window.MC_CONFIG = {
     show_analog: true,
     show_countdown: true,
     layout: "minimal",
+    digital_style: "classic",
     show_quran: true,
     quran_interval: 30,
     quran_mode: "fullcard",
@@ -160,6 +161,64 @@ window.MC_CONFIG = {
     }
     .layout-classic .prayer-row.next .pname { color: var(--accent); }
     .layout-classic .prayer-row.next [data-time] { color: var(--accent); font-weight: 800; }
+
+    /* ===== Digital Clock Styles ===== */
+
+    /* Neon style: glowing digits */
+    .digi-neon-glow {
+        color: #fff;
+        text-shadow:
+            0 0 7px var(--accent),
+            0 0 15px var(--accent),
+            0 0 30px var(--accent),
+            0 0 50px color-mix(in srgb, var(--accent) 60%, transparent);
+    }
+    .digi-neon-sep {
+        color: var(--accent);
+        text-shadow: 0 0 10px var(--accent);
+        animation: neonBlink 1.2s ease-in-out infinite;
+        margin: 0 0.02em;
+    }
+    @keyframes neonBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    /* Flip style: digit cards */
+    .digi-flip-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.04em;
+    }
+    .digi-flip-card {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.3) 100%);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 0.08em;
+        padding: 0.03em 0.08em;
+        min-width: 0.6em;
+        text-align: center;
+        color: #fff;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .digi-flip-card::after {
+        content: '';
+        position: absolute;
+        left: 0; right: 0;
+        top: 50%;
+        height: 1px;
+        background: rgba(0,0,0,0.4);
+        pointer-events: none;
+    }
+    .digi-flip-colon {
+        color: var(--accent);
+        font-size: 0.8em;
+        margin: 0 0.02em;
+        animation: neonBlink 1s ease-in-out infinite;
+    }
 </style>
 </head>
 <body

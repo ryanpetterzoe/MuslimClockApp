@@ -176,4 +176,8 @@
     <string name="pref_font_display_sum">Untuk nama masjid, label, dan tanggal</string>
     <string name="pref_font_digital">Font Jam Digital</string>
     <string name="pref_font_digital_sum">Khusus untuk angka jam besar dan jadwal sholat</string>
+
+    <!-- Digital clock style -->
+    <string name="pref_digital_style">Gaya Jam Digital</string>
+    <string name="pref_digital_style_sum">Pilih tampilan angka jam digital. Classic, Split, Neon, Flip, atau Dual-tone.</string>
 </resources>

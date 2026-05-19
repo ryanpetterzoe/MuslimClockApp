@@ -137,6 +137,15 @@
             app:defaultValue="Orbitron"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:key="digital_style"
+            app:title="@string/pref_digital_style"
+            app:summary="@string/pref_digital_style_sum"
+            app:entries="@array/digital_style_entries"
+            app:entryValues="@array/digital_style_values"
+            app:defaultValue="classic"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:key="show_analog"
             app:title="@string/pref_show_analog"
