@@ -109,6 +109,16 @@
         <item>Stack (Tumpukan Tengah) ★ VERTIKAL</item>
         <item>Rack (Rak Kayu Sholat) ★ VERTIKAL</item>
         <item>Column (Kolom Klasik Ornamen) ★ VERTIKAL</item>
+        <item>Mihrab (Lengkung Mihrab) ★ ORNAMEN</item>
+        <item>Lantern (Lentera Maroko) ★ ORNAMEN</item>
+        <item>Mosaic (Zellige Cobalt) ★ ORNAMEN</item>
+        <item>Crescent (Hilal Konstelasi) ★ ORNAMEN</item>
+        <item>Damascus (Logam Damaskus) ★ ORNAMEN</item>
+        <item>Persian (Karpet Medallion) ★ ORNAMEN</item>
+        <item>Mecca (Cahaya Haram) ★ ORNAMEN</item>
+        <item>Marrakesh (Tile Multi-Warna) ★ ORNAMEN</item>
+        <item>Imperial (Tugra Utsmani) ★ ORNAMEN</item>
+        <item>Jannah (Kebun Surga) ★ ORNAMEN</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -165,6 +175,16 @@
         <item>stack</item>
         <item>rack</item>
         <item>column</item>
+        <item>mihrab</item>
+        <item>lantern</item>
+        <item>mosaic</item>
+        <item>crescent</item>
+        <item>damascus</item>
+        <item>persian</item>
+        <item>mecca</item>
+        <item>marrakesh</item>
+        <item>imperial</item>
+        <item>jannah</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
