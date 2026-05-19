@@ -147,6 +147,21 @@
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
+            app:key="hide_seconds"
+            app:title="@string/pref_hide_seconds"
+            app:summary="@string/pref_hide_seconds_sum"
+            app:defaultValue="false" />
+
+        <ListPreference
+            app:key="analog_style"
+            app:title="@string/pref_analog_style"
+            app:summary="@string/pref_analog_style_sum"
+            app:entries="@array/analog_style_entries"
+            app:entryValues="@array/analog_style_values"
+            app:defaultValue="classic"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
             app:key="show_analog"
             app:title="@string/pref_show_analog"
             app:defaultValue="true" />

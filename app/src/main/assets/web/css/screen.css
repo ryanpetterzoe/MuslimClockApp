@@ -1361,3 +1361,278 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-jannah    .prayer.next::before {
     display: none;
 }
+
+
+
+/* ===================== NEW DIGITAL CLOCK STYLES ===================== */
+
+/* Matrix style: green phosphor glow */
+.digi-matrix {
+    color: #4ade80;
+    text-shadow:
+        0 0 5px #4ade80,
+        0 0 15px rgba(74, 222, 128, 0.5),
+        0 0 30px rgba(74, 222, 128, 0.3);
+}
+.digi-matrix-sep {
+    color: #4ade80;
+    text-shadow: 0 0 8px #4ade80;
+    animation: neonBlink 1s ease-in-out infinite;
+    margin: 0 0.03em;
+}
+
+/* Retro style: CRT scanline look */
+.digi-retro-wrap {
+    display: inline-block;
+    position: relative;
+    padding: 0.05em 0.15em;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 0.08em;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.digi-retro-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+    );
+    pointer-events: none;
+    border-radius: inherit;
+}
+.digi-retro {
+    color: #fbbf24;
+    text-shadow: 0 0 8px #fbbf24, 0 0 2px #fff;
+    letter-spacing: 0.08em;
+}
+
+/* Gradient style: colorful gradient text */
+.digi-gradient {
+    background: linear-gradient(135deg, var(--accent), #ffffff, var(--accent));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: digiGradientShift 4s ease-in-out infinite;
+}
+.digi-gradient-sep {
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.4);
+    margin: 0 0.02em;
+}
+@keyframes digiGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Outline style: stroke-only text */
+.digi-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--accent);
+    text-shadow: none;
+}
+.digi-outline-sep {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4);
+    margin: 0 0.03em;
+    animation: neonBlink 1.2s ease-in-out infinite;
+}
+
+/* Shadow style: deep 3D emboss */
+.digi-shadow {
+    color: #ffffff;
+    text-shadow:
+        1px 1px 0 rgba(0,0,0,0.3),
+        2px 2px 0 rgba(0,0,0,0.25),
+        3px 3px 0 rgba(0,0,0,0.2),
+        4px 4px 0 rgba(0,0,0,0.15),
+        5px 5px 10px rgba(0,0,0,0.4),
+        0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.digi-shadow-sep {
+    color: var(--accent);
+    text-shadow:
+        1px 1px 0 rgba(0,0,0,0.3),
+        2px 2px 0 rgba(0,0,0,0.2);
+    margin: 0 0.03em;
+    animation: neonBlink 1.5s ease-in-out infinite;
+}
+
+/* LCD style: segment display look */
+.digi-lcd-wrap {
+    display: inline-flex;
+    align-items: center;
+    background: #0a0f0a;
+    border: 2px solid rgba(74, 222, 128, 0.3);
+    border-radius: 0.1em;
+    padding: 0.05em 0.15em;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.5);
+}
+.digi-lcd {
+    color: #4ade80;
+    text-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+    letter-spacing: 0.05em;
+}
+.digi-lcd-sep {
+    color: #4ade80;
+    text-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+    margin: 0 0.02em;
+    animation: neonBlink 1s steps(2) infinite;
+}
+
+/* Binary style: decimal above binary row */
+.digi-binary-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+.digi-binary-decimal {
+    font-size: 1em;
+    color: #ffffff;
+}
+.digi-binary-row {
+    font-size: 0.22em;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-top: 0.4em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    opacity: 0.8;
+}
+
+/* Dots style: dot separators with pill backgrounds */
+.digi-dots-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.05em;
+}
+.digi-dots-digit {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.12em;
+    padding: 0.02em 0.1em;
+    color: #ffffff;
+}
+.digi-dots-sep {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15em;
+    font-size: 0.3em;
+    color: var(--accent);
+    line-height: 1;
+    animation: neonBlink 1s ease-in-out infinite;
+}
+
+/* Wave style: floating character animation */
+.digi-wave-wrap {
+    display: inline-flex;
+    align-items: baseline;
+}
+.digi-wave-char {
+    display: inline-block;
+    color: #ffffff;
+    animation: digiWaveFloat 2s ease-in-out infinite;
+}
+.digi-wave-sep {
+    color: var(--accent);
+    margin: 0 0.02em;
+    opacity: 0.7;
+}
+@keyframes digiWaveFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-0.08em); }
+}
+
+
+/* ===================== ANALOG CLOCK STYLES ===================== */
+
+/* Modern: dark face, white markers, no numerals */
+#analog.analog-modern circle:nth-child(3) {
+    fill: #1e293b;
+}
+#analog.analog-modern #ticks line {
+    stroke: #ffffff;
+}
+
+/* Minimal: dark face, only 4 markers */
+#analog.analog-minimal circle:nth-child(3) {
+    fill: #0f172a;
+}
+#analog.analog-minimal #ticks line {
+    stroke: #ffffff;
+}
+
+/* Skeleton: transparent face, accent ticks */
+#analog.analog-skeleton circle:nth-child(3) {
+    fill: rgba(15, 23, 42, 0.4);
+}
+#analog.analog-skeleton #numerals text {
+    fill: #ffffff;
+}
+
+/* Luxury: cream/gold face */
+#analog.analog-luxury circle:nth-child(3) {
+    fill: linear-gradient(180deg, #fef9e7 0%, #f5e6c8 100%);
+}
+#analog.analog-luxury #numerals text {
+    fill: #d4af37;
+}
+
+/* Sport: bright white face, bold red markers */
+#analog.analog-sport circle:nth-child(3) {
+    fill: #ffffff;
+}
+#analog.analog-sport #numerals text {
+    fill: #0f172a;
+}
+
+/* Radar: dark green-tinted face */
+#analog.analog-radar circle:nth-child(1) {
+    fill: #0a1a0a;
+}
+#analog.analog-radar circle:nth-child(2) {
+    fill: #0a1a0a;
+}
+#analog.analog-radar circle:nth-child(3) {
+    fill: #050f05;
+}
+#analog.analog-radar #handH rect,
+#analog.analog-radar #handM rect {
+    fill: #4ade80;
+}
+#analog.analog-radar #handS rect {
+    fill: #22c55e;
+}
+#analog.analog-radar #handS circle {
+    stroke: #22c55e;
+}
+/* Center dots for radar */
+#analog.analog-radar > circle:nth-last-child(1) {
+    fill: #22c55e;
+}
+#analog.analog-radar > circle:nth-last-child(2) {
+    fill: #0a1a0a;
+}
+
+/* Arabic: slightly warmer face */
+#analog.analog-arabic circle:nth-child(3) {
+    fill: #fefce8;
+}
+
+/* Roman: parchment-style face */
+#analog.analog-roman circle:nth-child(3) {
+    fill: #fffbeb;
+}
+#analog.analog-roman #numerals text {
+    fill: #1c1917;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Dots: clean white face with dot markers */
+#analog.analog-dots circle:nth-child(3) {
+    fill: #ffffff;
+}
