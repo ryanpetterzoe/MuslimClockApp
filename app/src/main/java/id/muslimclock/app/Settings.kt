@@ -48,6 +48,7 @@ object Settings {
     const val K_SHOW_TICKER    = "show_ticker"
     const val K_TICKER_TEXT    = "ticker_text"
     const val K_TICKER_SPEED   = "ticker_speed"
+    const val K_TICKER_STYLE   = "ticker_style"
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
     const val K_QURAN_MODE     = "quran_mode"
@@ -172,6 +173,7 @@ object Settings {
             .putBoolean(K_SHOW_TICKER,   true)
             .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini")
             .putString(K_TICKER_SPEED,   "30")
+            .putString(K_TICKER_STYLE,   "classic")
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
             .putString(K_QURAN_MODE,     "fullcard")
@@ -251,6 +253,7 @@ object Settings {
             put("show_ticker",     p.getBoolean(K_SHOW_TICKER,    true))
             put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini"))
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
+            put("ticker_style",    str(K_TICKER_STYLE,            "classic"))
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
             put("quran_mode",      str(K_QURAN_MODE,              "fullcard"))

@@ -194,6 +194,11 @@
         <item>Typewriter</item>
         <item>Slide Animasi</item>
         <item>Running Text (Marquee)</item>
+        <item>Fade (Pudar Masuk/Keluar)</item>
+        <item>Flip (Kartu Balik)</item>
+        <item>Glow (Cahaya Bersinar)</item>
+        <item>Minimal (Teks Bersih)</item>
+        <item>Scroll (Gulir Vertikal)</item>
     </string-array>
 
     <string-array name="quran_mode_values">
@@ -202,6 +207,28 @@
         <item>typewriter</item>
         <item>slide</item>
         <item>marquee</item>
+        <item>fade</item>
+        <item>flip</item>
+        <item>glow</item>
+        <item>minimalcard</item>
+        <item>scroll</item>
+    </string-array>
+
+    <!-- Ticker / running text display styles -->
+    <string-array name="ticker_style_entries">
+        <item>Classic (Scroll Kiri)</item>
+        <item>Bounce (Pantulan)</item>
+        <item>Fade (Pudar Ganti)</item>
+        <item>Neon (Glow Berjalan)</item>
+        <item>Typewriter (Ketik Satu-Satu)</item>
+    </string-array>
+
+    <string-array name="ticker_style_values">
+        <item>classic</item>
+        <item>bounce</item>
+        <item>fade</item>
+        <item>neon</item>
+        <item>typewriter</item>
     </string-array>
 
     <!-- Digital clock display styles -->
