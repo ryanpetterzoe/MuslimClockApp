@@ -389,6 +389,9 @@
         const wantedLayout = state.cfg.layout || 'minimal';
         if (state.mountedLayout !== wantedLayout) {
             mountLayout(wantedLayout);
+            // Reset digital autofit on layout change
+            _lastDigitalStyle = '';
+            _digitalFitSize = '';
         }
 
         // Rebuild analog clock face if the style changed.
@@ -398,6 +401,13 @@
             if (ticks) ticks.innerHTML = '';
             if (nums) nums.innerHTML = '';
             buildAnalogStatic();
+        }
+
+        // Reset digital autofit cache when style or hide_seconds changes
+        if (prev.digital_style !== state.cfg.digital_style ||
+            prev.hide_seconds !== state.cfg.hide_seconds) {
+            _lastDigitalStyle = '';
+            _digitalFitSize = '';
         }
 
         applyConfigToDom();
@@ -1659,6 +1669,8 @@
             main.innerHTML = renderDigitalStyle(style, h, m, s, hideSeconds);
             // Ensure the container has the style class for CSS targeting
             main.dataset.digitalStyle = style;
+            // Autofit: shrink #digital if it overflows its parent container
+            autoFitDigital(main);
         }
         const days   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
         const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -2181,6 +2193,73 @@
             if (next === cur) break;
             el.style.fontSize = next + 'px';
         }
+    }
+
+    /**
+     * Autofit the #digital clock element so it never overflows its
+     * parent container horizontally, regardless of which digital_style
+     * is active. This is critical when switching between styles like
+     * Binary (which renders two rows) or Dots (wider due to pill bg)
+     * on layouts with narrow clock areas.
+     *
+     * Strategy: measure the parent's available width vs the rendered
+     * clock's scrollWidth. If the clock overflows, shrink font-size
+     * step-by-step until it fits. Bounded by a minimum so the clock
+     * never becomes unreadable. Only runs once per render (called from
+     * tickDigital) and resets on each call for idempotency.
+     */
+    let _lastDigitalStyle = '';
+    let _digitalFitSize = '';
+
+    function autoFitDigital(el) {
+        if (!el) return;
+        // Determine the container that constrains width. For most
+        // layouts this is the parent (a flex/grid cell). We need to
+        // measure its clientWidth minus any padding as the "budget".
+        const parent = el.parentElement;
+        if (!parent) return;
+
+        const currentStyle = state.cfg.digital_style || 'classic';
+        const hideSeconds = state.cfg.hide_seconds === true;
+        const styleKey = currentStyle + (hideSeconds ? '-ns' : '');
+
+        // Only recalculate when style changes or on first run.
+        // During normal ticking (same style, same second count) the
+        // rendered width doesn't change, so we can reuse the last
+        // computed size for performance.
+        if (_lastDigitalStyle === styleKey && _digitalFitSize) {
+            if (_digitalFitSize !== 'default') {
+                el.style.fontSize = _digitalFitSize;
+            }
+            return;
+        }
+
+        // Reset to CSS-defined size for a fresh measurement.
+        el.style.fontSize = '';
+        _digitalFitSize = 'default';
+        _lastDigitalStyle = styleKey;
+
+        // Defer measurement one frame so the DOM has reflowed with
+        // the new innerHTML from renderDigitalStyle.
+        requestAnimationFrame(() => {
+            if (!el.isConnected) return;
+            const parentWidth = parent.clientWidth;
+            if (!parentWidth) return;
+
+            // Some layouts don't constrain the #digital width (it's
+            // allowed to fill the whole row). Skip if there's no overflow.
+            if (el.scrollWidth <= parentWidth + 2) return;
+
+            // Shrink until it fits.
+            let safety = 20;
+            while (el.scrollWidth > parentWidth + 2 && safety-- > 0) {
+                const cur = parseFloat(window.getComputedStyle(el).fontSize) || 100;
+                const next = Math.max(24, cur * 0.92); // shrink by 8% each step
+                if (next === cur) break;
+                el.style.fontSize = next + 'px';
+            }
+            _digitalFitSize = el.style.fontSize || 'default';
+        });
     }
 
     function updateNextCountdown(now) {
