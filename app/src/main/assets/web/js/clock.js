@@ -825,14 +825,8 @@
 
     function renderMinimalCard(ayat) {
         setAyatText(ayat);
-        // Minimal: just the text, no fancy effects. The CSS for the
-        // card mode handles the styling. We just ensure text is set.
-        const card = document.querySelector('#quranBar .q-card');
-        if (card) {
-            card.style.background = 'transparent';
-            card.style.border = 'none';
-            card.style.backdropFilter = 'none';
-        }
+        // Minimal mode: CSS handles the transparent look via data-mode attr.
+        // No inline style manipulation needed — keeps card tidy.
         reserveQuranSpace(document.getElementById('quranBar'));
     }
 

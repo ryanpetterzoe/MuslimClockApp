@@ -1698,6 +1698,44 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 /* ===================== NEW QURAN MODES CSS ===================== */
 
+/* Shared base card for new modes that reuse the .q-card skeleton.
+ * Without this, modes that aren't explicitly styled (fade, flip, glow,
+ * scroll) have no background/padding and the text floats bare on screen. */
+#quranBar[data-mode="fade"] #quranInner,
+#quranBar[data-mode="flip"] #quranInner,
+#quranBar[data-mode="glow"] #quranInner,
+#quranBar[data-mode="scroll"] #quranInner {
+    display: flex;
+    justify-content: center;
+    padding: 6px 32px 10px;
+}
+#quranBar[data-mode="fade"] .q-card,
+#quranBar[data-mode="flip"] .q-card,
+#quranBar[data-mode="glow"] .q-card,
+#quranBar[data-mode="scroll"] .q-card {
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 10px 22px;
+    text-align: center;
+    max-width: 80%;
+    width: auto;
+}
+#quranBar[data-mode="fade"] .q-arab,
+#quranBar[data-mode="flip"] .q-arab,
+#quranBar[data-mode="glow"] .q-arab,
+#quranBar[data-mode="scroll"] .q-arab  { font-size: clamp(16px, 1.6vw, 22px); margin-bottom: 4px; }
+#quranBar[data-mode="fade"] .q-trans,
+#quranBar[data-mode="flip"] .q-trans,
+#quranBar[data-mode="glow"] .q-trans,
+#quranBar[data-mode="scroll"] .q-trans { font-size: clamp(11px, 1.0vw, 13px); }
+#quranBar[data-mode="fade"] .q-ref,
+#quranBar[data-mode="flip"] .q-ref,
+#quranBar[data-mode="glow"] .q-ref,
+#quranBar[data-mode="scroll"] .q-ref   { font-size: 10px; margin-top: 4px; letter-spacing: 0.5px; }
+
 /* Fade mode: smooth opacity transition */
 #quranBar[data-mode="fade"] .q-card {
     transition: opacity 0.4s ease;
@@ -1718,16 +1756,21 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
-/* Minimal card mode: bare text, no chrome */
+/* Minimal card mode: bare text with a subtle bottom line */
 #quranBar[data-mode="minimalcard"] #quranInner {
-    padding: 4px 24px 8px;
+    display: flex;
+    justify-content: center;
+    padding: 6px 32px 10px;
 }
 #quranBar[data-mode="minimalcard"] .q-card {
-    background: transparent !important;
-    border: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 8px 22px 10px;
     text-align: center;
+    max-width: 85%;
 }
 #quranBar[data-mode="minimalcard"] .q-arab  { font-size: clamp(16px, 1.8vw, 24px); margin-bottom: 4px; }
 #quranBar[data-mode="minimalcard"] .q-trans { font-size: clamp(11px, 1.0vw, 14px); }
