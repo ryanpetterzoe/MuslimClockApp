@@ -39,6 +39,7 @@
         show_analog: true,
         show_countdown: true,
         layout: 'minimal',
+        digital_style: 'classic',   // classic | split | neon | flip | dualtone
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
         slide_duration: 8,      // seconds per slide
         slideshow_opacity: 100, // 0..100 — visual intensity of the slideshow background (default: full)
@@ -108,7 +109,10 @@
         // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
         'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
         // New: 5 vertical prayer-card themes (jadwal sholat tersusun tegak)
-        'vertical', 'pillar', 'stack', 'rack', 'column'
+        'vertical', 'pillar', 'stack', 'rack', 'column',
+        // New: 10 ornament-rich themes (Islamic visual languages, set v2)
+        'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
+        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah'
     ];
 
     /* ===== State (mutable) ===== */
@@ -387,6 +391,7 @@
 
         applyConfigToDom();
         renderTimes();   // refresh card values for new DOM nodes
+        loadHijri();     // re-render hijri date on fresh DOM (fixes blank after theme switch)
         applySlideshow();
 
         // If the adzan overlay is currently visible, refresh its imam
@@ -1315,14 +1320,19 @@
     }
 
     /* ===== Digital clock + date ===== */
+
+    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone'];
+
     function tickDigital() {
         const now = new Date();
         const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
         const main = $('#digital');
         if (main) {
-            main.innerHTML =
-                `${pad(h)}<span style="color: var(--accent);">:</span>${pad(m)}` +
-                `<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">${pad(s)}</span>`;
+            const style = DIGITAL_STYLES.includes(state.cfg.digital_style)
+                ? state.cfg.digital_style : 'classic';
+            main.innerHTML = renderDigitalStyle(style, h, m, s);
+            // Ensure the container has the style class for CSS targeting
+            main.dataset.digitalStyle = style;
         }
         const days   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
         const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -1332,6 +1342,65 @@
         updateNextCountdown(now);
         checkAdzanTrigger(now);
     }
+
+    /**
+     * Render the digital clock HTML based on the selected style.
+     * All styles receive h, m, s as integers.
+     */
+    function renderDigitalStyle(style, h, m, s) {
+        switch (style) {
+            case 'split':
+                // Hours giant, minutes:seconds below in a smaller line
+                return `<div style="display:flex;flex-direction:column;align-items:center;line-height:1;">` +
+                    `<span style="font-size:1em;">${pad(h)}</span>` +
+                    `<span style="font-size:0.45em;color:var(--accent);letter-spacing:0.1em;margin-top:0.1em;">` +
+                    `${pad(m)} <span style="color:rgba(255,255,255,0.5);">:</span> ${pad(s)}</span>` +
+                    `</div>`;
+
+            case 'neon':
+                // Glow effect with text-shadow on all digits
+                return `<span class="digi-neon-glow">${pad(h)}</span>` +
+                    `<span class="digi-neon-sep">:</span>` +
+                    `<span class="digi-neon-glow">${pad(m)}</span>` +
+                    `<span class="digi-neon-sep">:</span>` +
+                    `<span class="digi-neon-glow" style="font-size:0.65em;">${pad(s)}</span>`;
+
+            case 'flip':
+                // Each digit in its own flip-card-style box
+                return renderFlipDigits(h, m, s);
+
+            case 'dualtone':
+                // Hours in accent, minutes white, seconds dimmed
+                return `<span style="color:var(--accent);">${pad(h)}</span>` +
+                    `<span style="color:rgba(255,255,255,0.4);margin:0 0.05em;">:</span>` +
+                    `<span style="color:#ffffff;">${pad(m)}</span>` +
+                    `<span style="color:rgba(255,255,255,0.4);margin:0 0.05em;">:</span>` +
+                    `<span style="color:rgba(255,255,255,0.45);font-size:0.55em;vertical-align:top;margin-left:0.1em;">${pad(s)}</span>`;
+
+            case 'classic':
+            default:
+                // Original style
+                return `${pad(h)}<span style="color: var(--accent);">:</span>${pad(m)}` +
+                    `<span style="color: var(--accent); font-size: 0.4em;" class="align-top ml-3">${pad(s)}</span>`;
+        }
+    }
+
+    /** Render flip-card style: each digit gets a rounded box behind it */
+    function renderFlipDigits(h, m, s) {
+        const digits = `${pad(h)}:${pad(m)}:${pad(s)}`;
+        let html = '<span class="digi-flip-wrap">';
+        for (let i = 0; i < digits.length; i++) {
+            const ch = digits[i];
+            if (ch === ':') {
+                html += '<span class="digi-flip-colon">:</span>';
+            } else {
+                html += `<span class="digi-flip-card">${ch}</span>`;
+            }
+        }
+        html += '</span>';
+        return html;
+    }
+
 
     /* ===== Hijri date =====
      *
