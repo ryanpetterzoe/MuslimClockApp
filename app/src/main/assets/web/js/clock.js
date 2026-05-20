@@ -1066,16 +1066,34 @@
         ensureGoogleFont(display);
         ensureGoogleFont(digital);
 
+        // Arabic-style fonts need a serif or Arabic fallback chain rather
+        // than system-ui / monospace, so the browser picks a matching
+        // generic when glyphs are missing.
+        const ARABIC_FONTS = [
+            'amiri', 'scheherazade new', 'cairo', 'noto kufi arabic',
+            'el messiri', 'reem kufi', 'lateef', 'harmattan',
+            'noto naskh arabic', 'aref ruqaa', 'marhey', 'readex pro',
+            'tajawal', 'changa', 'almarai', 'lalezar', 'rakkas',
+            'baloo bhaijaan 2', 'kufam', 'mirza', 'vibes', 'mada'
+        ];
+
+        const isArabicDisplay = ARABIC_FONTS.includes(display.toLowerCase());
+        const isArabicDigital = ARABIC_FONTS.includes(digital.toLowerCase());
+
         // Quote the family name in the CSS rule so multi-word fonts
         // ('Plus Jakarta Sans', 'Press Start 2P', etc.) resolve correctly.
-        document.documentElement.style.setProperty(
-            '--font-display',
-            `"${display}", system-ui, sans-serif`
-        );
-        document.documentElement.style.setProperty(
-            '--font-digital',
-            `"${digital}", "Orbitron", monospace`
-        );
+        const displayFallback = isArabicDisplay
+            ? `"${display}", "Amiri", "Traditional Arabic", serif`
+            : `"${display}", system-ui, sans-serif`;
+        const digitalFallback = isArabicDigital
+            ? `"${digital}", "Cairo", "Noto Kufi Arabic", sans-serif`
+            : `"${digital}", "Orbitron", monospace`;
+
+        document.documentElement.style.setProperty('--font-display', displayFallback);
+        document.documentElement.style.setProperty('--font-digital', digitalFallback);
+
+        // Add a body class for layout CSS to target Arabic font mode.
+        document.body.classList.toggle('arabic-font-active', isArabicDisplay || isArabicDigital);
 
         // Re-run the prayer-card auto-fit once the chosen fonts actually
         // arrive over the network. Without this, switching to a wider
