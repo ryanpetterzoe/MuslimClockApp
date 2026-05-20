@@ -2739,6 +2739,40 @@
                 }
             } catch (e) { console.warn(e); }
         });
+
+        // Auto-hide: if the gear icon is focused/hovered but not
+        // activated within 3 seconds, blur it so CSS drops opacity
+        // back to the resting value (0.08).
+        let _gearHideTimer = null;
+        const GEAR_HIDE_DELAY = 3000;
+
+        function startGearHideTimer() {
+            clearGearHideTimer();
+            _gearHideTimer = setTimeout(() => {
+                gear.blur();
+            }, GEAR_HIDE_DELAY);
+        }
+
+        function clearGearHideTimer() {
+            if (_gearHideTimer) {
+                clearTimeout(_gearHideTimer);
+                _gearHideTimer = null;
+            }
+        }
+
+        gear.addEventListener('focus', startGearHideTimer);
+        gear.addEventListener('mouseenter', startGearHideTimer);
+        gear.addEventListener('blur', clearGearHideTimer);
+        gear.addEventListener('mouseleave', clearGearHideTimer);
+
+        // If the user actually clicks or activates via keyboard,
+        // cancel the timer (settings will open, no need to hide).
+        gear.addEventListener('click', clearGearHideTimer);
+        gear.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                clearGearHideTimer();
+            }
+        });
     }
 
     /* ===== init ===== */
