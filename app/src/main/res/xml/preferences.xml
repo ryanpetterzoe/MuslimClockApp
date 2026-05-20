@@ -640,4 +640,12 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="">
+        <Preference
+            app:key="copyright"
+            app:title="Khusyu\' Time Oleh Ryan Apps"
+            app:selectable="false"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
