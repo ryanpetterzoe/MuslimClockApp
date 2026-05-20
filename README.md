@@ -1,4 +1,4 @@
-# Muslim Clock — Android (TV / Landscape)
+# Khusyu' Time — Android (TV / Landscape)
 
 Aplikasi Android (Android TV-ready, landscape) untuk menampilkan jadwal sholat,
 jam digital + analog, hitung mundur, dan overlay adzan — **tanpa perlu hosting
@@ -79,7 +79,7 @@ adb connect <IP-tv>:5555
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-5. Buka launcher Android TV — banner "Muslim Clock" akan muncul di baris aplikasi.
+5. Buka launcher Android TV — banner "Khusyu' Time" akan muncul di baris aplikasi.
 
 ### Lewat sideload (file APK ke USB / Send Files to TV)
 
@@ -154,3 +154,4 @@ app/src/main/
 - Tailwind CSS via Play CDN (di-bundle, untuk produksi sebenarnya disarankan
   build CSS statis dengan Tailwind CLI).
 - Font: Inter, Orbitron, Amiri (Google Fonts).
+- © Khusyu' Time Oleh Ryan Apps
