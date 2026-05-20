@@ -6,6 +6,9 @@ body {
     background: #000;
     color: #fff;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
     /* Lock the body to the visual viewport so descendants using % of
      * 'height' resolve against a guaranteed-correct height. Even if
      * Android WebView reports 100vh that includes the area behind the
@@ -13,6 +16,30 @@ body {
      * actual painted bounds the WebView knows about. */
     position: fixed;
     inset: 0;
+}
+
+/* Prevent text selection and focus highlight on display elements (TV remote / D-pad) */
+*:focus {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#layoutHost, #layoutHost * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+#layoutHost *:not(button):not(a):not(input) {
+    pointer-events: none;
+}
+
+#tickerBar, #tickerBar *,
+#quranBar, #quranBar * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* ---------- Viewport sizing fix for Android WebView ----------
@@ -302,20 +329,23 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
  * to fully visible so the user can tap/click it.
  */
 .gear-samar {
-    opacity: 0.12;
-    transition: opacity 0.35s ease, transform 0.25s ease;
+    opacity: 0.08;
     cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 .gear-samar:hover,
 .gear-samar:focus,
 .gear-samar:focus-visible {
-    opacity: 1;
-    transform: scale(1.1);
+    opacity: 0.08;
+    transform: none;
     outline: none;
 }
 .gear-samar:active {
-    opacity: 1;
-    transform: scale(0.95);
+    opacity: 0.15;
+    transform: none;
 }
 
 /* Hide scrollbars */
