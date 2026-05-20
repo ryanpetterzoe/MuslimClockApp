@@ -64,6 +64,17 @@
         imam_isha: '',
         imam_jumat: '',
         khatib_jumat: '',
+        // Per-prayer adzan overlay content
+        adzan_content_fajr: 'quran',
+        adzan_text_fajr: '',
+        adzan_content_dhuhr: 'quran',
+        adzan_text_dhuhr: '',
+        adzan_content_asr: 'quran',
+        adzan_text_asr: '',
+        adzan_content_maghrib: 'quran',
+        adzan_text_maghrib: '',
+        adzan_content_isha: 'quran',
+        adzan_text_isha: '',
         // Layout editor — defaults match Settings.kt. 100% size = use the
         // layout's natural dimensions; 0% offset = no translation.
         analog_size:  100, analog_x_pct:  0, analog_y_pct:  0,
@@ -2401,6 +2412,47 @@
         $('#ovPrayer').textContent = (PRAYER_LABEL_ID[key] || key).toUpperCase();
         $('#ovSub').textContent = 'BERLANGSUNG';
         applyImamToOverlay(key);
+
+        // --- Per-prayer overlay content (Quran card or custom text) ---
+        const cfg = state.cfg;
+        const contentMode = cfg['adzan_content_' + key] || 'none';
+        const ovContent = $('#ovContent');
+        const ovQuranCard = $('#ovQuranCard');
+        const ovCustomText = $('#ovCustomText');
+
+        // Clear any previous rotation timer
+        if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+
+        if (contentMode === 'quran' && QURAN_AYAT.length > 0) {
+            // Show a random Quran ayat and rotate it
+            const showOverlayAyat = () => {
+                const idx = Math.floor(Math.random() * QURAN_AYAT.length);
+                const ayat = QURAN_AYAT[idx];
+                $('#ovQuranArab').textContent = ayat.arab;
+                $('#ovQuranTrans').textContent = ayat.trans;
+                $('#ovQuranRef').textContent = 'QS. ' + ayat.surah + ': ' + ayat.ayat;
+            };
+            showOverlayAyat();
+            // Rotate ayat at the configured interval
+            const interval = Math.max(10, parseInt(cfg.quran_interval, 10) || 30) * 1000;
+            _ovQuranTimer = setInterval(showOverlayAyat, interval);
+            ovQuranCard.style.display = '';
+            ovCustomText.style.display = 'none';
+            ovContent.style.display = '';
+        } else if (contentMode === 'custom') {
+            const text = (cfg['adzan_text_' + key] || '').trim();
+            if (text) {
+                ovCustomText.textContent = text;
+                ovCustomText.style.display = '';
+                ovQuranCard.style.display = 'none';
+                ovContent.style.display = '';
+            } else {
+                ovContent.style.display = 'none';
+            }
+        } else {
+            ovContent.style.display = 'none';
+        }
+
         overlay.classList.remove('hidden');
 
         // Kick off the alarm sound (no-op if no audio URL configured).
@@ -2420,6 +2472,10 @@
             startCountdown(iqDur, () => {
                 state.iqomahActive = false;
                 overlay.classList.add('hidden');
+                // Clean up overlay content
+                if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+                const ovContent = $('#ovContent');
+                if (ovContent) ovContent.style.display = 'none';
             });
         });
     }
@@ -2443,6 +2499,7 @@
      *     user moves into iqomah, so we don't need a separate timeout.
      */
     let _adzanPlayState = null;
+    let _ovQuranTimer = null;
 
     function playAdzanAlarm() {
         const audio = document.getElementById('adzanAudio');

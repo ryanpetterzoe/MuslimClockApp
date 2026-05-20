@@ -65,6 +65,19 @@ object Settings {
     const val K_IMAM_JUMAT        = "imam_jumat"
     const val K_KHATIB_JUMAT      = "khatib_jumat"
 
+    // Per-prayer adzan overlay content. Each prayer can show a Quran card,
+    // custom text, or nothing in the overlay below the countdown.
+    const val K_ADZAN_CONTENT_FAJR    = "adzan_content_fajr"
+    const val K_ADZAN_TEXT_FAJR       = "adzan_text_fajr"
+    const val K_ADZAN_CONTENT_DHUHR   = "adzan_content_dhuhr"
+    const val K_ADZAN_TEXT_DHUHR      = "adzan_text_dhuhr"
+    const val K_ADZAN_CONTENT_ASR     = "adzan_content_asr"
+    const val K_ADZAN_TEXT_ASR        = "adzan_text_asr"
+    const val K_ADZAN_CONTENT_MAGHRIB = "adzan_content_maghrib"
+    const val K_ADZAN_TEXT_MAGHRIB    = "adzan_text_maghrib"
+    const val K_ADZAN_CONTENT_ISHA    = "adzan_content_isha"
+    const val K_ADZAN_TEXT_ISHA       = "adzan_text_isha"
+
     // Layout editor — per-element positioning. Each editable element has
     // three knobs: size (50..200% of default), and X/Y offset in viewport
     // percent (-50..+50). All are clamped server-side in [toJson] so a
@@ -186,6 +199,16 @@ object Settings {
             .putString(K_IMAM_ISHA,      "")
             .putString(K_IMAM_JUMAT,     "")
             .putString(K_KHATIB_JUMAT,   "")
+            .putString(K_ADZAN_CONTENT_FAJR, "quran")
+            .putString(K_ADZAN_TEXT_FAJR, "")
+            .putString(K_ADZAN_CONTENT_DHUHR, "quran")
+            .putString(K_ADZAN_TEXT_DHUHR, "")
+            .putString(K_ADZAN_CONTENT_ASR, "quran")
+            .putString(K_ADZAN_TEXT_ASR, "")
+            .putString(K_ADZAN_CONTENT_MAGHRIB, "quran")
+            .putString(K_ADZAN_TEXT_MAGHRIB, "")
+            .putString(K_ADZAN_CONTENT_ISHA, "quran")
+            .putString(K_ADZAN_TEXT_ISHA, "")
             .putInt(K_ANALOG_SIZE,    100)
             .putInt(K_ANALOG_X_PCT,   0)
             .putInt(K_ANALOG_Y_PCT,   0)
@@ -268,6 +291,17 @@ object Settings {
             put("imam_isha",       str(K_IMAM_ISHA,        ""))
             put("imam_jumat",      str(K_IMAM_JUMAT,       ""))
             put("khatib_jumat",    str(K_KHATIB_JUMAT,     ""))
+            // Per-prayer overlay content
+            put("adzan_content_fajr",    str(K_ADZAN_CONTENT_FAJR,    "quran"))
+            put("adzan_text_fajr",       str(K_ADZAN_TEXT_FAJR,       ""))
+            put("adzan_content_dhuhr",   str(K_ADZAN_CONTENT_DHUHR,   "quran"))
+            put("adzan_text_dhuhr",      str(K_ADZAN_TEXT_DHUHR,      ""))
+            put("adzan_content_asr",     str(K_ADZAN_CONTENT_ASR,     "quran"))
+            put("adzan_text_asr",        str(K_ADZAN_TEXT_ASR,        ""))
+            put("adzan_content_maghrib", str(K_ADZAN_CONTENT_MAGHRIB, "quran"))
+            put("adzan_text_maghrib",    str(K_ADZAN_TEXT_MAGHRIB,    ""))
+            put("adzan_content_isha",    str(K_ADZAN_CONTENT_ISHA,    "quran"))
+            put("adzan_text_isha",       str(K_ADZAN_TEXT_ISHA,       ""))
             // Layout editor — clamped server-side so a corrupted prefs
             // file can never force the JS into nonsense (e.g. negative size).
             put("analog_size",     p.getInt(K_ANALOG_SIZE,   100).coerceIn(50, 200))

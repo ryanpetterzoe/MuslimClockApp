@@ -275,6 +275,15 @@ window.MC_CONFIG = {
         </div>
         <div class="font-digital font-black leading-none tabular-nums text-white" id="ovCount" style="font-size: 12rem;">10:00</div>
         <div class="text-3xl mt-4 tracking-[6px] uppercase" id="ovSub" style="color: color-mix(in srgb, var(--accent) 80%, white);">Berlangsung</div>
+        <!-- Per-prayer overlay content: Quran card or custom text -->
+        <div id="ovContent" class="mt-8 max-w-4xl mx-auto px-6" style="display:none;">
+            <div id="ovQuranCard" style="display:none;">
+                <div class="text-4xl leading-relaxed" id="ovQuranArab" style="font-family: 'Amiri', serif; direction: rtl;"></div>
+                <div class="text-xl mt-4 opacity-80" id="ovQuranTrans"></div>
+                <div class="text-base mt-2 opacity-60" id="ovQuranRef"></div>
+            </div>
+            <div id="ovCustomText" class="text-3xl leading-relaxed" style="display:none;"></div>
+        </div>
     </div>
 </div>
 

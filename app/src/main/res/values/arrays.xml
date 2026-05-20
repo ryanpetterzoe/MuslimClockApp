@@ -307,6 +307,18 @@
         <item>radar</item>
     </string-array>
 
+    <!-- Adzan overlay content mode options -->
+    <string-array name="adzan_content_entries">
+        <item>Kartu Qur\u0027an</item>
+        <item>Teks Custom</item>
+        <item>Tidak Ada</item>
+    </string-array>
+    <string-array name="adzan_content_values">
+        <item>quran</item>
+        <item>custom</item>
+        <item>none</item>
+    </string-array>
+
     <!--
       Display fonts (UI text — masjid name, prayer labels, dates).
       Each entry is a Google Font that's already preloaded by index.html
