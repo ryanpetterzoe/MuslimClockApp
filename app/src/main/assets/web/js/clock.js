@@ -2424,14 +2424,15 @@
         if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
 
         if (contentMode === 'quran' && QURAN_AYAT.length > 0) {
-            // Show a random Quran ayat and rotate it
+            // Show a Quran ayat and rotate sequentially
             const showOverlayAyat = () => {
-                const idx = Math.floor(Math.random() * QURAN_AYAT.length);
-                const ayat = QURAN_AYAT[idx];
+                _ovQuranIdx = (_ovQuranIdx + 1) % QURAN_AYAT.length;
+                const ayat = QURAN_AYAT[_ovQuranIdx];
                 $('#ovQuranArab').textContent = ayat.arab;
                 $('#ovQuranTrans').textContent = ayat.trans;
                 $('#ovQuranRef').textContent = 'QS. ' + ayat.surah + ': ' + ayat.ayat;
             };
+            _ovQuranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
             showOverlayAyat();
             // Rotate ayat at the configured interval
             const interval = Math.max(10, parseInt(cfg.quran_interval, 10) || 30) * 1000;
@@ -2500,6 +2501,7 @@
      */
     let _adzanPlayState = null;
     let _ovQuranTimer = null;
+    let _ovQuranIdx = 0;
 
     function playAdzanAlarm() {
         const audio = document.getElementById('adzanAudio');
@@ -2636,12 +2638,15 @@
         }
     }
     function hideAdzan() {
+        if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+        const ovContent = $('#ovContent');
+        if (ovContent) ovContent.style.display = 'none';
         state.adzanActive = false;
         state.iqomahActive = false;
         // Also kill any in-flight audio so dismissing the overlay
         // really does silence the alarm. If the user only meant to
         // hide the visual and keep listening they can let it run on
-        // its own — they won't hit hideAdzan in that flow.
+        // its own -- they won't hit hideAdzan in that flow.
         stopAdzanAlarm();
         $('#adzanOverlay').classList.add('hidden');
     }
