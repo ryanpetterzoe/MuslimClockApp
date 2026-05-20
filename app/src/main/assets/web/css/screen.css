@@ -339,12 +339,12 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .gear-samar:hover,
 .gear-samar:focus,
 .gear-samar:focus-visible {
-    opacity: 0.08;
+    opacity: 0.25;
     transform: none;
     outline: none;
 }
 .gear-samar:active {
-    opacity: 0.15;
+    opacity: 0.35;
     transform: none;
 }
 
