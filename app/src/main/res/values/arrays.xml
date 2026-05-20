@@ -237,6 +237,31 @@
         <item>typewriter</item>
     </string-array>
 
+    <!-- Ticker / running text background variations -->
+    <string-array name="ticker_bg_entries">
+        <item>Hitam Solid (Default)</item>
+        <item>Transparan</item>
+        <item>Glass (Blur Tembus)</item>
+        <item>Warna Aksen</item>
+        <item>Gradient Sunset</item>
+        <item>Gradient Ocean</item>
+        <item>Gradient Ungu</item>
+        <item>Hijau Islami</item>
+        <item>Merah Gelap</item>
+    </string-array>
+
+    <string-array name="ticker_bg_values">
+        <item>solid_dark</item>
+        <item>transparent</item>
+        <item>glass</item>
+        <item>accent</item>
+        <item>gradient_sunset</item>
+        <item>gradient_ocean</item>
+        <item>gradient_purple</item>
+        <item>green_islamic</item>
+        <item>red_dark</item>
+    </string-array>
+
     <!-- Digital clock display styles -->
     <string-array name="digital_style_entries">
         <item>Classic (Standar)</item>

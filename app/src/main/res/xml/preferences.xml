@@ -189,6 +189,15 @@
             app:defaultValue="classic"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:key="ticker_bg"
+            app:title="Background Running Text"
+            app:summary="Pilih jenis background running text"
+            app:entries="@array/ticker_bg_entries"
+            app:entryValues="@array/ticker_bg_values"
+            app:defaultValue="solid_dark"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:key="ticker_text"
             app:title="@string/pref_ticker_text"
