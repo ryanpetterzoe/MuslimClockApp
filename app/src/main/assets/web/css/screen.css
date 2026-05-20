@@ -1699,10 +1699,25 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     100% { opacity: 0; transform: translateX(0); }
 }
 
-/* Typewriter: step-based reveal */
+/* Typewriter: width-based reveal with blinking caret. The text is
+ * revealed character-by-character (steps timing function in clock.js)
+ * by animating width 0% → 100%, then briefly held and reset. A right
+ * border acts as a typewriter caret and blinks via a separate keyframe.
+ *
+ * Note: requires padding-left:0 on .marquee-inner so the text isn't
+ * pushed off-screen by the classic-scroll offset. The override lives
+ * in the data-attribute rule further below.
+ */
 @keyframes tickerTypewriter {
-    0%   { transform: translateX(0); max-width: 0; overflow: hidden; }
-    100% { transform: translateX(0); max-width: 100vw; overflow: hidden; }
+    0%   { width: 0; }
+    60%  { width: 100%; }
+    90%  { width: 100%; }
+    100% { width: 0; }
+}
+
+@keyframes tickerCaretBlink {
+    0%, 100% { border-right-color: var(--accent); }
+    50%      { border-right-color: transparent; }
 }
 
 /* Neon: glowing text effect */
@@ -1722,6 +1737,87 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 #tickerBar[data-ticker-style="bounce"] .marquee-inner {
     padding-left: 0 !important;
+}
+
+/* Typewriter: kill the off-screen offset that classic scroll uses, set
+ * up the blinking caret, and force overflow:hidden so the partial-width
+ * reveal actually clips the unrevealed characters. The caret animation
+ * runs in parallel with the typing animation (composed in clock.js).
+ */
+#tickerBar[data-ticker-style="typewriter"] .marquee-inner {
+    padding-left: 0 !important;
+    overflow: hidden;
+    border-right: 2px solid var(--accent);
+    box-sizing: border-box;
+    /* `width:0` initial state prevents a flash of fully-rendered text
+     * before the animation kicks in on slower devices. */
+    width: 0;
+}
+
+/* ---------- Ticker background variations ---------- */
+/* Each value here matches an entry in arrays.xml → ticker_bg_values
+ * and is set on #tickerBar from clock.js (bar.dataset.tickerBg).
+ * Rules target the inner .marquee so they compose with the bar's
+ * own neon-style background override (which uses !important).
+ */
+#tickerBar[data-ticker-bg="solid_dark"] .marquee {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#tickerBar[data-ticker-bg="transparent"] .marquee {
+    background: transparent;
+}
+
+#tickerBar[data-ticker-bg="glass"] .marquee {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+#tickerBar[data-ticker-bg="accent"] .marquee {
+    /* Accent-tinted dark: falls back to the masjid's accent color
+     * mixed with black for legibility behind the bright text. */
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--accent) 55%, rgba(0, 0, 0, 0.65)),
+        color-mix(in srgb, var(--accent) 35%, rgba(0, 0, 0, 0.75))
+    );
+}
+
+#tickerBar[data-ticker-bg="gradient_sunset"] .marquee {
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+}
+
+#tickerBar[data-ticker-bg="gradient_ocean"] .marquee {
+    background: linear-gradient(90deg, #2193b0, #6dd5ed);
+}
+
+#tickerBar[data-ticker-bg="gradient_purple"] .marquee {
+    background: linear-gradient(90deg, #614385, #516395);
+}
+
+#tickerBar[data-ticker-bg="green_islamic"] .marquee {
+    background: linear-gradient(90deg, #134e5e, #71b280);
+}
+
+#tickerBar[data-ticker-bg="red_dark"] .marquee {
+    background: rgba(80, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* On the lighter / colored backgrounds, force a soft text-shadow so
+ * the accent-colored ticker text stays legible regardless of how
+ * vivid the gradient is behind it. */
+#tickerBar[data-ticker-bg="gradient_sunset"] .marquee-inner,
+#tickerBar[data-ticker-bg="gradient_ocean"] .marquee-inner,
+#tickerBar[data-ticker-bg="gradient_purple"] .marquee-inner,
+#tickerBar[data-ticker-bg="green_islamic"] .marquee-inner,
+#tickerBar[data-ticker-bg="glass"] .marquee-inner {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 6px rgba(0, 0, 0, 0.35);
 }
 
 /* ===================== NEW QURAN MODES CSS ===================== */

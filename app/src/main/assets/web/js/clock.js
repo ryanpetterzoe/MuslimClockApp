@@ -49,6 +49,7 @@
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
         ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
+        ticker_bg: 'solid_dark', // solid_dark | transparent | glass | accent | gradient_sunset | gradient_ocean | gradient_purple | green_islamic | red_dark
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
@@ -483,10 +484,19 @@
             const speed = Math.max(5, parseInt(cfg.ticker_speed, 10) || 30);
             content.style.animationDuration = speed + 's';
 
-            // Apply ticker style
+            // Apply ticker style + background. Both are surfaced to CSS
+            // via data-attributes so the stylesheet can branch without
+            // any inline overrides leaking between style switches.
             const style = cfg.ticker_style || 'classic';
             bar.dataset.tickerStyle = style;
+            bar.dataset.tickerBg = cfg.ticker_bg || 'solid_dark';
             content.className = 'marquee-inner';  // reset
+            // Reset properties that individual cases below may have set
+            // on a previous render. Without this, switching from
+            // typewriter back to classic leaves stale animation/width.
+            content.style.animationIterationCount = '';
+            content.style.width = '';
+            content.style.paddingLeft = '';
             switch (style) {
                 case 'bounce':
                     content.style.animationName = 'tickerBounce';
@@ -503,8 +513,25 @@
                     content.style.animationTimingFunction = 'linear';
                     break;
                 case 'typewriter':
-                    content.style.animationName = 'tickerTypewriter';
-                    content.style.animationTimingFunction = 'steps(60, end)';
+                    // True typewriter: width animates 0→100% in steps so
+                    // characters appear one-by-one, then briefly holds
+                    // and resets. The blinking caret is composed via a
+                    // second keyframe (tickerCaretBlink) running on the
+                    // same element. Padding-left:0 is enforced by the
+                    // CSS data-attribute rule so the text actually
+                    // appears in the visible bar instead of being
+                    // pushed off-screen by the classic-scroll offset.
+                    content.style.paddingLeft = '0';
+                    // Cap step count to character length so each step
+                    // reveals one character. Fall back to a reasonable
+                    // default for very short / empty strings.
+                    {
+                        const charCount = Math.max(8, formatted.length);
+                        content.style.animationName = 'tickerTypewriter, tickerCaretBlink';
+                        content.style.animationTimingFunction = `steps(${charCount}, end), steps(1, end)`;
+                        content.style.animationDuration = `${speed}s, 0.7s`;
+                        content.style.animationIterationCount = 'infinite, infinite';
+                    }
                     break;
                 case 'classic':
                 default:
