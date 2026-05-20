@@ -333,21 +333,38 @@
         <item>Playfair Display (Serif)</item>
         <item>Merriweather (Serif)</item>
         <item>Cinzel (Klasik)</item>
-        <item>Amiri (Arab)</item>
-        <item>Scheherazade New (Arab)</item>
-        <item>Cairo (Latin + Arab)</item>
         <item>Quicksand (Rounded)</item>
         <item>Josefin Sans (Stylish)</item>
         <item>Cormorant Garamond (Elegant Serif)</item>
         <item>DM Sans (Modern)</item>
         <item>Space Grotesk (Geometric)</item>
         <item>Libre Baskerville (Classic Serif)</item>
-        <item>Noto Kufi Arabic (Kufi Arab)</item>
-        <item>El Messiri (Arab Modern)</item>
         <item>Impact (Bold Condensed)</item>
         <item>Anton (Bold Condensed)</item>
         <item>Oswald (Bold Condensed)</item>
         <item>Black Ops One (Military Bold)</item>
+        <!-- === Font Nuansa Arab / Islami === -->
+        <item>Amiri (Arab Naskh Klasik)</item>
+        <item>Scheherazade New (Arab Naskh Elegan)</item>
+        <item>Cairo (Arab Modern)</item>
+        <item>Noto Kufi Arabic (Kufi Geometrik)</item>
+        <item>El Messiri (Arab Kontemporer)</item>
+        <item>Reem Kufi (Kufi Minimalis)</item>
+        <item>Lateef (Arab Nastaliq)</item>
+        <item>Harmattan (Arab Sahara)</item>
+        <item>Noto Naskh Arabic (Naskh Standard)</item>
+        <item>Aref Ruqaa (Ruq\'ah Kaligrafi)</item>
+        <item>Marhey (Arab Playful)</item>
+        <item>Readex Pro (Arab Sans Modern)</item>
+        <item>Tajawal (Arab Clean)</item>
+        <item>Changa (Arab Tebal)</item>
+        <item>Almarai (Arab Profesional)</item>
+        <item>Lalezar (Arab Display Bold)</item>
+        <item>Rakkas (Arab Dekoratif)</item>
+        <item>Baloo Bhaijaan 2 (Arab Rounded)</item>
+        <item>Kufam (Kufi Modern)</item>
+        <item>Mirza (Arab Ornamen)</item>
+        <item>Mada (Arab Geometrik)</item>
     </string-array>
 
     <string-array name="font_display_values">
@@ -363,21 +380,38 @@
         <item>Playfair Display</item>
         <item>Merriweather</item>
         <item>Cinzel</item>
-        <item>Amiri</item>
-        <item>Scheherazade New</item>
-        <item>Cairo</item>
         <item>Quicksand</item>
         <item>Josefin Sans</item>
         <item>Cormorant Garamond</item>
         <item>DM Sans</item>
         <item>Space Grotesk</item>
         <item>Libre Baskerville</item>
-        <item>Noto Kufi Arabic</item>
-        <item>El Messiri</item>
         <item>Impact</item>
         <item>Anton</item>
         <item>Oswald</item>
         <item>Black Ops One</item>
+        <!-- === Font Nuansa Arab / Islami === -->
+        <item>Amiri</item>
+        <item>Scheherazade New</item>
+        <item>Cairo</item>
+        <item>Noto Kufi Arabic</item>
+        <item>El Messiri</item>
+        <item>Reem Kufi</item>
+        <item>Lateef</item>
+        <item>Harmattan</item>
+        <item>Noto Naskh Arabic</item>
+        <item>Aref Ruqaa</item>
+        <item>Marhey</item>
+        <item>Readex Pro</item>
+        <item>Tajawal</item>
+        <item>Changa</item>
+        <item>Almarai</item>
+        <item>Lalezar</item>
+        <item>Rakkas</item>
+        <item>Baloo Bhaijaan 2</item>
+        <item>Kufam</item>
+        <item>Mirza</item>
+        <item>Mada</item>
     </string-array>
 
     <!--
@@ -404,6 +438,22 @@
         <item>Doto (LED Dots)</item>
         <item>Impact (Bold Condensed)</item>
         <item>Anton (Bold Display)</item>
+        <!-- === Font Nuansa Arab untuk Jam Digital === -->
+        <item>Cairo (Arab Modern)</item>
+        <item>El Messiri (Arab Kontemporer)</item>
+        <item>Reem Kufi (Kufi Minimalis)</item>
+        <item>Noto Kufi Arabic (Kufi Geometrik)</item>
+        <item>Readex Pro (Arab Sans Modern)</item>
+        <item>Tajawal (Arab Clean)</item>
+        <item>Changa (Arab Tebal)</item>
+        <item>Almarai (Arab Profesional)</item>
+        <item>Lalezar (Arab Display Bold)</item>
+        <item>Marhey (Arab Playful)</item>
+        <item>Kufam (Kufi Modern)</item>
+        <item>Mada (Arab Geometrik)</item>
+        <item>Harmattan (Arab Sahara)</item>
+        <item>Rakkas (Arab Dekoratif)</item>
+        <item>Baloo Bhaijaan 2 (Arab Rounded)</item>
     </string-array>
 
     <string-array name="font_digital_values">
@@ -425,5 +475,21 @@
         <item>Doto</item>
         <item>Impact</item>
         <item>Anton</item>
+        <!-- === Font Nuansa Arab untuk Jam Digital === -->
+        <item>Cairo</item>
+        <item>El Messiri</item>
+        <item>Reem Kufi</item>
+        <item>Noto Kufi Arabic</item>
+        <item>Readex Pro</item>
+        <item>Tajawal</item>
+        <item>Changa</item>
+        <item>Almarai</item>
+        <item>Lalezar</item>
+        <item>Marhey</item>
+        <item>Kufam</item>
+        <item>Mada</item>
+        <item>Harmattan</item>
+        <item>Rakkas</item>
+        <item>Baloo Bhaijaan 2</item>
     </string-array>
 </resources>

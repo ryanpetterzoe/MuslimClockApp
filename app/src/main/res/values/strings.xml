@@ -188,9 +188,9 @@
 
     <!-- Fonts -->
     <string name="pref_font_display">Font Tampilan (Display)</string>
-    <string name="pref_font_display_sum">Untuk nama masjid, label, dan tanggal</string>
+    <string name="pref_font_display_sum">Untuk nama masjid, label, tanggal — tersedia banyak font nuansa Arab/Islami</string>
     <string name="pref_font_digital">Font Jam Digital</string>
-    <string name="pref_font_digital_sum">Khusus untuk angka jam besar dan jadwal sholat</string>
+    <string name="pref_font_digital_sum">Untuk angka jam besar dan jadwal sholat — termasuk font Arab modern</string>
 
     <!-- Digital clock style -->
     <string name="pref_digital_style">Gaya Jam Digital</string>
