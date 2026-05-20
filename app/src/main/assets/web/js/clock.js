@@ -1,4 +1,4 @@
-/* Muslim Clock — Android WebView build
+/* Khusyu' Time — Android WebView build
  *
  * Config sources, in priority order:
  *   1. native bridge `MCAndroid.getConfig()` (when running inside the app)
@@ -18,7 +18,7 @@
     const pad = (n) => String(n).padStart(2, '0');
 
     const DEFAULTS = {
-        masjid_name: 'Masjid Muslim Clock',
+        masjid_name: 'Masjid Khusyu\' Time',
         masjid_address: 'Jakarta, Indonesia',
         masjid_logo: '',
         location_lat: -6.2,
@@ -46,7 +46,7 @@
         slide_duration: 8,      // seconds per slide
         slideshow_opacity: 100, // 0..100 — visual intensity of the slideshow background (default: full)
         show_ticker: true,
-        ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
+        ticker_text: 'Selamat Datang di Masjid Khusyu\' Time | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
         ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
         show_quran: true,
@@ -2772,7 +2772,7 @@
             if (e.key === 'Escape') hideAdzan();
         });
 
-        console.log('[MuslimClock] mounted layout=' + state.mountedLayout +
+        console.log('[KhusyuTime] mounted layout=' + state.mountedLayout +
                     ', bridge=' + !!window.MCAndroid);
     }
 

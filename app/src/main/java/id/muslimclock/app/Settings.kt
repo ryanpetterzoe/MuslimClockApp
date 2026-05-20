@@ -158,7 +158,7 @@ object Settings {
 
         if (p.getBoolean("__initialized", false)) return
         p.edit()
-            .putString(K_MASJID_NAME,    "Masjid Muslim Clock")
+            .putString(K_MASJID_NAME,    "Masjid Khusyu' Time")
             .putString(K_MASJID_ADDRESS, "Jakarta, Indonesia")
             .putString(K_MASJID_LOGO,    "")
             .putString(K_LAT,            "-6.2")
@@ -184,7 +184,7 @@ object Settings {
             .putString(K_SLIDE_DURATION, "8")
             .putInt(K_SLIDESHOW_OPACITY, 100)
             .putBoolean(K_SHOW_TICKER,   true)
-            .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini")
+            .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Khusyu' Time | Jadwal Sholat Hari Ini")
             .putString(K_TICKER_SPEED,   "30")
             .putString(K_TICKER_STYLE,   "classic")
             .putBoolean(K_SHOW_QURAN,    true)
@@ -244,7 +244,7 @@ object Settings {
             (p.getString(k, d.toString()) ?: d.toString()).toIntOrNull() ?: d
 
         return JSONObject().apply {
-            put("masjid_name",     str(K_MASJID_NAME,    "Masjid Muslim Clock"))
+            put("masjid_name",     str(K_MASJID_NAME,    "Masjid Khusyu' Time"))
             put("masjid_address",  str(K_MASJID_ADDRESS, "Jakarta, Indonesia"))
             put("masjid_logo",     str(K_MASJID_LOGO,    ""))
             put("location_lat",    dbl(K_LAT, -6.2))
@@ -274,7 +274,7 @@ object Settings {
             put("slide_duration",  int(K_SLIDE_DURATION,           8))
             put("slideshow_opacity", p.getInt(K_SLIDESHOW_OPACITY, 100).coerceIn(0, 100))
             put("show_ticker",     p.getBoolean(K_SHOW_TICKER,    true))
-            put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini"))
+            put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Khusyu' Time | Jadwal Sholat Hari Ini"))
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
             put("ticker_style",    str(K_TICKER_STYLE,            "classic"))
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
