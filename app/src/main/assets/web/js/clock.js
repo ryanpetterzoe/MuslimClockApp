@@ -117,7 +117,9 @@
         'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
         'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
         // Special themed layouts with custom assets
-        'special1', 'special2', 'special3'
+        'special1', 'special2', 'special3',
+        // Special themed layouts with a2 (Mosque Silhouette Blue) assets
+        'special4', 'special5', 'special6'
     ];
 
     /* ===== State (mutable) ===== */
