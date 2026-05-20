@@ -140,6 +140,21 @@
     <string name="pref_khatib_jumat">Khatib Sholat Jum\'at</string>
     <string name="pref_imam_sum_default">Misal: Ust. Ahmad Fauzi</string>
 
+    <!-- Adzan overlay content -->
+    <string name="cat_adzan_content">Konten Overlay Adzan</string>
+    <string name="pref_adzan_content_fajr">Konten Overlay Subuh</string>
+    <string name="pref_adzan_content_dhuhr">Konten Overlay Dzuhur</string>
+    <string name="pref_adzan_content_asr">Konten Overlay Ashar</string>
+    <string name="pref_adzan_content_maghrib">Konten Overlay Maghrib</string>
+    <string name="pref_adzan_content_isha">Konten Overlay Isya</string>
+    <string name="pref_adzan_content_sum">Pilih tampilan di bawah hitungan mundur saat overlay adzan aktif</string>
+    <string name="pref_adzan_text_fajr">Teks Custom Subuh</string>
+    <string name="pref_adzan_text_dhuhr">Teks Custom Dzuhur</string>
+    <string name="pref_adzan_text_asr">Teks Custom Ashar</string>
+    <string name="pref_adzan_text_maghrib">Teks Custom Maghrib</string>
+    <string name="pref_adzan_text_isha">Teks Custom Isya</string>
+    <string name="pref_adzan_text_sum">Teks yang ditampilkan di overlay adzan saat mode Teks Custom dipilih</string>
+
     <!-- Layout editor -->
     <string name="cat_layout_editor">Editor Tata Letak</string>
     <string name="layout_editor_intro">Atur ukuran &amp; posisi tiap elemen. Berlaku di semua tema. Tekan tombol Reset di bawah untuk kembali ke default.</string>
@@ -173,9 +188,9 @@
 
     <!-- Fonts -->
     <string name="pref_font_display">Font Tampilan (Display)</string>
-    <string name="pref_font_display_sum">Untuk nama masjid, label, dan tanggal</string>
+    <string name="pref_font_display_sum">Untuk nama masjid, label, tanggal — tersedia banyak font nuansa Arab/Islami</string>
     <string name="pref_font_digital">Font Jam Digital</string>
-    <string name="pref_font_digital_sum">Khusus untuk angka jam besar dan jadwal sholat</string>
+    <string name="pref_font_digital_sum">Untuk angka jam besar dan jadwal sholat — termasuk font Arab modern</string>
 
     <!-- Digital clock style -->
     <string name="pref_digital_style">Gaya Jam Digital</string>

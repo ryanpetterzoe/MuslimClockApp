@@ -64,6 +64,17 @@
         imam_isha: '',
         imam_jumat: '',
         khatib_jumat: '',
+        // Per-prayer adzan overlay content
+        adzan_content_fajr: 'quran',
+        adzan_text_fajr: '',
+        adzan_content_dhuhr: 'quran',
+        adzan_text_dhuhr: '',
+        adzan_content_asr: 'quran',
+        adzan_text_asr: '',
+        adzan_content_maghrib: 'quran',
+        adzan_text_maghrib: '',
+        adzan_content_isha: 'quran',
+        adzan_text_isha: '',
         // Layout editor — defaults match Settings.kt. 100% size = use the
         // layout's natural dimensions; 0% offset = no translation.
         analog_size:  100, analog_x_pct:  0, analog_y_pct:  0,
@@ -117,7 +128,7 @@
         'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
         'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
         // Special themed layouts with custom assets
-        'special1'
+        'special1', 'special2', 'special3'
     ];
 
     /* ===== State (mutable) ===== */
@@ -1055,16 +1066,34 @@
         ensureGoogleFont(display);
         ensureGoogleFont(digital);
 
+        // Arabic-style fonts need a serif or Arabic fallback chain rather
+        // than system-ui / monospace, so the browser picks a matching
+        // generic when glyphs are missing.
+        const ARABIC_FONTS = [
+            'amiri', 'scheherazade new', 'cairo', 'noto kufi arabic',
+            'el messiri', 'reem kufi', 'lateef', 'harmattan',
+            'noto naskh arabic', 'aref ruqaa', 'marhey', 'readex pro',
+            'tajawal', 'changa', 'almarai', 'lalezar', 'rakkas',
+            'baloo bhaijaan 2', 'kufam', 'mirza', 'vibes', 'mada'
+        ];
+
+        const isArabicDisplay = ARABIC_FONTS.includes(display.toLowerCase());
+        const isArabicDigital = ARABIC_FONTS.includes(digital.toLowerCase());
+
         // Quote the family name in the CSS rule so multi-word fonts
         // ('Plus Jakarta Sans', 'Press Start 2P', etc.) resolve correctly.
-        document.documentElement.style.setProperty(
-            '--font-display',
-            `"${display}", system-ui, sans-serif`
-        );
-        document.documentElement.style.setProperty(
-            '--font-digital',
-            `"${digital}", "Orbitron", monospace`
-        );
+        const displayFallback = isArabicDisplay
+            ? `"${display}", "Amiri", "Traditional Arabic", serif`
+            : `"${display}", system-ui, sans-serif`;
+        const digitalFallback = isArabicDigital
+            ? `"${digital}", "Cairo", "Noto Kufi Arabic", sans-serif`
+            : `"${digital}", "Orbitron", monospace`;
+
+        document.documentElement.style.setProperty('--font-display', displayFallback);
+        document.documentElement.style.setProperty('--font-digital', digitalFallback);
+
+        // Add a body class for layout CSS to target Arabic font mode.
+        document.body.classList.toggle('arabic-font-active', isArabicDisplay || isArabicDigital);
 
         // Re-run the prayer-card auto-fit once the chosen fonts actually
         // arrive over the network. Without this, switching to a wider
@@ -2399,6 +2428,48 @@
         $('#ovPrayer').textContent = (PRAYER_LABEL_ID[key] || key).toUpperCase();
         $('#ovSub').textContent = 'BERLANGSUNG';
         applyImamToOverlay(key);
+
+        // --- Per-prayer overlay content (Quran card or custom text) ---
+        const cfg = state.cfg;
+        const contentMode = cfg['adzan_content_' + key] || 'none';
+        const ovContent = $('#ovContent');
+        const ovQuranCard = $('#ovQuranCard');
+        const ovCustomText = $('#ovCustomText');
+
+        // Clear any previous rotation timer
+        if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+
+        if (contentMode === 'quran' && QURAN_AYAT.length > 0) {
+            // Show a Quran ayat and rotate sequentially
+            const showOverlayAyat = () => {
+                _ovQuranIdx = (_ovQuranIdx + 1) % QURAN_AYAT.length;
+                const ayat = QURAN_AYAT[_ovQuranIdx];
+                $('#ovQuranArab').textContent = ayat.arab;
+                $('#ovQuranTrans').textContent = ayat.trans;
+                $('#ovQuranRef').textContent = 'QS. ' + ayat.surah + ': ' + ayat.ayat;
+            };
+            _ovQuranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
+            showOverlayAyat();
+            // Rotate ayat at the configured interval
+            const interval = Math.max(10, parseInt(cfg.quran_interval, 10) || 30) * 1000;
+            _ovQuranTimer = setInterval(showOverlayAyat, interval);
+            ovQuranCard.style.display = '';
+            ovCustomText.style.display = 'none';
+            ovContent.style.display = '';
+        } else if (contentMode === 'custom') {
+            const text = (cfg['adzan_text_' + key] || '').trim();
+            if (text) {
+                ovCustomText.textContent = text;
+                ovCustomText.style.display = '';
+                ovQuranCard.style.display = 'none';
+                ovContent.style.display = '';
+            } else {
+                ovContent.style.display = 'none';
+            }
+        } else {
+            ovContent.style.display = 'none';
+        }
+
         overlay.classList.remove('hidden');
 
         // Kick off the alarm sound (no-op if no audio URL configured).
@@ -2418,6 +2489,10 @@
             startCountdown(iqDur, () => {
                 state.iqomahActive = false;
                 overlay.classList.add('hidden');
+                // Clean up overlay content
+                if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+                const ovContent = $('#ovContent');
+                if (ovContent) ovContent.style.display = 'none';
             });
         });
     }
@@ -2441,6 +2516,8 @@
      *     user moves into iqomah, so we don't need a separate timeout.
      */
     let _adzanPlayState = null;
+    let _ovQuranTimer = null;
+    let _ovQuranIdx = 0;
 
     function playAdzanAlarm() {
         const audio = document.getElementById('adzanAudio');
@@ -2577,12 +2654,15 @@
         }
     }
     function hideAdzan() {
+        if (_ovQuranTimer) { clearInterval(_ovQuranTimer); _ovQuranTimer = null; }
+        const ovContent = $('#ovContent');
+        if (ovContent) ovContent.style.display = 'none';
         state.adzanActive = false;
         state.iqomahActive = false;
         // Also kill any in-flight audio so dismissing the overlay
         // really does silence the alarm. If the user only meant to
         // hide the visual and keep listening they can let it run on
-        // its own — they won't hit hideAdzan in that flow.
+        // its own -- they won't hit hideAdzan in that flow.
         stopAdzanAlarm();
         $('#adzanOverlay').classList.add('hidden');
     }

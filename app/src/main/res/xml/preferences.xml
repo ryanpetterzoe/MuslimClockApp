@@ -561,4 +561,83 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_adzan_content">
+
+        <ListPreference
+            app:key="adzan_content_fajr"
+            app:title="@string/pref_adzan_content_fajr"
+            app:summary="@string/pref_adzan_content_sum"
+            app:entries="@array/adzan_content_entries"
+            app:entryValues="@array/adzan_content_values"
+            app:defaultValue="quran"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_text_fajr"
+            app:title="@string/pref_adzan_text_fajr"
+            app:summary="@string/pref_adzan_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="adzan_content_dhuhr"
+            app:title="@string/pref_adzan_content_dhuhr"
+            app:summary="@string/pref_adzan_content_sum"
+            app:entries="@array/adzan_content_entries"
+            app:entryValues="@array/adzan_content_values"
+            app:defaultValue="quran"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_text_dhuhr"
+            app:title="@string/pref_adzan_text_dhuhr"
+            app:summary="@string/pref_adzan_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="adzan_content_asr"
+            app:title="@string/pref_adzan_content_asr"
+            app:summary="@string/pref_adzan_content_sum"
+            app:entries="@array/adzan_content_entries"
+            app:entryValues="@array/adzan_content_values"
+            app:defaultValue="quran"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_text_asr"
+            app:title="@string/pref_adzan_text_asr"
+            app:summary="@string/pref_adzan_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="adzan_content_maghrib"
+            app:title="@string/pref_adzan_content_maghrib"
+            app:summary="@string/pref_adzan_content_sum"
+            app:entries="@array/adzan_content_entries"
+            app:entryValues="@array/adzan_content_values"
+            app:defaultValue="quran"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_text_maghrib"
+            app:title="@string/pref_adzan_text_maghrib"
+            app:summary="@string/pref_adzan_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="adzan_content_isha"
+            app:title="@string/pref_adzan_content_isha"
+            app:summary="@string/pref_adzan_content_sum"
+            app:entries="@array/adzan_content_entries"
+            app:entryValues="@array/adzan_content_values"
+            app:defaultValue="quran"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="adzan_text_isha"
+            app:title="@string/pref_adzan_text_isha"
+            app:summary="@string/pref_adzan_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
