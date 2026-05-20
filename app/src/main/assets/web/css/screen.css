@@ -1852,16 +1852,17 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-special3 .special3-card.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
 .layout-special3 .prayer.next::before { display: none; }
 
-/* ===================== SPECIAL4 LAYOUT (A2 Blue - Horizontal Bottom) ===================== */
+/* ===================== SPECIAL4 LAYOUT (A2 Blue - Card Container) ===================== */
 .layout-special4 .special4-bg { z-index: 0; }
 .layout-special4 .special4-card {
-    background: url('../img/temaspesial/a2/card.png') center/cover no-repeat;
-    border-radius: 14px;
-    border: 1px solid rgba(43,117,240,0.4);
-    transition: transform .3s ease, box-shadow .3s ease;
+    background: rgba(43,117,240,0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(43,117,240,0.2);
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
 }
 .layout-special4 .special4-card.next {
     transform: translateY(-3px);
+    background: rgba(43,117,240,0.15);
     box-shadow: 0 0 24px #2B75F0, 0 8px 30px -6px rgba(2,17,56,0.5);
     border-color: #2B75F0;
 }
