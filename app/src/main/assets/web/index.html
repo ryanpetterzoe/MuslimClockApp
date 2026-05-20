@@ -232,7 +232,7 @@ window.MC_CONFIG = {
     data-show-countdown="1">
 
 <!-- Mount point for the active layout. clock.js clones a <template> here. -->
-<div id="layoutHost"></div>
+<div id="layoutHost" tabindex="-1"></div>
 
 <!-- Ticker running text (shared across layouts, fixed at bottom). -->
 <div id="tickerBar" class="fixed bottom-0 left-0 right-0 z-30" style="display:none;">
@@ -254,8 +254,9 @@ window.MC_CONFIG = {
 
 <!-- Floating settings button — very faint until hovered/focused. -->
 <button id="gearBtn"
-        class="fixed top-4 right-4 z-40 w-10 h-10 rounded-full glass-dark text-white text-lg flex items-center justify-center shadow-soft gear-samar"
+        class="fixed top-4 right-4 z-40 w-10 h-10 text-white text-lg flex items-center justify-center gear-samar"
         aria-label="Settings"
+        tabindex="-1"
         style="display:none;">
     &#9881;
 </button>
