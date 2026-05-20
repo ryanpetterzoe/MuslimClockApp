@@ -122,9 +122,6 @@
         <item>Spesial A1 (Custom Background)</item>
         <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
-        <item>Spesial B1 (Blue Horizontal)</item>
-        <item>Spesial B2 (Blue Vertikal Kanan)</item>
-        <item>Spesial B3 (Blue Vertikal Kiri)</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -194,9 +191,6 @@
         <item>special1</item>
         <item>special2</item>
         <item>special3</item>
-        <item>special4</item>
-        <item>special5</item>
-        <item>special6</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
