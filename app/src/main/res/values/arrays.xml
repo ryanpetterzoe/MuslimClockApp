@@ -144,6 +144,16 @@
         <item>Fullphoto 8 (BG Foto Sinematik) ★ BACKGROUND</item>
         <item>Fullphoto 9 (BG Foto Kaca) ★ BACKGROUND</item>
         <item>Fullphoto 10 (BG Foto Emas) ★ BACKGROUND</item>
+        <item>Fullphoto 11 (Heksagonal) ★ BACKGROUND</item>
+        <item>Fullphoto 12 (Sidebar Kaca) ★ BACKGROUND</item>
+        <item>Fullphoto 13 (Diagonal Ribbon) ★ BACKGROUND</item>
+        <item>Fullphoto 14 (Horizon Split) ★ BACKGROUND</item>
+        <item>Fullphoto 15 (Orbit Arc) ★ BACKGROUND</item>
+        <item>Fullphoto 16 (Pil Jadwal) ★ BACKGROUND</item>
+        <item>Fullphoto 17 (Cascade Tumpuk) ★ BACKGROUND</item>
+        <item>Fullphoto 18 (Grid Mosaic) ★ BACKGROUND</item>
+        <item>Fullphoto 19 (Bubble Melayang) ★ BACKGROUND</item>
+        <item>Fullphoto 20 (Meter Vertikal) ★ BACKGROUND</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -235,6 +245,16 @@
         <item>fullphoto8</item>
         <item>fullphoto9</item>
         <item>fullphoto10</item>
+        <item>fullphoto11</item>
+        <item>fullphoto12</item>
+        <item>fullphoto13</item>
+        <item>fullphoto14</item>
+        <item>fullphoto15</item>
+        <item>fullphoto16</item>
+        <item>fullphoto17</item>
+        <item>fullphoto18</item>
+        <item>fullphoto19</item>
+        <item>fullphoto20</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
