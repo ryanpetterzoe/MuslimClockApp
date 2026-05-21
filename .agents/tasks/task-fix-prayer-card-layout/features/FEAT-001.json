@@ -28,5 +28,5 @@
     "Verify the quran bar CSS is untouched"
   ],
   "blocked_reason": null,
-  "findings": "All three CSS changes applied successfully: (1) flex: 0 1 auto on .row-fixed allows shrinking, (2) max-height: 25vh on section.row-fixed caps prayer section height, (3) @media (max-height: 640px) provides compact styling. No build/test system exists for this pure CSS project - verified by code review. quranBar CSS untouched."
+  "findings": "All review feedback addressed: (1) Header protected from shrinking by reverting .row-fixed to flex:0 0 auto and scoping shrink to section.row-fixed only, (2) Comment updated to reflect new behavior, (3) Layout-family exceptions added for bigboard/pulpit/bulletin/tower/beacon and vertical/pillar/stack/rack/column, (4) Fixed 8px font replaced with clamp(7px, 1.2vh, 10px) for viewport scaling, (5) Added height:100%+overflow:hidden on .flex-layout and explicit flex-basis:0 on .row-fill for additional overlap prevention across all layouts."
 }
