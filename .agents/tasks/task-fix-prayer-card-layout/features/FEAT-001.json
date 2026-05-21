@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "fix",
   "description": "Fix prayer card layout overflow in horizontal/landscape mode. Prayer cards in horizontal layouts (grid-cols-6, grid-cols-3, flex-wrap) get pushed below the visible viewport on landscape screens because the flex layout does not properly constrain content to fit within the available height after accounting for ticker and quran bar space. The fix involves: (1) making the prayer section able to shrink, (2) reducing internal padding/gaps on short viewports via media queries, (3) ensuring proper min-height:0 on flex children so flexbox overflow is handled correctly.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "In app/src/main/assets/web/css/screen.css, modify the .flex-layout > .row-fixed rule to change from `flex: 0 0 auto` to `flex: 0 1 auto` (allow shrinking). This lets the prayer section compress slightly rather than overflowing the viewport. Keep min-height:0 which is already set.",
     "In app/src/main/assets/web/css/screen.css, add a `@media (max-height: 600px)` block that targets the prayer sections: reduce padding (pb-4 is 16px from Tailwind - use pb-2 equivalent i.e. 8px), reduce gap in grid layouts, and shrink font sizes slightly. This handles landscape TV/tablet where vertical space is around 480-600px.",
@@ -28,5 +28,5 @@
     "Verify the quran bar CSS is untouched"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All three CSS changes applied successfully: (1) flex: 0 1 auto on .row-fixed allows shrinking, (2) max-height: 25vh on section.row-fixed caps prayer section height, (3) @media (max-height: 640px) provides compact styling. No build/test system exists for this pure CSS project - verified by code review. quranBar CSS untouched."
 }
