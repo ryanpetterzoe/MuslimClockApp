@@ -377,6 +377,12 @@
             app:selectable="false"
             app:summary="@string/layout_editor_intro" />
 
+        <Preference
+            app:key="open_layout_editor"
+            app:title="@string/pref_open_layout_editor"
+            app:summary="@string/pref_open_layout_editor_sum"
+            app:icon="@android:drawable/ic_menu_view" />
+
         <SeekBarPreference
             app:key="analog_size"
             app:title="@string/pref_analog_size"
