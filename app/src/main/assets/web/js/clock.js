@@ -665,7 +665,10 @@
                 el.style.left = '0';
                 el.style.right = '0';
                 if (anchor === 'bottom') {
-                    el.style.bottom = '0';
+                    // Offset from the bottom by the combined height of the
+                    // fixed quran bar + ticker so the prayer section never
+                    // overlaps those bottom-pinned elements.
+                    el.style.bottom = 'calc(var(--ticker-h, 0px) + var(--quran-h, 0px))';
                     el.style.top = '';
                 } else {
                     el.style.top = '0';
@@ -1012,7 +1015,26 @@
         requestAnimationFrame(() => {
             const h = bar.getBoundingClientRect().height || 0;
             document.documentElement.style.setProperty('--quran-h', Math.ceil(h) + 'px');
+            // Re-run autofit and collision check after the quran height is
+            // established so prayer cards adjust to the new available space.
+            setTimeout(() => {
+                autoFitVerticalOverflow();
+                preventPrayerQuranCollision();
+            }, 30);
         });
+
+        // Install a ResizeObserver (once) so that whenever the quran bar
+        // changes height (e.g. font load, ayat rotation, mode switch),
+        // the reserved space stays accurate and layouts don't overlap.
+        if (!bar._quranRO) {
+            bar._quranRO = new ResizeObserver(() => {
+                const h2 = bar.getBoundingClientRect().height || 0;
+                document.documentElement.style.setProperty('--quran-h', Math.ceil(h2) + 'px');
+                // Re-check collision after height changes.
+                preventPrayerQuranCollision();
+            });
+            bar._quranRO.observe(bar);
+        }
     }
 
     function showNextAyat(initial) {
@@ -1342,6 +1364,58 @@
             apply(uniqueDateSelector(dateWrap),
                   cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
                   'top right');
+        }
+
+        // After all transforms are applied, schedule a collision check
+        // so that visually the prayer section never overlaps the quran bar.
+        requestAnimationFrame(preventPrayerQuranCollision);
+    }
+
+    /**
+     * Prevent the prayer-card section from visually overlapping the
+     * quran bar. After layout-editor transforms (translate/scale) are
+     * applied, the prayer section might extend below its intended area
+     * and collide with the fixed-bottom quran bar. This function
+     * detects the overlap using bounding rects and nudges the prayer
+     * section upward with an additional translateY correction.
+     */
+    function preventPrayerQuranCollision() {
+        const bar = document.getElementById('quranBar');
+        if (!bar || bar.style.display === 'none') return;
+
+        const host = document.getElementById('layoutHost');
+        if (!host) return;
+        const prayerSection = findPrayerContainer();
+        if (!prayerSection) return;
+
+        // Strip any previous collision correction so we measure the
+        // "natural" position (with only layout-editor transforms).
+        const currentTransform = prayerSection.style.transform || '';
+        const baseTransform = currentTransform.replace(/translateY\(-\d+(\.\d+)?px\)\s*/g, '').trim();
+        if (currentTransform !== baseTransform) {
+            prayerSection.style.transform = baseTransform || '';
+        }
+
+        // Force a synchronous layout so rects reflect the base position.
+        const barRect = bar.getBoundingClientRect();
+        const prayerRect = prayerSection.getBoundingClientRect();
+
+        // If there's no quran bar height, nothing to collide with.
+        if (barRect.height <= 0) return;
+
+        // Calculate overlap: how many pixels the prayer section's bottom
+        // extends below the quran bar's top.
+        const overlap = prayerRect.bottom - barRect.top;
+        if (overlap <= 0) return; // No collision
+
+        // Apply a correction by shifting upward by the overlap + a gap.
+        const gap = 8; // px of breathing room
+        const correction = Math.ceil(overlap + gap);
+
+        if (baseTransform) {
+            prayerSection.style.transform = `translateY(-${correction}px) ` + baseTransform;
+        } else {
+            prayerSection.style.transform = `translateY(-${correction}px)`;
         }
     }
 
