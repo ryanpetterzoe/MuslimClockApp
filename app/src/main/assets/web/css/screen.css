@@ -68,25 +68,41 @@ body {
 }
 
 /* The flex helper ensures direct children of a column-flex layout root
- * have predictable shrink behaviour: header/footer rows never shrink,
- * the main row absorbs all leftover space and may overflow into a
- * hidden region rather than push siblings off-screen.
+ * have predictable shrink behaviour: header rows never shrink; prayer
+ * sections (section.row-fixed) may shrink and are capped to fit short
+ * viewports. The main row absorbs all leftover space and may overflow
+ * into a hidden region rather than push siblings off-screen.
  *
  * Stacking guarantee (slideshow z-index fix):
  * Every direct row of a flex layout gets `position: relative; z-index: 1`
  * by default. The slideshow-host is forced to `z-index: 0` (see below).
  * That way, even templates that forgot to add `relative z-10` on their
  * header/main/section will still render their content ABOVE the
- * slideshow background — never the other way around. Templates that
+ * slideshow background -- never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
-.flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; position: relative; z-index: 1; }
-.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+.flex-layout         { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; position: relative; z-index: 1; }
+.flex-layout > section.row-fixed { flex: 0 1 auto; }
+.flex-layout > .row-fill  { flex: 1 1 0; flex-basis: 0; min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
 
 /* Prayer section max-height safety net: never exceed 25% of viewport height */
 .flex-layout > section.row-fixed {
     max-height: 25vh;
     overflow: hidden;
+}
+
+/* Big-schedule and vertical-card layouts have intentionally large prayer sections */
+.layout-bigboard section.row-fixed,
+.layout-pulpit section.row-fixed,
+.layout-bulletin section.row-fixed,
+.layout-tower section.row-fixed,
+.layout-beacon section.row-fixed,
+.layout-vertical section.row-fixed,
+.layout-pillar section.row-fixed,
+.layout-stack section.row-fixed,
+.layout-rack section.row-fixed,
+.layout-column section.row-fixed {
+    max-height: none;
 }
 
 /* ---------- Slideshow stacking guarantee ----------
@@ -2095,6 +2111,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     section.row-fixed .label,
     section.row-fixed .truncate,
     section.row-fixed [class*="tracking-"] {
-        font-size: 8px !important;
+        font-size: clamp(7px, 1.2vh, 10px) !important;
     }
 }
