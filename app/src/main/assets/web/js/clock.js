@@ -136,7 +136,10 @@
         'special1', 'special2', 'special3',
         // New: 12 photo-frame + centered-logo themes
         'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
-        'oasis', 'sanctuary', 'arch', 'courtyard', 'terrace', 'panorama'
+        'oasis', 'sanctuary', 'arch', 'courtyard', 'terrace', 'panorama',
+        // New: 10 full-background-photo layouts (slideshow as full BG)
+        'fullphoto1', 'fullphoto2', 'fullphoto3', 'fullphoto4', 'fullphoto5',
+        'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10'
     ];
 
     /* ===== State (mutable) ===== */

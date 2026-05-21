@@ -2006,3 +2006,52 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-special3 .special3-card.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
 .layout-special3 .prayer.next::before { display: none; }
 
+
+/* ===================== FULLPHOTO LAYOUTS NEXT-STATE STYLES ===================== */
+
+/* Fullphoto 1 (Elegan) */
+.layout-fullphoto1 .prayer.next { border-color: var(--accent); background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent); border-radius: 8px; }
+.layout-fullphoto1 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto1 .prayer.next::before { display: none; }
+
+/* Fullphoto 2 (Neon) */
+.layout-fullphoto2 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent); box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); }
+.layout-fullphoto2 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
+.layout-fullphoto2 .prayer.next::before { display: none; }
+
+/* Fullphoto 3 (Minimal) */
+.layout-fullphoto3 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto3 .prayer.next::before { display: none; }
+
+/* Fullphoto 4 (Kubah) */
+.layout-fullphoto4 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent); }
+.layout-fullphoto4 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto4 .prayer.next::before { display: none; }
+
+/* Fullphoto 5 (Kaligrafi) */
+.layout-fullphoto5 .prayer.next { border-left-color: var(--accent) !important; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent); }
+.layout-fullphoto5 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto5 .prayer.next::before { display: none; }
+
+/* Fullphoto 6 (Lanskap) */
+.layout-fullphoto6 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto6 .prayer.next::before { display: none; }
+
+/* Fullphoto 7 (Jadwal Besar) */
+.layout-fullphoto7 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent)); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 25%, transparent); }
+.layout-fullphoto7 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto7 .prayer.next::before { display: none; }
+
+/* Fullphoto 8 (Sinematik) */
+.layout-fullphoto8 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto8 .prayer.next::before { display: none; }
+
+/* Fullphoto 9 (Kaca) */
+.layout-fullphoto9 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 15%, transparent), rgba(0,0,0,0.4)); box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 20%, transparent); }
+.layout-fullphoto9 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto9 .prayer.next::before { display: none; }
+
+/* Fullphoto 10 (Emas) */
+.layout-fullphoto10 .prayer.next { border-color: var(--accent); background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent); }
+.layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto10 .prayer.next::before { display: none; }

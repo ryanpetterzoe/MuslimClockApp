@@ -134,6 +134,16 @@
         <item>Courtyard (Panorama + Pills) ★ FOTO</item>
         <item>Terrace (Foto Besar + Step) ★ FOTO</item>
         <item>Panorama (Wide + Gradient) ★ FOTO</item>
+        <item>Fullphoto 1 (BG Foto Elegan) ★ BACKGROUND</item>
+        <item>Fullphoto 2 (BG Foto Neon) ★ BACKGROUND</item>
+        <item>Fullphoto 3 (BG Foto Minimal) ★ BACKGROUND</item>
+        <item>Fullphoto 4 (BG Foto Kubah) ★ BACKGROUND</item>
+        <item>Fullphoto 5 (BG Foto Kaligrafi) ★ BACKGROUND</item>
+        <item>Fullphoto 6 (BG Foto Lanskap) ★ BACKGROUND</item>
+        <item>Fullphoto 7 (BG Foto Jadwal Besar) ★ BACKGROUND</item>
+        <item>Fullphoto 8 (BG Foto Sinematik) ★ BACKGROUND</item>
+        <item>Fullphoto 9 (BG Foto Kaca) ★ BACKGROUND</item>
+        <item>Fullphoto 10 (BG Foto Emas) ★ BACKGROUND</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -215,6 +225,16 @@
         <item>courtyard</item>
         <item>terrace</item>
         <item>panorama</item>
+        <item>fullphoto1</item>
+        <item>fullphoto2</item>
+        <item>fullphoto3</item>
+        <item>fullphoto4</item>
+        <item>fullphoto5</item>
+        <item>fullphoto6</item>
+        <item>fullphoto7</item>
+        <item>fullphoto8</item>
+        <item>fullphoto9</item>
+        <item>fullphoto10</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->

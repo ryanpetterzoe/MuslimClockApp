@@ -3494,6 +3494,350 @@ window.MC_CONFIG = {
 </div>
 </template>
 
+
+<!-- ============== LAYOUT: FULLPHOTO1 (BG Foto Elegan) ============== -->
+<template id="layout-fullphoto1">
+<div class="layout-fullphoto1 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(0,0,0,0.4) 0%,rgba(0,0,0,0.2) 40%,rgba(0,0,0,0.7) 70%,rgba(0,0,0,0.9) 100%);"></div>
+    <header class="row-fixed relative z-10 flex flex-col items-center justify-center pt-4 pb-2 px-8">
+        <div id="logoBox" class="w-14 h-14 rounded-full flex items-center justify-center text-2xl" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);backdrop-filter:blur(8px);">&#x262A;</div>
+        <div class="text-center mt-2">
+            <div class="text-xl font-black tracking-wider text-white drop-shadow-lg"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+            <div class="text-[10px] text-white/70 mt-0.5" id="masjidAddress">Jakarta, Indonesia</div>
+        </div>
+        <div class="flex items-center gap-4 mt-2"><div id="greg-date" class="text-xs font-bold text-white/90">--</div><span class="text-white/30">|</span><div id="hij-date" class="text-xs font-semibold" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-3 px-8">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none drop-shadow-lg" style="font-size:clamp(64px,min(14vw,24vh),200px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(56px,7vh,80px);height:clamp(56px,7vh,80px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-6 pb-4">
+        <div class="flex items-center justify-center gap-2 flex-wrap py-3 px-4 rounded-full" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);">
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="fajr"><span class="text-[10px] font-bold text-white/80">Subuh</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="sunrise"><span class="text-[10px] font-bold text-white/80">Syuruq</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="dhuhr"><span class="text-[10px] font-bold text-white/80" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="asr"><span class="text-[10px] font-bold text-white/80">Ashar</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="maghrib"><span class="text-[10px] font-bold text-white/80">Maghrib</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="isha"><span class="text-[10px] font-bold text-white/80">Isya</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO2 (BG Foto Neon) ============== -->
+<template id="layout-fullphoto2">
+<div class="layout-fullphoto2 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(5,8,22,0.6) 0%,rgba(5,8,22,0.3) 50%,rgba(5,8,22,0.8) 100%);"></div>
+    <header class="row-fixed relative z-10 flex items-center gap-3 pt-4 pb-2 px-8">
+        <div id="logoBox" class="w-11 h-11 rounded-lg flex items-center justify-center text-lg" style="background:rgba(0,0,0,0.6);color:var(--accent);border-left:3px solid var(--accent);backdrop-filter:blur(8px);">&#x262A;</div>
+        <div style="border-left:3px solid var(--accent);padding-left:10px;">
+            <div class="text-base font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+            <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+        </div>
+        <div class="ml-auto flex items-center gap-3"><div id="greg-date" class="text-xs font-bold text-white/80">--</div><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-3 px-8">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(64px,min(14vw,22vh),180px);text-shadow:0 0 30px var(--accent),0 0 60px rgba(245,179,1,0.3);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(48px,6vh,72px);height:clamp(48px,6vh,72px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-4">
+        <div class="grid grid-cols-3 gap-2">
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="fajr"><span class="text-[10px] font-bold text-white">Subuh</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="sunrise"><span class="text-[10px] font-bold text-white">Syuruq</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="dhuhr"><span class="text-[10px] font-bold text-white" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="asr"><span class="text-[10px] font-bold text-white">Ashar</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="maghrib"><span class="text-[10px] font-bold text-white">Maghrib</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-4 py-2 rounded-lg" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.3);" data-key="isha"><span class="text-[10px] font-bold text-white">Isya</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(14px,1.8vw,20px);color:var(--accent);">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO3 (BG Foto Minimal) ============== -->
+<template id="layout-fullphoto3">
+<div class="layout-fullphoto3 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:rgba(0,0,0,0.5);"></div>
+    <header class="row-fixed relative z-10 flex items-center justify-between pt-3 pb-1 px-6">
+        <div class="flex items-center gap-2">
+            <div id="logoBox" class="w-7 h-7 rounded flex items-center justify-center text-xs" style="background:rgba(255,255,255,0.1);color:var(--accent);">&#x262A;</div>
+            <div>
+                <div class="text-[11px] font-bold text-white/80"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                <div class="text-[9px] text-white/50" id="masjidAddress">Jakarta, Indonesia</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3"><div id="greg-date" class="text-[10px] font-bold text-white/70">--</div><div id="hij-date" class="text-[10px]" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-2 px-8">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(80px,min(20vw,32vh),280px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.35em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/70"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(40px,5vh,60px);height:clamp(40px,5vh,60px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-3">
+        <div class="flex items-center justify-center gap-4">
+            <div class="prayer flex items-center gap-1" data-key="fajr"><span class="text-[9px] font-bold text-white/60">Subuh</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+            <div class="prayer flex items-center gap-1" data-key="sunrise"><span class="text-[9px] font-bold text-white/60">Syuruq</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+            <div class="prayer flex items-center gap-1" data-key="dhuhr"><span class="text-[9px] font-bold text-white/60" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+            <div class="prayer flex items-center gap-1" data-key="asr"><span class="text-[9px] font-bold text-white/60">Ashar</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+            <div class="prayer flex items-center gap-1" data-key="maghrib"><span class="text-[9px] font-bold text-white/60">Maghrib</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+            <div class="prayer flex items-center gap-1" data-key="isha"><span class="text-[9px] font-bold text-white/60">Isya</span><span class="font-digital font-bold digit-cell text-white/90" data-time style="font-size:12px;">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO4 (BG Foto Kubah) ============== -->
+<template id="layout-fullphoto4">
+<div class="layout-fullphoto4 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(10,30,60,0.7) 0%,rgba(0,0,0,0.4) 50%,rgba(10,30,60,0.8) 100%);"></div>
+    <header class="row-fixed relative z-10 flex flex-col items-center justify-center pt-4 pb-2 px-8">
+        <div id="logoBox" class="w-12 h-12 rounded-full flex items-center justify-center text-xl" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);backdrop-filter:blur(6px);">&#x262A;</div>
+        <div class="text-center mt-2">
+            <div class="text-lg font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+            <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+        </div>
+        <div class="mt-2 flex items-center gap-2"><span class="block w-12 h-px" style="background:var(--accent);opacity:0.5;"></span><span style="color:var(--accent);font-size:10px;">&#10022;</span><span class="block w-12 h-px" style="background:var(--accent);opacity:0.5;"></span></div>
+        <div class="flex items-center gap-4 mt-1"><div id="greg-date" class="text-xs font-bold text-white/80">--</div><span class="text-white/30">|</span><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex items-center justify-center gap-6 px-8">
+        <div class="flex flex-col items-center gap-2">
+            <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(48px,min(10vw,16vh),140px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+            <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        </div>
+        <div id="analogWrap"><div data-analog style="width:clamp(64px,10vh,110px);height:clamp(64px,10vh,110px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-4">
+        <div class="grid grid-cols-3 gap-2">
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="fajr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Subuh</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="sunrise"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Syuruq</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="dhuhr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="asr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Ashar</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="maghrib"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Maghrib</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 rounded-xl" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border:1px solid rgba(245,179,1,0.25);" data-key="isha"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Isya</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(14px,2vw,22px);">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO5 (BG Foto Kaligrafi) ============== -->
+<template id="layout-fullphoto5">
+<div class="layout-fullphoto5 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0.7) 100%);"></div>
+    <header class="row-fixed relative z-10 flex items-center justify-end pt-4 pb-2 px-8 gap-3">
+        <div class="text-right">
+            <div class="text-base font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+            <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+        </div>
+        <div id="logoBox" class="w-11 h-11 rounded-lg flex items-center justify-center text-lg" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);backdrop-filter:blur(6px);">&#x262A;</div>
+    </header>
+    <main class="row-fill relative z-10 grid items-center px-8 gap-4" style="grid-template-columns:1fr 1.5fr;">
+        <div class="flex flex-col gap-2">
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="fajr"><span class="text-[10px] font-bold text-white">Subuh</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="sunrise"><span class="text-[10px] font-bold text-white">Syuruq</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="dhuhr"><span class="text-[10px] font-bold text-white" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="asr"><span class="text-[10px] font-bold text-white">Ashar</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="maghrib"><span class="text-[10px] font-bold text-white">Maghrib</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+            <div class="prayer flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-left:2px solid var(--accent);" data-key="isha"><span class="text-[10px] font-bold text-white">Isya</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(13px,1.5vw,18px);color:var(--accent);">--:--</span></div>
+        </div>
+        <div class="flex flex-col items-center justify-center gap-2">
+            <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(52px,min(11vw,18vh),160px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+            <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+            <div id="analogWrap"><div data-analog style="width:clamp(56px,8vh,90px);height:clamp(56px,8vh,90px);"></div></div>
+        </div>
+    </main>
+    <section class="row-fixed relative z-10 flex items-center justify-center px-8 pb-3">
+        <div class="flex items-center gap-4"><div id="greg-date" class="text-xs font-bold text-white/80">--</div><span class="text-white/30">|</span><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO6 (BG Foto Lanskap) ============== -->
+<template id="layout-fullphoto6">
+<div class="layout-fullphoto6 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(0deg,rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.1) 40%,rgba(0,0,0,0.3) 100%);"></div>
+    <header class="row-fixed relative z-10 flex items-center justify-end pt-4 pb-2 px-8">
+        <div class="flex items-center gap-3"><div id="greg-date" class="text-xs font-bold text-white/70">--</div><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-end justify-start px-8 pt-4 gap-2">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(56px,min(12vw,20vh),170px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(48px,6vh,72px);height:clamp(48px,6vh,72px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-4">
+        <div class="flex items-end justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div id="logoBox" class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);">&#x262A;</div>
+                <div>
+                    <div class="text-sm font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                    <div class="text-[9px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap justify-end py-2 px-3 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);">
+                <div class="prayer flex items-center gap-1 px-2" data-key="fajr"><span class="text-[9px] font-bold text-white/70">Subuh</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="sunrise"><span class="text-[9px] font-bold text-white/70">Syuruq</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="dhuhr"><span class="text-[9px] font-bold text-white/70" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="asr"><span class="text-[9px] font-bold text-white/70">Ashar</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="maghrib"><span class="text-[9px] font-bold text-white/70">Maghrib</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="isha"><span class="text-[9px] font-bold text-white/70">Isya</span><span class="font-digital font-bold digit-cell" data-time style="font-size:12px;color:var(--accent);">--:--</span></div>
+            </div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO7 (BG Foto Jadwal Besar) ============== -->
+<template id="layout-fullphoto7">
+<div class="layout-fullphoto7 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.4) 50%,rgba(0,0,0,0.7) 100%);"></div>
+    <header class="row-fixed relative z-10 flex flex-col items-center justify-center pt-4 pb-2 px-8">
+        <div class="flex items-center gap-3">
+            <div id="logoBox" class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);">&#x262A;</div>
+            <div class="text-center">
+                <div class="text-base font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 mt-1"><div id="greg-date" class="text-xs font-bold text-white/80">--</div><span class="text-white/30">|</span><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-4 px-6">
+        <div class="flex items-center gap-4">
+            <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(44px,min(9vw,14vh),120px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+            <div id="analogWrap"><div data-analog style="width:clamp(48px,7vh,80px);height:clamp(48px,7vh,80px);"></div></div>
+        </div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div class="grid grid-cols-3 gap-3 w-full" style="max-width:700px;">
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="fajr"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);">Subuh</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="sunrise"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);">Syuruq</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="dhuhr"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="asr"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);">Ashar</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="maghrib"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);">Maghrib</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-4 rounded-xl" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,179,1,0.3);" data-key="isha"><span class="text-sm uppercase tracking-wider font-bold" style="color:var(--accent);">Isya</span><span class="font-digital font-black text-white digit-cell mt-2" data-time style="font-size:clamp(20px,3vw,36px);">--:--</span></div>
+        </div>
+    </main>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO8 (BG Foto Sinematik) ============== -->
+<template id="layout-fullphoto8">
+<div class="layout-fullphoto8 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.1) 30%,rgba(0,0,0,0.85) 65%,rgba(0,0,0,0.95) 100%);"></div>
+    <header class="row-fixed relative z-10 flex items-center justify-end pt-3 pb-1 px-8">
+        <div class="flex items-center gap-3"><div id="greg-date" class="text-xs font-bold text-white/70">--</div><div id="hij-date" class="text-xs" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-3 px-8">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(80px,min(18vw,28vh),250px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.35em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/70"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(40px,5vh,64px);height:clamp(40px,5vh,64px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-4">
+        <div class="flex flex-col items-center gap-3">
+            <div class="flex items-center gap-2">
+                <div id="logoBox" class="w-8 h-8 rounded-full flex items-center justify-center text-sm" style="background:rgba(0,0,0,0.5);color:var(--accent);border:1px solid var(--accent);">&#x262A;</div>
+                <div class="text-center">
+                    <div class="text-sm font-bold text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                    <div class="text-[9px] text-white/50" id="masjidAddress">Jakarta, Indonesia</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 py-2 px-4 rounded-lg" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);">
+                <div class="prayer flex items-center gap-1 px-2" data-key="fajr"><span class="text-[9px] font-bold text-white/70">Subuh</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="sunrise"><span class="text-[9px] font-bold text-white/70">Syuruq</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="dhuhr"><span class="text-[9px] font-bold text-white/70" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="asr"><span class="text-[9px] font-bold text-white/70">Ashar</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="maghrib"><span class="text-[9px] font-bold text-white/70">Maghrib</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+                <div class="prayer flex items-center gap-1 px-2" data-key="isha"><span class="text-[9px] font-bold text-white/70">Isya</span><span class="font-digital font-bold digit-cell" data-time style="font-size:clamp(12px,1.4vw,16px);color:var(--accent);">--:--</span></div>
+            </div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO9 (BG Foto Kaca) ============== -->
+<template id="layout-fullphoto9">
+<div class="layout-fullphoto9 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.5) 100%);"></div>
+    <header class="row-fixed relative z-10 flex items-center justify-center pt-4 pb-2 px-8">
+        <div class="flex items-center gap-3 py-2 px-5 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);">
+            <div id="logoBox" class="w-10 h-10 rounded-full flex items-center justify-center text-lg" style="background:rgba(255,255,255,0.1);color:var(--accent);border:1px solid var(--accent);">&#x262A;</div>
+            <div>
+                <div class="text-base font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+            </div>
+            <div class="ml-4 flex flex-col items-end"><div id="greg-date" class="text-[10px] font-bold text-white/80">--</div><div id="hij-date" class="text-[10px]" style="color:var(--accent);">--</div></div>
+        </div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-4 px-8">
+        <div class="flex items-center gap-4 py-4 px-6 rounded-2xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);">
+            <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(52px,min(11vw,18vh),150px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+            <div id="analogWrap"><div data-analog style="width:clamp(56px,8vh,90px);height:clamp(56px,8vh,90px);"></div></div>
+        </div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold text-[10px]">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+    </main>
+    <section class="row-fixed relative z-10 px-6 pb-4">
+        <div class="grid grid-cols-6 gap-2">
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="fajr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Subuh</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="sunrise"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Syuruq</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="dhuhr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="asr"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Ashar</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="maghrib"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Maghrib</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex flex-col items-center py-3 px-2 rounded-xl" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);" data-key="isha"><span class="text-[9px] uppercase tracking-wider font-bold" style="color:var(--accent);">Isya</span><span class="font-digital font-bold text-white digit-cell mt-1" data-time style="font-size:clamp(13px,1.6vw,20px);">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
+
+
+<!-- ============== LAYOUT: FULLPHOTO10 (BG Foto Emas) ============== -->
+<template id="layout-fullphoto10">
+<div class="layout-fullphoto10 app-screen flex-layout relative" style="background:#000;">
+    <div class="slideshow-host absolute inset-0"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(10,20,40,0.6) 0%,rgba(0,0,0,0.3) 50%,rgba(10,20,40,0.7) 100%);"></div>
+    <header class="row-fixed relative z-10 flex flex-col items-center justify-center pt-4 pb-2 px-8">
+        <div class="pb-2" style="border-bottom:2px solid var(--accent);">
+            <div class="flex items-center gap-3">
+                <div id="logoBox" class="w-12 h-12 rounded-full flex items-center justify-center text-xl" style="background:rgba(0,0,0,0.5);color:var(--accent);border:2px solid var(--accent);">&#x262A;</div>
+                <div class="text-center">
+                    <div class="text-lg font-black text-white"><span style="color:var(--accent);" id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                    <div class="text-[10px] text-white/60" id="masjidAddress">Jakarta, Indonesia</div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 mt-2"><div id="greg-date" class="text-xs font-bold text-white/80">--</div><span style="color:var(--accent);">&#10022;</span><div id="hij-date" class="text-xs font-semibold" style="color:var(--accent);">--</div></div>
+    </header>
+    <main class="row-fill relative z-10 flex flex-col items-center justify-center gap-3 px-8">
+        <div id="digital" class="font-digital font-black text-white digit-cell leading-none" style="font-size:clamp(60px,min(13vw,22vh),180px);">--<span style="color:var(--accent);">:</span>--<span style="color:var(--accent);font-size:0.4em;" class="align-top ml-2">--</span></div>
+        <div id="nextPill" class="flex items-center gap-2 text-xs text-white/80"><span class="uppercase tracking-widest font-semibold">Menuju</span><span id="nextLabel" class="font-bold" style="color:var(--accent);">--</span><span>&#183;</span><span id="nextCountdown" class="font-digital text-white">--:--:--</span></div>
+        <div id="analogWrap"><div data-analog style="width:clamp(56px,7vh,80px);height:clamp(56px,7vh,80px);"></div></div>
+    </main>
+    <section class="row-fixed relative z-10 px-8 pb-4">
+        <div class="flex items-center justify-center gap-3 py-3 px-4" style="border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);">
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="fajr"><span class="text-[10px] font-bold" style="color:var(--accent);">Subuh</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="sunrise"><span class="text-[10px] font-bold" style="color:var(--accent);">Syuruq</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="dhuhr"><span class="text-[10px] font-bold" style="color:var(--accent);" id="dhuhrLabel">Dzuhur</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="asr"><span class="text-[10px] font-bold" style="color:var(--accent);">Ashar</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="maghrib"><span class="text-[10px] font-bold" style="color:var(--accent);">Maghrib</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+            <div class="prayer flex items-center gap-2 px-3 py-1" data-key="isha"><span class="text-[10px] font-bold" style="color:var(--accent);">Isya</span><span class="font-digital font-bold text-white digit-cell" data-time style="font-size:clamp(14px,1.6vw,20px);">--:--</span></div>
+        </div>
+    </section>
+</div>
+</template>
 <audio id="adzanAudio" preload="none" style="display:none"></audio>
 <script src="js/clock.js"></script>
 </body>
