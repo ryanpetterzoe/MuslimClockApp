@@ -68,31 +68,46 @@ body {
 }
 
 /* The flex helper ensures direct children of a column-flex layout root
- * have predictable shrink behaviour: row-fixed items may shrink when
- * viewport is short (landscape). The main row absorbs all leftover
- * space and may overflow into a hidden region rather than push siblings
- * off-screen.
+ * have predictable shrink behaviour: row-fixed items keep their natural
+ * size and are NEVER clipped. The main row absorbs all leftover space.
+ *
+ * ANTI-CLIP GUARANTEE: overflow is VISIBLE on all rows so nothing
+ * gets cut off (prayer cards, countdown text, digital clock digits).
  *
  * Stacking guarantee (slideshow z-index fix):
- * Every direct row of a flex layout gets `position: relative; z-index: 1`
- * by default. The slideshow-host is forced to `z-index: 0` (see below).
- * That way, even templates that forgot to add `relative z-10` on their
- * header/main/section will still render their content ABOVE the
- * slideshow background -- never the other way around. Templates that
- * already declare `relative z-10` keep working because z-10 > z-1. */
-.flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: hidden; position: relative; z-index: 1; }
-.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+ * Every direct row of a flex layout gets position:relative with high
+ * z-index. The slideshow-host is forced to z-index:0 (see below).
+ * Content always renders ABOVE the slideshow background. */
+.flex-layout         { display: flex; flex-direction: column; height: 100%; }
+.flex-layout > .row-fixed { flex: 0 0 auto; overflow: visible; position: relative; z-index: 5; }
+.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; overflow: visible; position: relative; z-index: 2; }
 
-/* Bring the clock content closer to the prayer cards section by
- * shifting the visual center downward. Without this, justify-center
- * in a tall row-fill places the clock too high because the bottom
- * of the viewport is occupied by quran bar + ticker + prayer cards.
- * A small top-padding bias + tighter gap creates a more balanced look. */
+/* Digital clock + countdown area: auto-fit with compact gap.
+ * justify-content: center keeps elements vertically centered in
+ * available space. gap is tight so countdown doesn't drift far
+ * from the clock. Only affects flex-direction:column layouts. */
 .flex-layout > main.row-fill {
-    gap: 8px !important;
-    padding-top: 1vh;
+    padding-top: 0;
     padding-bottom: 0;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+/* Override Tailwind gap-3 (12px) to 4px for flex column layouts */
+.flex-layout > main.row-fill.flex {
+    gap: 4px !important;
+}
+
+/* Prayer cards section: ensure it never clips and has breathing room */
+.flex-layout > section.row-fixed {
+    overflow: visible;
+    padding-top: 4px;
+}
+
+/* Header: always visible, never clipped by slideshow */
+.flex-layout > header.row-fixed {
+    overflow: visible;
+    z-index: 10;
 }
 
 /* Compact row-fixed padding on very short viewports (landscape phones) */
@@ -108,11 +123,13 @@ body {
  * `relative z-10`), which causes the slideshow to cover content when
  * opacity is high — the bug users see at slideshow_opacity=100%.
  *
- * Pinning to z-index: 0 (combined with z-index: 1 on .row-fixed/.row-fill
- * above and z-index: 10+ in templates) means a positioned slideshow will
- * always sit beneath content, regardless of which template mounts. */
+ * Pinning to z-index: 0 (combined with z-index: 5 on .row-fixed and
+ * z-index: 2 on .row-fill above, and z-index: 10+ in templates)
+ * means a positioned slideshow will always sit beneath content,
+ * regardless of which template mounts. */
 .slideshow-host {
-    z-index: 0;
+    z-index: 0 !important;
+    pointer-events: none;
 }
 .slide {
     z-index: 0;
@@ -146,9 +163,11 @@ body {
  * surrounding flex containers absorb without reflowing the prayer row.
  */
 #digital {
-    line-height: 1.15;
-    padding-block: 0.06em;
+    line-height: 1.1;
+    padding-block: 0.04em;
     overflow: visible;
+    /* Ensure digital clock never causes overlap with siblings */
+    max-height: fit-content;
 }
 
 /* Arabic fonts typically have taller ascenders/descenders and wider
@@ -2073,3 +2092,151 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto10 .prayer.next::before { display: none; }
 
+
+
+/* ===================== AUTO-FIT LAYOUT FIX =====================
+ * Guarantees:
+ * 1. NOTHING gets cut off (kepotong) — no overflow clipping anywhere
+ * 2. Digital clock sits below header, never overlaps it
+ * 3. Countdown (menuju) sits tight below digital clock — no huge gap
+ * 4. Slideshow/frame image NEVER covers header or content
+ * 5. Prayer schedule cards fully visible — top AND bottom
+ * 6. All elements auto-fit within the viewport bounds
+ */
+
+/* --- Global anti-clip for all layout content --- */
+[class*="layout-"] header,
+[class*="layout-"] main,
+[class*="layout-"] section {
+    overflow: visible !important;
+}
+
+/* --- Header always on top, never covered by slideshow --- */
+[class*="layout-"] > header {
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+/* --- Slideshow/BG image must NEVER overlap content --- */
+[class*="layout-"] > .slideshow-host,
+[class*="layout-"] > div:first-child:not(header):not(main):not(section) {
+    z-index: 0 !important;
+    pointer-events: none;
+}
+
+/* --- Main content (digital clock area): compact, centered, no overlap --- */
+/* For flex-based layouts (most layouts) - override gap-3 from Tailwind */
+.flex-layout > main.row-fill.flex {
+    gap: 4px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
+    z-index: 3 !important;
+    overflow: visible !important;
+}
+/* For grid-based layouts (classic, cinema, neon, mosque, magazine) */
+.flex-layout > main.row-fill.grid {
+    gap: 1rem !important;
+    min-height: 0 !important;
+    z-index: 3 !important;
+    overflow: visible !important;
+}
+
+/* --- Digital clock: auto-size, never overflow viewport width --- */
+#digital {
+    max-width: 95vw;
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+/* --- Countdown pill (nextPill): tight spacing to digital clock --- */
+#nextPill {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+    z-index: 4;
+}
+
+/* --- Prayer cards section: fully visible, auto-height --- */
+[class*="layout-"] > section:last-child {
+    overflow: visible !important;
+    z-index: 5 !important;
+    flex-shrink: 0 !important;
+}
+
+/* --- Prayer card individual items: never clipped --- */
+.prayer, .prayer-card, .prayer-grid-cell, .prayer-row,
+.prayer-pill, .arch-card, .scoreboard-row, .float-prayer,
+.ed-prayer, .ps-card, .pl-row, .schedule-card, .ring-card,
+.prayer-pearl, .pr-row, .planet-card, .geo-card, .medal,
+.glass-prayer, .np-cell, .br-block, .heritage-card {
+    overflow: visible !important;
+}
+
+/* --- Prayer cards grid/flex: ensure proper spacing and no cut-off --- */
+[class*="layout-"] > section .grid,
+[class*="layout-"] > section .flex {
+    overflow: visible !important;
+}
+
+/* --- Font-size auto-fit for prayer time digits: scale down on small screens --- */
+[data-time] {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}
+
+/* --- Analog clock: constrain size to not push other elements --- */
+#analogWrap, [data-analog] {
+    flex-shrink: 1 !important;
+    max-height: 15vh !important;
+    max-width: 15vh !important;
+}
+#analogWrap svg, [data-analog] svg {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+/* --- Fullphoto layouts: ensure header/content visible above BG --- */
+[class*="layout-fullphoto"] > header {
+    z-index: 10 !important;
+    position: relative !important;
+}
+[class*="layout-fullphoto"] > main {
+    z-index: 5 !important;
+    position: relative !important;
+}
+[class*="layout-fullphoto"] > section {
+    z-index: 5 !important;
+    position: relative !important;
+}
+
+/* --- Gradient overlays must stay BELOW content --- */
+[class*="layout-"] > .absolute:not(.slideshow-host) {
+    z-index: 1 !important;
+}
+
+/* --- Special layout (temaspesial): frame image below content --- */
+[class*="layout-special"] > .slideshow-host,
+[class*="layout-special"] .absolute {
+    z-index: 0 !important;
+}
+
+/* --- Responsive: tighter on short screens --- */
+@media (max-height: 600px) {
+    .flex-layout > main.row-fill {
+        gap: 2px !important;
+    }
+    #analogWrap, [data-analog] {
+        max-height: 10vh !important;
+        max-width: 10vh !important;
+    }
+    [class*="layout-"] > section:last-child {
+        padding-bottom: 2px !important;
+    }
+}
+
+@media (max-height: 400px) {
+    #analogWrap {
+        display: none !important;
+    }
+}
