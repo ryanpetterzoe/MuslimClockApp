@@ -85,7 +85,7 @@ body {
 
 /* Compact row-fixed padding on very short viewports (landscape phones) */
 @media (max-height: 500px) {
-    .flex-layout > .row-fixed { padding-top: 2px !important; padding-bottom: 2px !important; }
+    .flex-layout > section.row-fixed { padding-top: 2px !important; padding-bottom: 2px !important; }
 }
 
 /* ---------- Slideshow stacking guarantee ----------

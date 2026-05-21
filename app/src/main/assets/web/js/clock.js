@@ -2749,6 +2749,7 @@
             if (el.dataset.vfitScale) {
                 el.style.transform = '';
                 el.style.transformOrigin = '';
+                el.style.height = '';
                 delete el.dataset.vfitScale;
             }
         });
@@ -2797,6 +2798,7 @@
 
             sections.forEach(function(s) {
                 s.el.style.transform = 'scale(' + scaleFactor + ')';
+                s.el.style.height = Math.ceil(s.h * scaleFactor) + 'px';
                 s.el.style.transformOrigin = 'center bottom';
                 s.el.dataset.vfitScale = String(scaleFactor);
             });
@@ -3262,10 +3264,15 @@
 
         // Vertical overflow auto-fit: detect and scale prayer sections
         // when they exceed available viewport height (landscape/short screens).
-        window.addEventListener('resize', function() { setTimeout(autoFitVerticalOverflow, 150); });
-        window.addEventListener('orientationchange', function() { setTimeout(autoFitVerticalOverflow, 200); });
+        let _vfitTimer = null;
+        const scheduleVfit = function() {
+            if (_vfitTimer) clearTimeout(_vfitTimer);
+            _vfitTimer = setTimeout(function() { _vfitTimer = null; autoFitVerticalOverflow(); }, 150);
+        };
+        window.addEventListener('resize', scheduleVfit);
+        window.addEventListener('orientationchange', scheduleVfit);
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', function() { setTimeout(autoFitVerticalOverflow, 150); });
+            window.visualViewport.addEventListener('resize', scheduleVfit);
         }
 
         loadHijri();
