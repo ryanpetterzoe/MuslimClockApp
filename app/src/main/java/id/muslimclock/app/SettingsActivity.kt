@@ -107,6 +107,10 @@ class SettingsActivity : AppCompatActivity() {
                 confirmResetLayout()
                 true
             }
+            findPreference<Preference>("open_layout_editor")?.setOnPreferenceClickListener {
+                startActivity(android.content.Intent(requireContext(), LayoutEditorActivity::class.java))
+                true
+            }
             findPreference<Preference>("activate_license")?.setOnPreferenceClickListener {
                 showLicenseInputDialog()
                 true

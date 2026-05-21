@@ -159,6 +159,18 @@
     <string name="cat_layout_editor">Editor Tata Letak</string>
     <string name="layout_editor_intro">Atur ukuran &amp; posisi tiap elemen. Berlaku di semua tema. Tekan tombol Reset di bawah untuk kembali ke default.</string>
 
+    <!-- Layout Editor Activity (live preview) -->
+    <string name="layout_editor_title">Editor Tata Letak (Live)</string>
+    <string name="layout_editor_preview_label">LIVE PREVIEW</string>
+    <string name="layout_editor_size_label">Ukuran</string>
+    <string name="layout_editor_x_label">Geser Horizontal</string>
+    <string name="layout_editor_y_label">Geser Vertikal</string>
+    <string name="layout_editor_reset">Reset</string>
+    <string name="layout_editor_done">Simpan</string>
+    <string name="layout_editor_saved">Tata letak tersimpan</string>
+    <string name="pref_open_layout_editor">Buka Editor Live Preview</string>
+    <string name="pref_open_layout_editor_sum">Atur posisi elemen dengan live preview — langsung terlihat hasilnya saat digeser</string>
+
     <string name="pref_analog_size">Ukuran Jam Analog</string>
     <string name="pref_analog_x">Geser Jam Analog (Horizontal)</string>
     <string name="pref_analog_y">Geser Jam Analog (Vertikal)</string>
