@@ -117,32 +117,32 @@
 
     const SUPPORTED_LAYOUTS = [
         'minimal', 'mosque', 'cinema', 'neon', 'classic',
-        'aurora', 'frame', 'stadium', 'magazine',
-        'theater', 'showcase', 'split', 'polaroid',
-        'window', 'festival', 'portrait',
-        'galaxy', 'geometric', 'kinetic', 'marble', 'terminal', 'sunset',
+        'aurora', 'frame',
+        'theater', 'showcase', 'polaroid',
+        'window', 'festival',
+        'galaxy', 'geometric', 'marble', 'sunset',
         'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
         'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
         'celestial', 'rumi', 'andalusia', 'medina', 'batik',
-        // New: 5 photo-frame themes (foto + jam besar + jadwal horizontal)
-        'gallery', 'journal', 'studio', 'canvas', 'memory',
-        // New: 5 big-schedule themes (kartu jadwal sholat besar/jelas)
+        // Photo-frame themes (foto + jam besar + jadwal horizontal)
+        'gallery', 'journal', 'studio', 'memory',
+        // Big-schedule themes (kartu jadwal sholat besar/jelas)
         'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
-        // New: 5 vertical prayer-card themes (jadwal sholat tersusun tegak)
+        // Vertical prayer-card themes (jadwal sholat tersusun tegak)
         'vertical', 'pillar', 'stack', 'rack', 'column',
-        // New: 10 ornament-rich themes (Islamic visual languages, set v2)
-        'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
-        'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
+        // Ornament-rich themes (Islamic visual languages)
+        'mihrab', 'lantern', 'mosaic', 'crescent',
+        'persian', 'mecca', 'marrakesh', 'jannah',
         // Special themed layouts with custom assets
-        'special1', 'special2', 'special3',
-        // New: 12 photo-frame + centered-logo themes
+        'special1', 'special3',
+        // Photo-frame + centered-logo themes
         'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
-        'oasis', 'sanctuary', 'arch', 'courtyard', 'terrace', 'panorama',
-        // New: 10 full-background-photo layouts (slideshow as full BG)
-        'fullphoto1', 'fullphoto2', 'fullphoto3', 'fullphoto4', 'fullphoto5',
+        'sanctuary', 'terrace',
+        // Full-background-photo layouts (slideshow as full BG)
+        'fullphoto1', 'fullphoto2', 'fullphoto3',
         'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',
-        'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto14', 'fullphoto15',
-        'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20'
+        'fullphoto11', 'fullphoto13', 'fullphoto14', 'fullphoto15',
+        'fullphoto16', 'fullphoto17', 'fullphoto19', 'fullphoto20'
     ];
 
     /* ===== State (mutable) ===== */
@@ -232,7 +232,7 @@
         // existing colour scheme. The dark variant is the right choice
         // for almost every theme; the light one is for layouts that
         // use dark text on a pale background (e.g. layout-magazine).
-        const lightThemes = ['layout-magazine'];
+        const lightThemes = ['layout-andalusia'];
         const isLight = lightThemes.some(c => root.classList.contains(c));
 
         const slot = document.createElement('div');
@@ -722,6 +722,12 @@
         var aside = host.querySelector('aside');
         var hasSidebar = aside && aside.querySelector('[data-key]');
 
+        // Cinema layout uses a 3-column grid with an <aside> for prayer
+        // times, but it's NOT a sidebar layout — quranBar should span
+        // full width and center the card visually.
+        var isCinema = host.querySelector('.layout-cinema');
+        if (isCinema) hasSidebar = false;
+
         if (hasSidebar) {
             // Get the sidebar's width so quranBar avoids that area.
             var sidebarRect = aside.getBoundingClientRect();
@@ -751,8 +757,25 @@
         if (hdr) setPassthrough(hdr, 'top');
 
         // Apply to bottom sections with prayer cards (section.row-fixed).
+        // IMPORTANT: Never passthrough a section that contains prayer
+        // schedule cards ([data-key]) — those MUST remain in flex flow
+        // so they sit at the bottom of the viewport, not float to center.
         var sections = screen.querySelectorAll('section.row-fixed');
         for (var i = 0; i < sections.length; i++) {
+            if (sections[i].querySelector('[data-key]')) {
+                // Revert any stale passthrough on prayer sections
+                if (sections[i].dataset.passthrough === '1') {
+                    sections[i].style.position = '';
+                    sections[i].style.left = '';
+                    sections[i].style.right = '';
+                    sections[i].style.top = '';
+                    sections[i].style.bottom = '';
+                    sections[i].style.zIndex = '';
+                    sections[i].style.pointerEvents = '';
+                    delete sections[i].dataset.passthrough;
+                }
+                continue;
+            }
             setPassthrough(sections[i], 'bottom');
         }
 

@@ -57,6 +57,14 @@
             android:theme="@style/Theme.MuslimClock.Settings"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".LayoutEditorActivity"
+            android:exported="false"
+            android:label="@string/layout_editor_title"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.MuslimClock.Settings"
+            android:parentActivityName=".SettingsActivity" />
+
         <!--
           Auto-launch the clock after boot when the user has the
           start-on-boot toggle on. Listens to BOOT_COMPLETED plus the
