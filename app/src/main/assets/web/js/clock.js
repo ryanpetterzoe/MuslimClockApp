@@ -607,6 +607,151 @@
 
         // License watermark — show "DEMO VERSION" overlay when not Pro.
         applyLicenseWatermark();
+
+        // Transparent-container passthrough logic.
+        // Containers that are visually transparent should not block/clip
+        // adjacent content. Only sections with a visible background
+        // should reserve space and visually block things behind them.
+        applyTransparentPassthrough();
+    }
+
+    /* ===== Transparent passthrough helpers ===== */
+
+    /**
+     * Check whether an element is visually transparent (no background
+     * color, no background image, no backdrop-filter, no glass class).
+     */
+    function isElTransparent(el) {
+        if (!el) return false;
+        var cs = getComputedStyle(el);
+        var bg = cs.backgroundColor;
+        var bgImage = cs.backgroundImage;
+        var hasBackdrop = cs.backdropFilter && cs.backdropFilter !== 'none';
+        if (!hasBackdrop) {
+            // Webkit prefix fallback
+            var wkBackdrop = cs.webkitBackdropFilter;
+            hasBackdrop = wkBackdrop && wkBackdrop !== 'none';
+        }
+        var hasBgClass = /\b(bg-(?!transparent\b|opacity\b)\S+|glass-dark|glass|backdrop-blur)\b/.test(el.className);
+        var hasInlineBg = el.style.background ||
+            (el.style.backgroundColor && el.style.backgroundColor !== 'transparent' && el.style.backgroundColor !== 'rgba(0, 0, 0, 0)');
+        var bgTransparent = (!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)');
+        var noBgImage = (!bgImage || bgImage === 'none');
+        return bgTransparent && noBgImage && !hasBackdrop && !hasBgClass && !hasInlineBg;
+    }
+
+    /**
+     * Apply passthrough to a single element. When transparent, it is taken
+     * out of normal flow so it does not reserve space or clip adjacent content.
+     * When it has a visible background, it stays in normal flow.
+     *
+     * @param {Element} el - The container element
+     * @param {string} anchor - 'top' or 'bottom' positioning when absolute
+     */
+    function setPassthrough(el, anchor) {
+        if (!el) return;
+        if (isElTransparent(el)) {
+            // Already positioned by identity_position logic: skip if position
+            // was set to relative for absolute children (e.g. date_position).
+            // Also skip if the element was explicitly set to 'relative' by
+            // other code (identity positioning needs it for absolute children).
+            var needsRelative = el.style.position === 'relative' ||
+                                el.querySelector('[style*="position: absolute"]') ||
+                                el.querySelector('[style*="position:absolute"]');
+            if (!needsRelative) {
+                el.style.position = 'absolute';
+                el.style.left = '0';
+                el.style.right = '0';
+                if (anchor === 'bottom') {
+                    el.style.bottom = '0';
+                    el.style.top = '';
+                } else {
+                    el.style.top = '0';
+                    el.style.bottom = '';
+                }
+            }
+            el.style.zIndex = '0';
+            el.style.pointerEvents = 'none';
+            var children = el.children;
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.pointerEvents = 'auto';
+            }
+            el.dataset.passthrough = '1';
+        } else {
+            // Has visible background - ensure it is in normal flow.
+            if (el.dataset.passthrough === '1') {
+                if (el.style.position === 'absolute' && !el.classList.contains('absolute')) {
+                    el.style.position = '';
+                    el.style.left = '';
+                    el.style.right = '';
+                    el.style.top = '';
+                    el.style.bottom = '';
+                }
+                el.style.zIndex = '';
+                el.style.pointerEvents = '';
+                var children2 = el.children;
+                for (var j = 0; j < children2.length; j++) {
+                    children2[j].style.pointerEvents = '';
+                }
+                delete el.dataset.passthrough;
+            }
+        }
+    }
+
+    /**
+     * For the quran bar: when a sidebar/vertical-prayer layout is active,
+     * shrink the quran bar width so it does not cover the sidebar area.
+     * The quran card itself is already pointer-events:none, but visually
+     * its backdrop-filter and background cover the full width.
+     */
+    function applyQuranPassthrough() {
+        var bar = document.getElementById('quranBar');
+        if (!bar) return;
+        var inner = document.getElementById('quranInner');
+        if (!inner) return;
+
+        // Detect sidebar-style layouts with vertical prayer cards.
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var aside = host.querySelector('aside');
+        var hasSidebar = aside && aside.querySelector('[data-key]');
+
+        if (hasSidebar) {
+            // Get the sidebar's width so quranBar avoids that area.
+            var sidebarRect = aside.getBoundingClientRect();
+            var isLeft = sidebarRect.left < window.innerWidth / 2;
+            if (isLeft) {
+                bar.style.left = sidebarRect.width + 'px';
+                bar.style.right = '0';
+            } else {
+                bar.style.left = '0';
+                bar.style.right = sidebarRect.width + 'px';
+            }
+        } else {
+            // Reset to full width (default).
+            bar.style.left = '0';
+            bar.style.right = '0';
+        }
+    }
+
+    function applyTransparentPassthrough() {
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var screen = host.querySelector('.app-screen');
+        if (!screen) return;
+
+        // Apply to the header (identity area) - it is at the top.
+        var hdr = screen.querySelector('header.row-fixed');
+        if (hdr) setPassthrough(hdr, 'top');
+
+        // Apply to bottom sections with prayer cards (section.row-fixed).
+        var sections = screen.querySelectorAll('section.row-fixed');
+        for (var i = 0; i < sections.length; i++) {
+            setPassthrough(sections[i], 'bottom');
+        }
+
+        // Handle quran bar passthrough for sidebar layouts.
+        applyQuranPassthrough();
     }
 
     /**
