@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix 5 layout/rendering issues: (1) background/scrim z-index stacking blocking content across all themes, (2) background positioned in front of overlay at 100% opacity, (3) excessive gap between countdown pill and digital clock, (4) header overflow:hidden clipping the top of the digital clock, (5) digital clock should render directly below header without clipping",
+  "status": "completed",
+  "steps": [
+    "In app/src/main/assets/web/css/screen.css, fix the scrim div stacking: add a new CSS rule targeting the scrim divs (the absolute inset-0 gradient overlays that are siblings of .slideshow-host). These must have z-index:0 so they stay behind content. Add: `.flex-layout > .app-screen > .absolute, .app-screen > .absolute { z-index: 0; }` or better: add a dedicated class `.slideshow-scrim { position:absolute; inset:0; z-index:0; pointer-events:none; }` and apply it. However since templates use Tailwind 'absolute inset-0' without a custom class, the most reliable approach is to add CSS: `.slideshow-host ~ .absolute[style*=\"background\"] { z-index: 0 !important; }` -- BUT the cleanest approach is: in the ensureSlideshowHost() function in clock.js, set scrim.style.zIndex = '0' on the created scrim element.",
+    "In app/src/main/assets/web/css/screen.css, change `.flex-layout > .row-fixed` to remove `overflow: hidden` (change to `overflow: visible`). This prevents the header from clipping content. The overflow:hidden was there to prevent siblings from pushing off-screen, but position:relative + z-index already handles stacking. Keep overflow:hidden ONLY on `.flex-layout > .row-fill` (the main content area uses it to prevent the clock from expanding beyond its bounds, which is fine since main has flex:1).",
+    "Actually, the REAL clipping problem is that `.row-fill` (the main area containing the digital clock) has `overflow: hidden` AND `min-height: 0`. When the clock is large and positioned at the top of the main area via `justify-center`, the top can be clipped. The fix: change `.flex-layout > .row-fill` from `overflow: hidden` to `overflow: visible`. HOWEVER this could cause prayer cards to overflow. Better approach: keep overflow:hidden on row-fill BUT remove it specifically from header row-fixed. Change the rule to: `.flex-layout > .row-fixed { overflow: visible; }` so header content is never clipped.",
+    "In app/src/main/assets/web/css/screen.css, reduce the gap in `.flex-layout > main.row-fill` from `gap: 8px !important` to `gap: 4px !important` and reduce `padding-top: 1vh` to `padding-top: 0`. This tightens the space between the countdown pill (#nextPill) and the digital clock (#digital).",
+    "In app/src/main/assets/web/js/clock.js, in the ensureSlideshowHost() function, add `scrim.style.zIndex = '0'` after creating the scrim div, ensuring dynamically-created scrims stay behind content.",
+    "In app/src/main/assets/web/css/screen.css, add a new rule to ensure ALL absolute-positioned background/scrim children of .app-screen stay at z-index 0: `.app-screen > .slideshow-host, .app-screen > .slideshow-host + .absolute { z-index: 0; }'`. This handles both the slideshow-host AND the gradient scrim that immediately follows it in all templates.",
+    "Verify that the existing `.slideshow-host { z-index: 0; }` rule is still in place and working. The scrim div (gradient overlay) that follows .slideshow-host in DOM order also needs z-index:0 or it will paint above row-fixed/row-fill siblings that only have z-index:1."
+  ],
+  "acceptance_criteria": [
+    "The slideshow-host AND its sibling scrim div both have z-index:0, ensuring they render BEHIND header/main/section content which has z-index:1 or z-10",
+    "Header (.row-fixed) no longer has overflow:hidden, so it cannot clip the digital clock's top edge",
+    "The gap between the countdown pill and the digital clock is reduced (from 8px to 4px, padding-top from 1vh to 0)",
+    "The digital clock sits directly below the header without any clipping or excessive gaps",
+    "All existing themes (minimal, mosque, cinema, neon, classic, fullphoto*, etc.) continue to display correctly with background behind content"
+  ],
+  "verification": [
+    "Read screen.css and confirm .row-fixed has overflow:visible instead of overflow:hidden",
+    "Read screen.css and confirm .flex-layout > main.row-fill has gap:4px and padding-top:0",
+    "Read screen.css and confirm there is a rule targeting the scrim sibling of .slideshow-host setting z-index:0",
+    "Read clock.js ensureSlideshowHost() and confirm scrim.style.zIndex = '0' is set"
+  ],
+  "blocked_reason": null,
+  "findings": "All 5 fixes applied successfully. Used gap:2px per delegation prompt (feature file said 4px). overflow:hidden kept on .row-fill to contain prayer cards; only .row-fixed changed to overflow:visible."
+}

@@ -1,0 +1,20 @@
+{
+  "project_type": "Android WebView clock app - UI rendered via bundled HTML/CSS/JS in assets/web/",
+  "language": "HTML/CSS/JavaScript (web assets), Kotlin (Android shell)",
+  "build_system": "Gradle (AGP 8.5.2, Kotlin 1.9.24) - no build needed for web assets changes",
+  "test_framework": "No automated tests - visual verification only",
+  "build_command": "N/A for CSS/JS changes (web assets are bundled as-is)",
+  "test_command": "N/A - visual UI changes, verify by reading the code",
+  "verification_instructions": "1. Review CSS changes to confirm z-index stacking is correct. 2. Review that overflow:hidden is removed from row-fixed header. 3. Verify gap values are reduced. 4. Confirm scrim divs get proper z-index.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup needed - changes are to static web assets",
+  "environment_constraints": "INTEGRATIONS_ONLY network - no package installs possible. Changes are purely to static CSS/JS/HTML files.",
+  "contribution_requirements": "Each fix in a branch, PR based workflow. Web assets at app/src/main/assets/web/",
+  "key_patterns": "Layout system uses <template> elements cloned into #layoutHost. CSS uses .flex-layout with .row-fixed (header/footer) and .row-fill (main content). z-index stacking: slideshow-host=0, row-fixed/row-fill=1, template content uses 'relative z-10' class. Scrim divs are 'absolute inset-0' with gradient backgrounds.",
+  "relevant_files": [
+    "app/src/main/assets/web/css/screen.css",
+    "app/src/main/assets/web/js/clock.js",
+    "app/src/main/assets/web/index.html"
+  ],
+  "directory_structure": "app/src/main/assets/web/ contains index.html (layout templates), css/screen.css (all styles), js/clock.js (layout logic, config, rendering)"
+}

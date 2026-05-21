@@ -199,6 +199,7 @@
         // slideshow is visible across all themes.
         ensureSlideshowHost(host);
         buildAnalogStatic();   // populate ticks/numerals on the freshly cloned SVG
+        setTimeout(autoFitVerticalOverflow, 50);
         return true;
     }
 
@@ -240,6 +241,7 @@
         const scrim = document.createElement('div');
         scrim.className = 'absolute inset-0';
         scrim.style.pointerEvents = 'none';
+        scrim.style.zIndex = '0';
         scrim.style.background = isLight
             ? 'linear-gradient(180deg,rgba(250,249,246,0.55) 0%,rgba(250,249,246,0.82) 100%)'
             : 'linear-gradient(180deg,rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.72) 100%)';
@@ -613,6 +615,7 @@
         // adjacent content. Only sections with a visible background
         // should reserve space and visually block things behind them.
         applyTransparentPassthrough();
+        setTimeout(autoFitVerticalOverflow, 50);
     }
 
     /* ===== Transparent passthrough helpers ===== */
@@ -663,7 +666,10 @@
                 el.style.left = '0';
                 el.style.right = '0';
                 if (anchor === 'bottom') {
-                    el.style.bottom = '0';
+                    // Offset from the bottom by the combined height of the
+                    // fixed quran bar + ticker so the prayer section never
+                    // overlaps those bottom-pinned elements.
+                    el.style.bottom = 'calc(var(--ticker-h, 0px) + var(--quran-h, 0px))';
                     el.style.top = '';
                 } else {
                     el.style.top = '0';
@@ -1010,7 +1016,26 @@
         requestAnimationFrame(() => {
             const h = bar.getBoundingClientRect().height || 0;
             document.documentElement.style.setProperty('--quran-h', Math.ceil(h) + 'px');
+            // Re-run autofit and collision check after the quran height is
+            // established so prayer cards adjust to the new available space.
+            setTimeout(() => {
+                autoFitVerticalOverflow();
+                preventPrayerQuranCollision();
+            }, 30);
         });
+
+        // Install a ResizeObserver (once) so that whenever the quran bar
+        // changes height (e.g. font load, ayat rotation, mode switch),
+        // the reserved space stays accurate and layouts don't overlap.
+        if (!bar._quranRO) {
+            bar._quranRO = new ResizeObserver(() => {
+                const h2 = bar.getBoundingClientRect().height || 0;
+                document.documentElement.style.setProperty('--quran-h', Math.ceil(h2) + 'px');
+                // Re-check collision after height changes.
+                preventPrayerQuranCollision();
+            });
+            bar._quranRO.observe(bar);
+        }
     }
 
     function showNextAyat(initial) {
@@ -1340,6 +1365,58 @@
             apply(uniqueDateSelector(dateWrap),
                   cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
                   'top right');
+        }
+
+        // After all transforms are applied, schedule a collision check
+        // so that visually the prayer section never overlaps the quran bar.
+        requestAnimationFrame(preventPrayerQuranCollision);
+    }
+
+    /**
+     * Prevent the prayer-card section from visually overlapping the
+     * quran bar. After layout-editor transforms (translate/scale) are
+     * applied, the prayer section might extend below its intended area
+     * and collide with the fixed-bottom quran bar. This function
+     * detects the overlap using bounding rects and nudges the prayer
+     * section upward with an additional translateY correction.
+     */
+    function preventPrayerQuranCollision() {
+        const bar = document.getElementById('quranBar');
+        if (!bar || bar.style.display === 'none') return;
+
+        const host = document.getElementById('layoutHost');
+        if (!host) return;
+        const prayerSection = findPrayerContainer();
+        if (!prayerSection) return;
+
+        // Strip any previous collision correction so we measure the
+        // "natural" position (with only layout-editor transforms).
+        const currentTransform = prayerSection.style.transform || '';
+        const baseTransform = currentTransform.replace(/translateY\(-\d+(\.\d+)?px\)\s*/g, '').trim();
+        if (currentTransform !== baseTransform) {
+            prayerSection.style.transform = baseTransform || '';
+        }
+
+        // Force a synchronous layout so rects reflect the base position.
+        const barRect = bar.getBoundingClientRect();
+        const prayerRect = prayerSection.getBoundingClientRect();
+
+        // If there's no quran bar height, nothing to collide with.
+        if (barRect.height <= 0) return;
+
+        // Calculate overlap: how many pixels the prayer section's bottom
+        // extends below the quran bar's top.
+        const overlap = prayerRect.bottom - barRect.top;
+        if (overlap <= 0) return; // No collision
+
+        // Apply a correction by shifting upward by the overlap + a gap.
+        const gap = 8; // px of breathing room
+        const correction = Math.ceil(overlap + gap);
+
+        if (baseTransform) {
+            prayerSection.style.transform = `translateY(-${correction}px) ` + baseTransform;
+        } else {
+            prayerSection.style.transform = `translateY(-${correction}px)`;
         }
     }
 
@@ -2720,6 +2797,82 @@
     }
 
     /**
+     * Detect vertical overflow in the flex layout and scale down prayer
+     * sections (section.row-fixed) to prevent overlap. Works by measuring
+     * the natural height of all row-fixed children vs. available container
+     * height. If row-fixed items consume more than 60% of the viewport,
+     * scale the largest section down to fit.
+     */
+    function autoFitVerticalOverflow() {
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var screen = host.querySelector('.app-screen');
+        if (!screen) return;
+
+        var containerH = screen.clientHeight;
+        if (containerH <= 0) return;
+
+        var rowFixed = screen.querySelectorAll(':scope > .row-fixed');
+        if (!rowFixed.length) return;
+
+        // Reset transforms first so we measure natural sizes
+        rowFixed.forEach(function(el) {
+            if (el.dataset.vfitScale) {
+                el.style.transform = '';
+                el.style.transformOrigin = '';
+                el.style.height = '';
+                delete el.dataset.vfitScale;
+            }
+        });
+
+        // Wait one frame for layout to settle after reset
+        requestAnimationFrame(function() {
+            var containerH2 = screen.clientHeight;
+            if (containerH2 <= 0) return;
+
+            var totalFixed = 0;
+            var sections = [];
+            rowFixed.forEach(function(el) {
+                var pos = window.getComputedStyle(el).position;
+                if (pos === 'absolute' || pos === 'fixed') return;
+                var h = el.scrollHeight || el.offsetHeight || 0;
+                totalFixed += h;
+                if (el.tagName === 'SECTION' || (el.tagName !== 'HEADER' && el.querySelector('[data-key]'))) {
+                    sections.push({ el: el, h: h });
+                }
+            });
+
+            var maxFixed = containerH2 * 0.60;
+            if (totalFixed <= maxFixed) return;
+
+            var headerH = 0;
+            rowFixed.forEach(function(el) {
+                var pos = window.getComputedStyle(el).position;
+                if (pos === 'absolute' || pos === 'fixed') return;
+                if (el.tagName === 'HEADER') {
+                    headerH += el.scrollHeight || el.offsetHeight || 0;
+                }
+            });
+
+            var sectionBudget = maxFixed - headerH;
+            var totalSectionH = 0;
+            sections.forEach(function(s) { totalSectionH += s.h; });
+
+            if (totalSectionH <= 0 || sectionBudget <= 0) return;
+
+            var scaleFactor = Math.max(0.65, Math.min(1.0, sectionBudget / totalSectionH));
+            if (scaleFactor >= 0.98) return;
+
+            sections.forEach(function(s) {
+                s.el.style.transform = 'scale(' + scaleFactor + ')';
+                s.el.style.height = Math.ceil(s.h * scaleFactor) + 'px';
+                s.el.style.transformOrigin = 'center bottom';
+                s.el.dataset.vfitScale = String(scaleFactor);
+            });
+        });
+    }
+
+    /**
      * Autofit the #digital clock element so it never overflows its
      * parent container horizontally, regardless of which digital_style
      * is active. This is critical when switching between styles like
@@ -3175,6 +3328,15 @@
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', scheduleAutoFit);
         }
+
+        // Vertical overflow auto-fit on resize/orientation change
+        var _vfitTimer = null;
+        function scheduleVfit() {
+            if (_vfitTimer) clearTimeout(_vfitTimer);
+            _vfitTimer = setTimeout(autoFitVerticalOverflow, 150);
+        }
+        window.addEventListener('resize', scheduleVfit);
+        window.addEventListener('orientationchange', function() { setTimeout(scheduleVfit, 300); });
 
         loadHijri();
         loadPrayerTimes();

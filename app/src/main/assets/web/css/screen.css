@@ -68,10 +68,10 @@ body {
 }
 
 /* The flex helper ensures direct children of a column-flex layout root
- * have predictable shrink behaviour: header rows never shrink; prayer
- * sections (section.row-fixed) may shrink and are capped to fit short
- * viewports. The main row absorbs all leftover space and may overflow
- * into a hidden region rather than push siblings off-screen.
+ * have predictable shrink behaviour: row-fixed items may shrink when
+ * viewport is short (landscape). The main row absorbs all leftover
+ * space and may overflow into a hidden region rather than push siblings
+ * off-screen.
  *
  * Stacking guarantee (slideshow z-index fix):
  * Every direct row of a flex layout gets `position: relative; z-index: 1`
@@ -80,29 +80,24 @@ body {
  * header/main/section will still render their content ABOVE the
  * slideshow background -- never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
-.flex-layout         { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; position: relative; z-index: 1; }
-.flex-layout > section.row-fixed { flex: 0 1 auto; }
-.flex-layout > .row-fill  { flex: 1 1 0; flex-basis: 0; min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+.flex-layout         { display: flex; flex-direction: column; }
+.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: visible; position: relative; z-index: 1; }
+.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
 
-/* Prayer section max-height safety net: never exceed 25% of viewport height */
-.flex-layout > section.row-fixed {
-    max-height: 25vh;
-    overflow: hidden;
+/* Bring the clock content closer to the prayer cards section by
+ * shifting the visual center downward. Without this, justify-center
+ * in a tall row-fill places the clock too high because the bottom
+ * of the viewport is occupied by quran bar + ticker + prayer cards.
+ * A small top-padding bias + tighter gap creates a more balanced look. */
+.flex-layout > main.row-fill {
+    gap: 2px !important;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
-/* Big-schedule and vertical-card layouts have intentionally large prayer sections */
-.layout-bigboard section.row-fixed,
-.layout-pulpit section.row-fixed,
-.layout-bulletin section.row-fixed,
-.layout-tower section.row-fixed,
-.layout-beacon section.row-fixed,
-.layout-vertical section.row-fixed,
-.layout-pillar section.row-fixed,
-.layout-stack section.row-fixed,
-.layout-rack section.row-fixed,
-.layout-column section.row-fixed {
-    max-height: none;
+/* Compact row-fixed padding on very short viewports (landscape phones) */
+@media (max-height: 500px) {
+    .flex-layout > section.row-fixed { padding-top: 2px !important; padding-bottom: 2px !important; }
 }
 
 /* ---------- Slideshow stacking guarantee ----------
@@ -117,6 +112,14 @@ body {
  * above and z-index: 10+ in templates) means a positioned slideshow will
  * always sit beneath content, regardless of which template mounts. */
 .slideshow-host {
+    z-index: 0;
+}
+/* Scrim / overlay gradient divs that sit behind content.
+ * These are always absolute-positioned direct children of the
+ * flex-layout root (class="absolute inset-0" in templates).
+ * Must stay at z-index 0 so .row-fixed/.row-fill (z-index:1)
+ * always paint above them. */
+.flex-layout > .absolute {
     z-index: 0;
 }
 .slide {
@@ -2078,39 +2081,57 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto10 .prayer.next::before { display: none; }
 
-/* ===================== LANDSCAPE / SHORT-VIEWPORT COMPACT PRAYER CARDS ===================== */
-@media (max-height: 640px) {
-    /* Prayer section: tighter padding */
-    .flex-layout > section.row-fixed {
-        padding-bottom: 8px !important;
-        padding-top: 4px !important;
-    }
-    /* Prayer card internals: reduce padding */
-    section.row-fixed .prayer-card,
-    section.row-fixed .prayer-grid-cell,
-    section.row-fixed .neon-card,
-    section.row-fixed .arch-card,
-    section.row-fixed .float-prayer,
-    section.row-fixed .scoreboard-row {
-        padding: 6px !important;
-    }
-    section.row-fixed .prayer-pill {
-        padding: 4px 10px !important;
-    }
-    /* Reduce grid gap */
-    section.row-fixed .grid {
-        gap: 4px !important;
-    }
-    section.row-fixed .flex-wrap {
-        gap: 4px !important;
-    }
-    /* Slightly smaller prayer card fonts */
-    section.row-fixed [data-time] {
-        font-size: clamp(12px, 1.8vw, 22px) !important;
-    }
-    section.row-fixed .label,
-    section.row-fixed .truncate,
-    section.row-fixed [class*="tracking-"] {
-        font-size: clamp(7px, 1.2vh, 10px) !important;
-    }
+
+
+
+/* ===================== LAYOUT FIX: Anti-kepotong + Spacing + Z-index =====================
+ * Targeted fixes for:
+ * 1. Jam digital default posisinya dibawah header (bukan keatasan)
+ * 2. Jarak antara jam digital dan "Menuju Maghrib" lebih dekat
+ * 3. Frame gambar/slideshow tidak nutupi header
+ * 4. Kartu jadwal sholat tidak kepotong atas/bawah
+ */
+
+/* FIX 1: Slideshow NEVER covers header - stronger z-index */
+.slideshow-host {
+    z-index: 0 !important;
+}
+[class*="layout-"] > header {
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* FIX 2: row-fixed (header & prayer section) - no clip, higher z */
+.flex-layout > .row-fixed {
+    overflow: visible !important;
+    z-index: 5;
+}
+
+/* FIX 3: Gap between digital clock and countdown - tighter */
+.flex-layout > main.row-fill {
+    gap: 4px !important;
+}
+
+/* FIX 4: Gradient overlays stay behind content */
+[class*="layout-"] > .absolute:not(.slideshow-host) {
+    z-index: 1 !important;
+}
+
+/* FIX 5: Fullphoto layouts - content always above BG */
+[class*="layout-fullphoto"] > header,
+[class*="layout-fullphoto"] > main,
+[class*="layout-fullphoto"] > section {
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+/* FIX 6: Prayer cards section never clips content */
+.flex-layout > section.row-fixed {
+    overflow: visible !important;
+}
+
+/* FIX 7: Prayer time digits - allow vertical overflow for tall fonts */
+.prayer [data-time],
+.prayer .digit-cell {
+    overflow-y: visible !important;
 }
