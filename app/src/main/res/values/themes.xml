@@ -19,7 +19,7 @@
           larger than the actually-visible area and the bottom of the
           layout was clipped. `shortEdges` lets the layout extend into
           the cutout area on the long edges (landscape: top/bottom),
-          and we consume the rest via `--safe-*` insets in CSS.
+          and we consume the rest via the safe-* insets in CSS.
         -->
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
     </style>

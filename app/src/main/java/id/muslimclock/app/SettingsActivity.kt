@@ -387,10 +387,16 @@ class SettingsActivity : AppCompatActivity() {
                         Settings.K_NEXT_SIZE     to 100,
                         Settings.K_NEXT_X_PCT    to 0,
                         Settings.K_NEXT_Y_PCT    to 0,
+                        Settings.K_LOGO_SIZE     to 100,
+                        Settings.K_IDENTITY_SIZE to 100,
                     )
                     for ((key, def) in resets) {
                         findPreference<androidx.preference.SeekBarPreference>(key)?.value = def
                     }
+                    // Reset identity_position ListPreference back to "left"
+                    findPreference<androidx.preference.ListPreference>(Settings.K_IDENTITY_POSITION)?.value = "left"
+                    // Reset date_position ListPreference back to "auto"
+                    findPreference<androidx.preference.ListPreference>(Settings.K_DATE_POSITION)?.value = "auto"
                     Toast.makeText(ctx, R.string.layout_reset_done, Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton(android.R.string.cancel, null)

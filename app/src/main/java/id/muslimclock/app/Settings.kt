@@ -49,6 +49,7 @@ object Settings {
     const val K_TICKER_TEXT    = "ticker_text"
     const val K_TICKER_SPEED   = "ticker_speed"
     const val K_TICKER_STYLE   = "ticker_style"
+    const val K_TICKER_BG      = "ticker_bg"
     const val K_SHOW_QURAN     = "show_quran"
     const val K_QURAN_INTERVAL = "quran_interval"
     const val K_QURAN_MODE     = "quran_mode"
@@ -108,6 +109,17 @@ object Settings {
     const val K_NEXT_SIZE     = "next_size"
     const val K_NEXT_X_PCT    = "next_x_pct"
     const val K_NEXT_Y_PCT    = "next_y_pct"
+
+    // Identity sizing & position — controls the logo box dimensions,
+    // masjid name/address font size, and header alignment (left/center/right).
+    const val K_LOGO_SIZE          = "logo_size"
+    const val K_IDENTITY_SIZE      = "identity_size"
+    const val K_IDENTITY_POSITION  = "identity_position"
+
+    // Date position — independent control over date (Masehi & Hijriah)
+    // alignment. Defaults to "auto" which derives position from identity_position:
+    // identity left => date right, identity center => date center, identity right => date left.
+    const val K_DATE_POSITION      = "date_position"
 
     // System: auto-launch the app after the device finishes booting.
     // Default ON because the primary deployment is a TV permanently
@@ -187,6 +199,7 @@ object Settings {
             .putString(K_TICKER_TEXT,    "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini")
             .putString(K_TICKER_SPEED,   "30")
             .putString(K_TICKER_STYLE,   "classic")
+            .putString(K_TICKER_BG,      "solid_dark")
             .putBoolean(K_SHOW_QURAN,    true)
             .putString(K_QURAN_INTERVAL, "30")
             .putString(K_QURAN_MODE,     "fullcard")
@@ -227,6 +240,10 @@ object Settings {
             .putInt(K_NEXT_SIZE,      100)
             .putInt(K_NEXT_X_PCT,     0)
             .putInt(K_NEXT_Y_PCT,     0)
+            .putInt(K_LOGO_SIZE,      100)
+            .putInt(K_IDENTITY_SIZE,  100)
+            .putString(K_IDENTITY_POSITION, "left")
+            .putString(K_DATE_POSITION, "auto")
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -277,6 +294,7 @@ object Settings {
             put("ticker_text",     str(K_TICKER_TEXT,             "Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini"))
             put("ticker_speed",    int(K_TICKER_SPEED,            30))
             put("ticker_style",    str(K_TICKER_STYLE,            "classic"))
+            put("ticker_bg",       str(K_TICKER_BG,               "solid_dark"))
             put("show_quran",      p.getBoolean(K_SHOW_QURAN,    true))
             put("quran_interval",  int(K_QURAN_INTERVAL,          30))
             put("quran_mode",      str(K_QURAN_MODE,              "fullcard"))
@@ -322,6 +340,10 @@ object Settings {
             put("next_size",       p.getInt(K_NEXT_SIZE,     100).coerceIn(50, 200))
             put("next_x_pct",      p.getInt(K_NEXT_X_PCT,    0).coerceIn(-50, 50))
             put("next_y_pct",      p.getInt(K_NEXT_Y_PCT,    0).coerceIn(-50, 50))
+            put("logo_size",       p.getInt(K_LOGO_SIZE,     100).coerceIn(50, 200))
+            put("identity_size",   p.getInt(K_IDENTITY_SIZE, 100).coerceIn(50, 200))
+            put("identity_position", str(K_IDENTITY_POSITION, "left"))
+            put("date_position", str(K_DATE_POSITION, "auto"))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))

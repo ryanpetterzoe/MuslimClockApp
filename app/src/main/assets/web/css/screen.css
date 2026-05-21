@@ -6,6 +6,9 @@ body {
     background: #000;
     color: #fff;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
     /* Lock the body to the visual viewport so descendants using % of
      * 'height' resolve against a guaranteed-correct height. Even if
      * Android WebView reports 100vh that includes the area behind the
@@ -13,6 +16,30 @@ body {
      * actual painted bounds the WebView knows about. */
     position: fixed;
     inset: 0;
+}
+
+/* Prevent text selection and focus highlight on display elements (TV remote / D-pad) */
+*:focus {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#layoutHost, #layoutHost * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+#layoutHost *:not(button):not(a):not(input) {
+    pointer-events: none;
+}
+
+#tickerBar, #tickerBar *,
+#quranBar, #quranBar * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* ---------- Viewport sizing fix for Android WebView ----------
@@ -41,20 +68,42 @@ body {
 }
 
 /* The flex helper ensures direct children of a column-flex layout root
- * have predictable shrink behaviour: header/footer rows never shrink,
- * the main row absorbs all leftover space and may overflow into a
- * hidden region rather than push siblings off-screen.
+ * have predictable shrink behaviour: header rows never shrink; prayer
+ * sections (section.row-fixed) may shrink and are capped to fit short
+ * viewports. The main row absorbs all leftover space and may overflow
+ * into a hidden region rather than push siblings off-screen.
  *
  * Stacking guarantee (slideshow z-index fix):
  * Every direct row of a flex layout gets `position: relative; z-index: 1`
  * by default. The slideshow-host is forced to `z-index: 0` (see below).
  * That way, even templates that forgot to add `relative z-10` on their
  * header/main/section will still render their content ABOVE the
- * slideshow background — never the other way around. Templates that
+ * slideshow background -- never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
-.flex-layout         { display: flex; flex-direction: column; }
+.flex-layout         { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; position: relative; z-index: 1; }
-.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+.flex-layout > section.row-fixed { flex: 0 1 auto; }
+.flex-layout > .row-fill  { flex: 1 1 0; flex-basis: 0; min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+
+/* Prayer section max-height safety net: never exceed 25% of viewport height */
+.flex-layout > section.row-fixed {
+    max-height: 25vh;
+    overflow: hidden;
+}
+
+/* Big-schedule and vertical-card layouts have intentionally large prayer sections */
+.layout-bigboard section.row-fixed,
+.layout-pulpit section.row-fixed,
+.layout-bulletin section.row-fixed,
+.layout-tower section.row-fixed,
+.layout-beacon section.row-fixed,
+.layout-vertical section.row-fixed,
+.layout-pillar section.row-fixed,
+.layout-stack section.row-fixed,
+.layout-rack section.row-fixed,
+.layout-column section.row-fixed {
+    max-height: none;
+}
 
 /* ---------- Slideshow stacking guarantee ----------
  * The slideshow-host (and its inner .slide/<video> children) must
@@ -302,20 +351,23 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
  * to fully visible so the user can tap/click it.
  */
 .gear-samar {
-    opacity: 0.12;
-    transition: opacity 0.35s ease, transform 0.25s ease;
+    opacity: 0.08;
     cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 .gear-samar:hover,
 .gear-samar:focus,
 .gear-samar:focus-visible {
-    opacity: 1;
-    transform: scale(1.1);
+    opacity: 0.25;
+    transform: none;
     outline: none;
 }
 .gear-samar:active {
-    opacity: 1;
-    transform: scale(0.95);
+    opacity: 0.35;
+    transform: none;
 }
 
 /* Hide scrollbars */
@@ -1699,10 +1751,25 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     100% { opacity: 0; transform: translateX(0); }
 }
 
-/* Typewriter: step-based reveal */
+/* Typewriter: width-based reveal with blinking caret. The text is
+ * revealed character-by-character (steps timing function in clock.js)
+ * by animating width 0% → 100%, then briefly held and reset. A right
+ * border acts as a typewriter caret and blinks via a separate keyframe.
+ *
+ * Note: requires padding-left:0 on .marquee-inner so the text isn't
+ * pushed off-screen by the classic-scroll offset. The override lives
+ * in the data-attribute rule further below.
+ */
 @keyframes tickerTypewriter {
-    0%   { transform: translateX(0); max-width: 0; overflow: hidden; }
-    100% { transform: translateX(0); max-width: 100vw; overflow: hidden; }
+    0%   { width: 0; }
+    60%  { width: 100%; }
+    90%  { width: 100%; }
+    100% { width: 0; }
+}
+
+@keyframes tickerCaretBlink {
+    0%, 100% { border-right-color: var(--accent); }
+    50%      { border-right-color: transparent; }
 }
 
 /* Neon: glowing text effect */
@@ -1722,6 +1789,87 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 #tickerBar[data-ticker-style="bounce"] .marquee-inner {
     padding-left: 0 !important;
+}
+
+/* Typewriter: kill the off-screen offset that classic scroll uses, set
+ * up the blinking caret, and force overflow:hidden so the partial-width
+ * reveal actually clips the unrevealed characters. The caret animation
+ * runs in parallel with the typing animation (composed in clock.js).
+ */
+#tickerBar[data-ticker-style="typewriter"] .marquee-inner {
+    padding-left: 0 !important;
+    overflow: hidden;
+    border-right: 2px solid var(--accent);
+    box-sizing: border-box;
+    /* `width:0` initial state prevents a flash of fully-rendered text
+     * before the animation kicks in on slower devices. */
+    width: 0;
+}
+
+/* ---------- Ticker background variations ---------- */
+/* Each value here matches an entry in arrays.xml → ticker_bg_values
+ * and is set on #tickerBar from clock.js (bar.dataset.tickerBg).
+ * Rules target the inner .marquee so they compose with the bar's
+ * own neon-style background override (which uses !important).
+ */
+#tickerBar[data-ticker-bg="solid_dark"] .marquee {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#tickerBar[data-ticker-bg="transparent"] .marquee {
+    background: transparent;
+}
+
+#tickerBar[data-ticker-bg="glass"] .marquee {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+#tickerBar[data-ticker-bg="accent"] .marquee {
+    /* Accent-tinted dark: falls back to the masjid's accent color
+     * mixed with black for legibility behind the bright text. */
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--accent) 55%, rgba(0, 0, 0, 0.65)),
+        color-mix(in srgb, var(--accent) 35%, rgba(0, 0, 0, 0.75))
+    );
+}
+
+#tickerBar[data-ticker-bg="gradient_sunset"] .marquee {
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+}
+
+#tickerBar[data-ticker-bg="gradient_ocean"] .marquee {
+    background: linear-gradient(90deg, #2193b0, #6dd5ed);
+}
+
+#tickerBar[data-ticker-bg="gradient_purple"] .marquee {
+    background: linear-gradient(90deg, #614385, #516395);
+}
+
+#tickerBar[data-ticker-bg="green_islamic"] .marquee {
+    background: linear-gradient(90deg, #134e5e, #71b280);
+}
+
+#tickerBar[data-ticker-bg="red_dark"] .marquee {
+    background: rgba(80, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* On the lighter / colored backgrounds, force a soft text-shadow so
+ * the accent-colored ticker text stays legible regardless of how
+ * vivid the gradient is behind it. */
+#tickerBar[data-ticker-bg="gradient_sunset"] .marquee-inner,
+#tickerBar[data-ticker-bg="gradient_ocean"] .marquee-inner,
+#tickerBar[data-ticker-bg="gradient_purple"] .marquee-inner,
+#tickerBar[data-ticker-bg="green_islamic"] .marquee-inner,
+#tickerBar[data-ticker-bg="glass"] .marquee-inner {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 6px rgba(0, 0, 0, 0.35);
 }
 
 /* ===================== NEW QURAN MODES CSS ===================== */
@@ -1880,3 +2028,89 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-special3 .special3-card.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
 .layout-special3 .prayer.next::before { display: none; }
 
+
+/* ===================== FULLPHOTO LAYOUTS NEXT-STATE STYLES ===================== */
+
+/* Fullphoto 1 (Elegan) */
+.layout-fullphoto1 .prayer.next { border-color: var(--accent); background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent); border-radius: 8px; }
+.layout-fullphoto1 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto1 .prayer.next::before { display: none; }
+
+/* Fullphoto 2 (Neon) */
+.layout-fullphoto2 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent); box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); }
+.layout-fullphoto2 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
+.layout-fullphoto2 .prayer.next::before { display: none; }
+
+/* Fullphoto 3 (Minimal) */
+.layout-fullphoto3 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto3 .prayer.next::before { display: none; }
+
+/* Fullphoto 4 (Kubah) */
+.layout-fullphoto4 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent); }
+.layout-fullphoto4 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto4 .prayer.next::before { display: none; }
+
+/* Fullphoto 5 (Kaligrafi) */
+.layout-fullphoto5 .prayer.next { border-left-color: var(--accent) !important; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent); }
+.layout-fullphoto5 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto5 .prayer.next::before { display: none; }
+
+/* Fullphoto 6 (Lanskap) */
+.layout-fullphoto6 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto6 .prayer.next::before { display: none; }
+
+/* Fullphoto 7 (Jadwal Besar) */
+.layout-fullphoto7 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent)); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 25%, transparent); }
+.layout-fullphoto7 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto7 .prayer.next::before { display: none; }
+
+/* Fullphoto 8 (Sinematik) */
+.layout-fullphoto8 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto8 .prayer.next::before { display: none; }
+
+/* Fullphoto 9 (Kaca) */
+.layout-fullphoto9 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 15%, transparent), rgba(0,0,0,0.4)); box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 20%, transparent); }
+.layout-fullphoto9 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto9 .prayer.next::before { display: none; }
+
+/* Fullphoto 10 (Emas) */
+.layout-fullphoto10 .prayer.next { border-color: var(--accent); background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent); }
+.layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto10 .prayer.next::before { display: none; }
+
+/* ===================== LANDSCAPE / SHORT-VIEWPORT COMPACT PRAYER CARDS ===================== */
+@media (max-height: 640px) {
+    /* Prayer section: tighter padding */
+    .flex-layout > section.row-fixed {
+        padding-bottom: 8px !important;
+        padding-top: 4px !important;
+    }
+    /* Prayer card internals: reduce padding */
+    section.row-fixed .prayer-card,
+    section.row-fixed .prayer-grid-cell,
+    section.row-fixed .neon-card,
+    section.row-fixed .arch-card,
+    section.row-fixed .float-prayer,
+    section.row-fixed .scoreboard-row {
+        padding: 6px !important;
+    }
+    section.row-fixed .prayer-pill {
+        padding: 4px 10px !important;
+    }
+    /* Reduce grid gap */
+    section.row-fixed .grid {
+        gap: 4px !important;
+    }
+    section.row-fixed .flex-wrap {
+        gap: 4px !important;
+    }
+    /* Slightly smaller prayer card fonts */
+    section.row-fixed [data-time] {
+        font-size: clamp(12px, 1.8vw, 22px) !important;
+    }
+    section.row-fixed .label,
+    section.row-fixed .truncate,
+    section.row-fixed [class*="tracking-"] {
+        font-size: clamp(7px, 1.2vh, 10px) !important;
+    }
+}

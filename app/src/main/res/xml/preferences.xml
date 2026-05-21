@@ -189,6 +189,15 @@
             app:defaultValue="classic"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:key="ticker_bg"
+            app:title="Background Running Text"
+            app:summary="Pilih jenis background running text"
+            app:entries="@array/ticker_bg_entries"
+            app:entryValues="@array/ticker_bg_values"
+            app:defaultValue="solid_dark"
+            app:useSimpleSummaryProvider="true" />
+
         <EditTextPreference
             app:key="ticker_text"
             app:title="@string/pref_ticker_text"
@@ -318,6 +327,47 @@
             app:key="khatib_jumat"
             app:title="@string/pref_khatib_jumat"
             app:summary="@string/pref_imam_sum_default"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_identity_settings">
+
+        <SeekBarPreference
+            app:key="logo_size"
+            app:title="@string/pref_logo_size"
+            app:summary="@string/pref_logo_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="identity_size"
+            app:title="@string/pref_identity_size"
+            app:summary="@string/pref_identity_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <ListPreference
+            app:key="identity_position"
+            app:title="@string/pref_identity_position"
+            app:summary="@string/pref_identity_position_sum"
+            app:entries="@array/identity_position_entries"
+            app:entryValues="@array/identity_position_values"
+            app:defaultValue="left"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="date_position"
+            app:title="@string/pref_date_position"
+            app:summary="@string/pref_date_position_sum"
+            app:entries="@array/date_position_entries"
+            app:entryValues="@array/date_position_values"
+            app:defaultValue="auto"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
@@ -638,6 +688,14 @@
             app:summary="@string/pref_adzan_text_sum"
             app:useSimpleSummaryProvider="true" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="">
+        <Preference
+            app:key="copyright"
+            app:title="Khusyu\' Time Oleh Ryan Apps"
+            app:selectable="false"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>

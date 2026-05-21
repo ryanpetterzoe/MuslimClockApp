@@ -122,6 +122,38 @@
         <item>Spesial A1 (Custom Background)</item>
         <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
+        <item>Exhibit (Foto + Ribbon) ★ FOTO</item>
+        <item>Pavilion (3 Kolom Foto) ★ FOTO</item>
+        <item>Shrine (Foto BG + Grid 3x2) ★ FOTO</item>
+        <item>Atrium (Foto Kanan + Grid 2x3) ★ FOTO</item>
+        <item>Dome (Foto Kubah + Arch Cards) ★ FOTO</item>
+        <item>Minaret (Foto Kiri + List Dots) ★ FOTO</item>
+        <item>Oasis (Timeline + Foto Bawah) ★ FOTO</item>
+        <item>Sanctuary (Foto Tengah + Side) ★ FOTO</item>
+        <item>Arch (Foto Lengkung + Arch) ★ FOTO</item>
+        <item>Courtyard (Panorama + Pills) ★ FOTO</item>
+        <item>Terrace (Foto Besar + Step) ★ FOTO</item>
+        <item>Panorama (Wide + Gradient) ★ FOTO</item>
+        <item>Fullphoto 1 (BG Foto Elegan) ★ BACKGROUND</item>
+        <item>Fullphoto 2 (BG Foto Neon) ★ BACKGROUND</item>
+        <item>Fullphoto 3 (BG Foto Minimal) ★ BACKGROUND</item>
+        <item>Fullphoto 4 (BG Foto Kubah) ★ BACKGROUND</item>
+        <item>Fullphoto 5 (BG Foto Kaligrafi) ★ BACKGROUND</item>
+        <item>Fullphoto 6 (BG Foto Lanskap) ★ BACKGROUND</item>
+        <item>Fullphoto 7 (BG Foto Jadwal Besar) ★ BACKGROUND</item>
+        <item>Fullphoto 8 (BG Foto Sinematik) ★ BACKGROUND</item>
+        <item>Fullphoto 9 (BG Foto Kaca) ★ BACKGROUND</item>
+        <item>Fullphoto 10 (BG Foto Emas) ★ BACKGROUND</item>
+        <item>Fullphoto 11 (Heksagonal) ★ BACKGROUND</item>
+        <item>Fullphoto 12 (Sidebar Kaca) ★ BACKGROUND</item>
+        <item>Fullphoto 13 (Diagonal Ribbon) ★ BACKGROUND</item>
+        <item>Fullphoto 14 (Horizon Split) ★ BACKGROUND</item>
+        <item>Fullphoto 15 (Orbit Arc) ★ BACKGROUND</item>
+        <item>Fullphoto 16 (Pil Jadwal) ★ BACKGROUND</item>
+        <item>Fullphoto 17 (Cascade Tumpuk) ★ BACKGROUND</item>
+        <item>Fullphoto 18 (Grid Mosaic) ★ BACKGROUND</item>
+        <item>Fullphoto 19 (Bubble Melayang) ★ BACKGROUND</item>
+        <item>Fullphoto 20 (Meter Vertikal) ★ BACKGROUND</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -191,6 +223,38 @@
         <item>special1</item>
         <item>special2</item>
         <item>special3</item>
+        <item>exhibit</item>
+        <item>pavilion</item>
+        <item>shrine</item>
+        <item>atrium</item>
+        <item>dome</item>
+        <item>minaret</item>
+        <item>oasis</item>
+        <item>sanctuary</item>
+        <item>arch</item>
+        <item>courtyard</item>
+        <item>terrace</item>
+        <item>panorama</item>
+        <item>fullphoto1</item>
+        <item>fullphoto2</item>
+        <item>fullphoto3</item>
+        <item>fullphoto4</item>
+        <item>fullphoto5</item>
+        <item>fullphoto6</item>
+        <item>fullphoto7</item>
+        <item>fullphoto8</item>
+        <item>fullphoto9</item>
+        <item>fullphoto10</item>
+        <item>fullphoto11</item>
+        <item>fullphoto12</item>
+        <item>fullphoto13</item>
+        <item>fullphoto14</item>
+        <item>fullphoto15</item>
+        <item>fullphoto16</item>
+        <item>fullphoto17</item>
+        <item>fullphoto18</item>
+        <item>fullphoto19</item>
+        <item>fullphoto20</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -205,6 +269,34 @@
         <item>Glow (Cahaya Bersinar)</item>
         <item>Minimal (Teks Bersih)</item>
         <item>Scroll (Gulir Vertikal)</item>
+    </string-array>
+
+    <!-- Identity position options -->
+    <string-array name="identity_position_entries">
+        <item>Kiri</item>
+        <item>Tengah</item>
+        <item>Kanan</item>
+    </string-array>
+
+    <string-array name="identity_position_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+
+    <!-- Date position options -->
+    <string-array name="date_position_entries">
+        <item>Otomatis (ikuti identitas)</item>
+        <item>Kiri</item>
+        <item>Tengah</item>
+        <item>Kanan</item>
+    </string-array>
+
+    <string-array name="date_position_values">
+        <item>auto</item>
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
     </string-array>
 
     <string-array name="quran_mode_values">
@@ -235,6 +327,31 @@
         <item>fade</item>
         <item>neon</item>
         <item>typewriter</item>
+    </string-array>
+
+    <!-- Ticker / running text background variations -->
+    <string-array name="ticker_bg_entries">
+        <item>Hitam Solid (Default)</item>
+        <item>Transparan</item>
+        <item>Glass (Blur Tembus)</item>
+        <item>Warna Aksen</item>
+        <item>Gradient Sunset</item>
+        <item>Gradient Ocean</item>
+        <item>Gradient Ungu</item>
+        <item>Hijau Islami</item>
+        <item>Merah Gelap</item>
+    </string-array>
+
+    <string-array name="ticker_bg_values">
+        <item>solid_dark</item>
+        <item>transparent</item>
+        <item>glass</item>
+        <item>accent</item>
+        <item>gradient_sunset</item>
+        <item>gradient_ocean</item>
+        <item>gradient_purple</item>
+        <item>green_islamic</item>
+        <item>red_dark</item>
     </string-array>
 
     <!-- Digital clock display styles -->

@@ -1,0 +1,7 @@
+{
+  "task_id": "task-fix-prayer-card-layout",
+  "task_description": "Fix all prayer schedule card layouts (especially horizontal ones) that get pushed too far down on landscape/TV screens, causing overlap or clipping. Make them fit tidily within the viewport. Keep the Quran card positioned below prayer cards but above the running text ticker.",
+  "status": "completed",
+  "feature_order": ["FEAT-001"],
+  "blocked_reason": null
+}

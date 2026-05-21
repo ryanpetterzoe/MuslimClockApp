@@ -49,6 +49,7 @@
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
         ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
+        ticker_bg: 'solid_dark', // solid_dark | transparent | glass | accent | gradient_sunset | gradient_ocean | gradient_purple | green_islamic | red_dark
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
         quran_mode: 'fullcard', // fullcard | card | typewriter | slide | marquee
@@ -83,6 +84,11 @@
         quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
         date_size:    100, date_x_pct:    0, date_y_pct:    0,
         next_size:    100, next_x_pct:    0, next_y_pct:    0,
+        // Identity sizing & position
+        logo_size: 100,
+        identity_size: 100,
+        identity_position: 'left',
+        date_position: 'auto',
     };
 
     const PRAYER_LABEL_ID = {
@@ -128,7 +134,15 @@
         'mihrab', 'lantern', 'mosaic', 'crescent', 'damascus',
         'persian', 'mecca', 'marrakesh', 'imperial', 'jannah',
         // Special themed layouts with custom assets
-        'special1', 'special2', 'special3'
+        'special1', 'special2', 'special3',
+        // New: 12 photo-frame + centered-logo themes
+        'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
+        'oasis', 'sanctuary', 'arch', 'courtyard', 'terrace', 'panorama',
+        // New: 10 full-background-photo layouts (slideshow as full BG)
+        'fullphoto1', 'fullphoto2', 'fullphoto3', 'fullphoto4', 'fullphoto5',
+        'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',
+        'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto14', 'fullphoto15',
+        'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20'
     ];
 
     /* ===== State (mutable) ===== */
@@ -340,6 +354,210 @@
             }
         }
 
+        // Logo size — scale the #logoBox based on logo_size/100.
+        if (box) {
+            const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
+            box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
+            box.style.transformOrigin = 'center center';
+        }
+
+        // Identity text size — scale #masjidName and #masjidAddress font-size.
+        const identityScale = Math.max(50, Math.min(200, parseInt(cfg.identity_size, 10) || 100)) / 100;
+        if (nameEl) nameEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
+        if (addrEl) addrEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
+
+        // Identity position — control alignment of the header identity block.
+        const idPos = cfg.identity_position || 'left';
+        // Use closest('header') for robust header lookup instead of fragile parentElement traversal.
+        const identityEl = box || nameEl;
+        const header = identityEl ? identityEl.closest('header') : null;
+
+        // Date position — resolve 'auto' to a concrete position based on identity_position.
+        // auto: identity left => date right, identity center => date center, identity right => date left.
+        let datePos = cfg.date_position;
+        if (!datePos || datePos === 'auto') {
+            if (idPos === 'left') datePos = 'right';
+            else if (idPos === 'right') datePos = 'left';
+            else datePos = 'center';
+        }
+
+        const gregDate = $('#greg-date');
+        const hijDate = $('#hij-date');
+        const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
+
+        if (header) {
+            // Reset inline styles first
+            header.style.justifyContent = '';
+            header.style.flexDirection = '';
+            header.style.alignItems = '';
+            header.style.textAlign = '';
+            header.style.flexWrap = '';
+            header.style.position = '';
+            if (dateContainer) {
+                dateContainer.style.justifyContent = '';
+                dateContainer.style.textAlign = '';
+                dateContainer.style.alignSelf = '';
+                dateContainer.style.marginLeft = '';
+                dateContainer.style.marginRight = '';
+                dateContainer.style.position = '';
+                dateContainer.style.left = '';
+                dateContainer.style.right = '';
+                dateContainer.style.transform = '';
+                dateContainer.style.order = '';
+                dateContainer.style.width = '';
+            }
+            // Reset identity block order
+            const identityBlock = identityEl ? identityEl.closest('header > *') || identityEl.parentElement : null;
+            if (identityBlock && identityBlock !== header) {
+                identityBlock.style.order = '';
+            }
+            // Reset logo positioning (may have been set to absolute in center+center mode)
+            if (box) {
+                box.style.position = '';
+                box.style.left = '';
+                box.style.top = '';
+                // Restore logo scale transform (don't clear transform entirely, re-apply logo_size)
+                const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
+                box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
+                const identParent = box.parentElement;
+                if (identParent && identParent !== header) {
+                    identParent.style.flexDirection = '';
+                    identParent.style.alignItems = '';
+                    identParent.style.textAlign = '';
+                    identParent.style.position = '';
+                    identParent.style.paddingTop = '';
+                }
+            }
+
+            // Detect if the header uses column flex-direction (e.g. fullphoto1, fullphoto4).
+            const isColumnFlex = header.classList.contains('flex-col') ||
+                getComputedStyle(header).flexDirection === 'column';
+
+            if (idPos === 'center' && datePos === 'center') {
+                // Both centered: stack vertically, center-align all text.
+                // Logo should NOT affect centering of text elements.
+                if (!isColumnFlex) {
+                    header.style.flexDirection = 'column';
+                }
+                header.style.alignItems = 'center';
+                header.style.textAlign = 'center';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'center';
+                    dateContainer.style.alignSelf = 'center';
+                    dateContainer.style.width = '100%';
+                }
+                // Make the logo absolute so it doesn't shift the text centering
+                if (box) {
+                    box.style.position = 'absolute';
+                    box.style.left = '50%';
+                    box.style.transform = 'translateX(-50%)';
+                    box.style.top = '0';
+                    // Adjust the identity block to not include logo in flex flow
+                    const identParent = box.parentElement;
+                    if (identParent && identParent !== header) {
+                        identParent.style.flexDirection = 'column';
+                        identParent.style.alignItems = 'center';
+                        identParent.style.textAlign = 'center';
+                        identParent.style.position = 'relative';
+                        identParent.style.paddingTop = (box.offsetHeight || 40) + 8 + 'px';
+                    }
+                }
+            } else if (idPos === 'center' && datePos !== 'center') {
+                // Identity centered, date on a side: use column for identity, position date absolutely.
+                if (!isColumnFlex) {
+                    header.style.flexDirection = 'column';
+                }
+                header.style.alignItems = 'center';
+                header.style.textAlign = 'center';
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translateY(-50%)';
+                    if (datePos === 'right') {
+                        dateContainer.style.right = '2rem';
+                        dateContainer.style.textAlign = 'right';
+                    } else {
+                        dateContainer.style.left = '2rem';
+                        dateContainer.style.textAlign = 'left';
+                    }
+                }
+            } else if (idPos === 'left' && datePos === 'right') {
+                // Default natural layout: space-between keeps identity left, date right.
+                // Do NOT override justifyContent - let the original class handle it.
+                header.style.justifyContent = 'space-between';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'right';
+                }
+            } else if (idPos === 'right' && datePos === 'left') {
+                // Swap: date goes left, identity goes right. Use row-reverse or order.
+                header.style.justifyContent = 'space-between';
+                if (isColumnFlex) {
+                    header.style.alignItems = 'flex-end';
+                } else {
+                    header.style.flexDirection = 'row-reverse';
+                }
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'left';
+                }
+            } else if (idPos === 'left' && datePos === 'left') {
+                // Both left: identity first, date after, both at flex-start.
+                header.style.justifyContent = 'flex-start';
+                if (dateContainer) {
+                    dateContainer.style.marginLeft = '1.5rem';
+                    dateContainer.style.textAlign = 'left';
+                }
+            } else if (idPos === 'right' && datePos === 'right') {
+                // Both right: pack everything to the end.
+                header.style.justifyContent = 'flex-end';
+                if (isColumnFlex) {
+                    header.style.alignItems = 'flex-end';
+                }
+                if (dateContainer) {
+                    dateContainer.style.marginLeft = '1.5rem';
+                    dateContainer.style.textAlign = 'right';
+                }
+            } else if (idPos === 'left' && datePos === 'center') {
+                // Identity left, date centered absolutely.
+                header.style.justifyContent = 'flex-start';
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.left = '50%';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translate(-50%, -50%)';
+                    dateContainer.style.textAlign = 'center';
+                }
+            } else if (idPos === 'right' && datePos === 'center') {
+                // Identity right, date centered absolutely.
+                header.style.justifyContent = 'flex-end';
+                if (isColumnFlex) {
+                    header.style.alignItems = 'flex-end';
+                }
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.left = '50%';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translate(-50%, -50%)';
+                    dateContainer.style.textAlign = 'center';
+                }
+            } else {
+                // Fallback: space-between
+                header.style.justifyContent = 'space-between';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = datePos === 'right' ? 'right' : (datePos === 'center' ? 'center' : 'left');
+                }
+            }
+        } else if (dateContainer) {
+            // No header found, just style the date container directly
+            dateContainer.style.textAlign = datePos === 'right' ? 'right' : (datePos === 'center' ? 'center' : 'left');
+            dateContainer.style.alignSelf = datePos === 'right' ? 'flex-end' : (datePos === 'center' ? 'center' : 'flex-start');
+        }
+        // Also set text-align on individual date elements for consistency
+        if (gregDate) gregDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
+        if (hijDate) hijDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
+
         // Friday label
         if (new Date().getDay() === 5) {
             const dl = $('#dhuhrLabel');
@@ -389,6 +607,151 @@
 
         // License watermark — show "DEMO VERSION" overlay when not Pro.
         applyLicenseWatermark();
+
+        // Transparent-container passthrough logic.
+        // Containers that are visually transparent should not block/clip
+        // adjacent content. Only sections with a visible background
+        // should reserve space and visually block things behind them.
+        applyTransparentPassthrough();
+    }
+
+    /* ===== Transparent passthrough helpers ===== */
+
+    /**
+     * Check whether an element is visually transparent (no background
+     * color, no background image, no backdrop-filter, no glass class).
+     */
+    function isElTransparent(el) {
+        if (!el) return false;
+        var cs = getComputedStyle(el);
+        var bg = cs.backgroundColor;
+        var bgImage = cs.backgroundImage;
+        var hasBackdrop = cs.backdropFilter && cs.backdropFilter !== 'none';
+        if (!hasBackdrop) {
+            // Webkit prefix fallback
+            var wkBackdrop = cs.webkitBackdropFilter;
+            hasBackdrop = wkBackdrop && wkBackdrop !== 'none';
+        }
+        var hasBgClass = /\b(bg-(?!transparent\b|opacity\b)\S+|glass-dark|glass|backdrop-blur)\b/.test(el.className);
+        var hasInlineBg = el.style.background ||
+            (el.style.backgroundColor && el.style.backgroundColor !== 'transparent' && el.style.backgroundColor !== 'rgba(0, 0, 0, 0)');
+        var bgTransparent = (!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)');
+        var noBgImage = (!bgImage || bgImage === 'none');
+        return bgTransparent && noBgImage && !hasBackdrop && !hasBgClass && !hasInlineBg;
+    }
+
+    /**
+     * Apply passthrough to a single element. When transparent, it is taken
+     * out of normal flow so it does not reserve space or clip adjacent content.
+     * When it has a visible background, it stays in normal flow.
+     *
+     * @param {Element} el - The container element
+     * @param {string} anchor - 'top' or 'bottom' positioning when absolute
+     */
+    function setPassthrough(el, anchor) {
+        if (!el) return;
+        if (isElTransparent(el)) {
+            // Already positioned by identity_position logic: skip if position
+            // was set to relative for absolute children (e.g. date_position).
+            // Also skip if the element was explicitly set to 'relative' by
+            // other code (identity positioning needs it for absolute children).
+            var needsRelative = el.style.position === 'relative' ||
+                                el.querySelector('[style*="position: absolute"]') ||
+                                el.querySelector('[style*="position:absolute"]');
+            if (!needsRelative) {
+                el.style.position = 'absolute';
+                el.style.left = '0';
+                el.style.right = '0';
+                if (anchor === 'bottom') {
+                    el.style.bottom = '0';
+                    el.style.top = '';
+                } else {
+                    el.style.top = '0';
+                    el.style.bottom = '';
+                }
+            }
+            el.style.zIndex = '0';
+            el.style.pointerEvents = 'none';
+            var children = el.children;
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.pointerEvents = 'auto';
+            }
+            el.dataset.passthrough = '1';
+        } else {
+            // Has visible background - ensure it is in normal flow.
+            if (el.dataset.passthrough === '1') {
+                if (el.style.position === 'absolute' && !el.classList.contains('absolute')) {
+                    el.style.position = '';
+                    el.style.left = '';
+                    el.style.right = '';
+                    el.style.top = '';
+                    el.style.bottom = '';
+                }
+                el.style.zIndex = '';
+                el.style.pointerEvents = '';
+                var children2 = el.children;
+                for (var j = 0; j < children2.length; j++) {
+                    children2[j].style.pointerEvents = '';
+                }
+                delete el.dataset.passthrough;
+            }
+        }
+    }
+
+    /**
+     * For the quran bar: when a sidebar/vertical-prayer layout is active,
+     * shrink the quran bar width so it does not cover the sidebar area.
+     * The quran card itself is already pointer-events:none, but visually
+     * its backdrop-filter and background cover the full width.
+     */
+    function applyQuranPassthrough() {
+        var bar = document.getElementById('quranBar');
+        if (!bar) return;
+        var inner = document.getElementById('quranInner');
+        if (!inner) return;
+
+        // Detect sidebar-style layouts with vertical prayer cards.
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var aside = host.querySelector('aside');
+        var hasSidebar = aside && aside.querySelector('[data-key]');
+
+        if (hasSidebar) {
+            // Get the sidebar's width so quranBar avoids that area.
+            var sidebarRect = aside.getBoundingClientRect();
+            var isLeft = sidebarRect.left < window.innerWidth / 2;
+            if (isLeft) {
+                bar.style.left = sidebarRect.width + 'px';
+                bar.style.right = '0';
+            } else {
+                bar.style.left = '0';
+                bar.style.right = sidebarRect.width + 'px';
+            }
+        } else {
+            // Reset to full width (default).
+            bar.style.left = '0';
+            bar.style.right = '0';
+        }
+    }
+
+    function applyTransparentPassthrough() {
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var screen = host.querySelector('.app-screen');
+        if (!screen) return;
+
+        // Apply to the header (identity area) - it is at the top.
+        var hdr = screen.querySelector('header.row-fixed');
+        if (hdr) setPassthrough(hdr, 'top');
+
+        // Apply to bottom sections with prayer cards (section.row-fixed).
+        var sections = screen.querySelectorAll('section.row-fixed');
+        for (var i = 0; i < sections.length; i++) {
+            setPassthrough(sections[i], 'bottom');
+        }
+
+        // Handle quran bar passthrough for sidebar layouts.
+        applyQuranPassthrough();
     }
 
     /**
@@ -483,10 +846,19 @@
             const speed = Math.max(5, parseInt(cfg.ticker_speed, 10) || 30);
             content.style.animationDuration = speed + 's';
 
-            // Apply ticker style
+            // Apply ticker style + background. Both are surfaced to CSS
+            // via data-attributes so the stylesheet can branch without
+            // any inline overrides leaking between style switches.
             const style = cfg.ticker_style || 'classic';
             bar.dataset.tickerStyle = style;
+            bar.dataset.tickerBg = cfg.ticker_bg || 'solid_dark';
             content.className = 'marquee-inner';  // reset
+            // Reset properties that individual cases below may have set
+            // on a previous render. Without this, switching from
+            // typewriter back to classic leaves stale animation/width.
+            content.style.animationIterationCount = '';
+            content.style.width = '';
+            content.style.paddingLeft = '';
             switch (style) {
                 case 'bounce':
                     content.style.animationName = 'tickerBounce';
@@ -503,8 +875,25 @@
                     content.style.animationTimingFunction = 'linear';
                     break;
                 case 'typewriter':
-                    content.style.animationName = 'tickerTypewriter';
-                    content.style.animationTimingFunction = 'steps(60, end)';
+                    // True typewriter: width animates 0→100% in steps so
+                    // characters appear one-by-one, then briefly holds
+                    // and resets. The blinking caret is composed via a
+                    // second keyframe (tickerCaretBlink) running on the
+                    // same element. Padding-left:0 is enforced by the
+                    // CSS data-attribute rule so the text actually
+                    // appears in the visible bar instead of being
+                    // pushed off-screen by the classic-scroll offset.
+                    content.style.paddingLeft = '0';
+                    // Cap step count to character length so each step
+                    // reveals one character. Fall back to a reasonable
+                    // default for very short / empty strings.
+                    {
+                        const charCount = Math.max(8, formatted.length);
+                        content.style.animationName = 'tickerTypewriter, tickerCaretBlink';
+                        content.style.animationTimingFunction = `steps(${charCount}, end), steps(1, end)`;
+                        content.style.animationDuration = `${speed}s, 0.7s`;
+                        content.style.animationIterationCount = 'infinite, infinite';
+                    }
                     break;
                 case 'classic':
                 default:
@@ -2711,6 +3100,40 @@
                     window.MCAndroid.openSettings();
                 }
             } catch (e) { console.warn(e); }
+        });
+
+        // Auto-hide: if the gear icon is focused/hovered but not
+        // activated within 3 seconds, blur it so CSS drops opacity
+        // back to the resting value (0.08).
+        let _gearHideTimer = null;
+        const GEAR_HIDE_DELAY = 3000;
+
+        function startGearHideTimer() {
+            clearGearHideTimer();
+            _gearHideTimer = setTimeout(() => {
+                gear.blur();
+            }, GEAR_HIDE_DELAY);
+        }
+
+        function clearGearHideTimer() {
+            if (_gearHideTimer) {
+                clearTimeout(_gearHideTimer);
+                _gearHideTimer = null;
+            }
+        }
+
+        gear.addEventListener('focus', startGearHideTimer);
+        gear.addEventListener('mouseenter', startGearHideTimer);
+        gear.addEventListener('blur', clearGearHideTimer);
+        gear.addEventListener('mouseleave', clearGearHideTimer);
+
+        // If the user actually clicks or activates via keyboard,
+        // cancel the timer (settings will open, no need to hide).
+        gear.addEventListener('click', clearGearHideTimer);
+        gear.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                clearGearHideTimer();
+            }
         });
     }
 

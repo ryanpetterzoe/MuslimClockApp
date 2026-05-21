@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Add 10 new fullphoto background layouts (fullphoto11-fullphoto20) with unique, creative prayer card designs using Tailwind CSS. Each layout must have a distinct visual character for the prayer cards while maintaining readability and preventing content from being clipped.",
+  "status": "completed",
+  "steps": [
+    "Add 10 new <template> blocks to the END of app/src/main/assets/web/index.html (before the <audio> and <script> tags at the bottom). Each template follows the fullphoto pattern with slideshow-host as first child. The 10 layouts are: fullphoto11 (Hexagonal - prayer cards in rounded-full circles arranged in a gentle arc), fullphoto12 (Sidebar - prayer times as a vertical strip on the left with frosted glass, clock on right), fullphoto13 (Diagonal Ribbon - prayer cards arranged diagonally with skewed backgrounds), fullphoto14 (Split Horizon - top half has clock, bottom half has prayer cards as horizontal gradient bars), fullphoto15 (Orbit - prayer cards arranged in a semi-circle/orbit around the clock center), fullphoto16 (Ticker Strip - prayer times in a single horizontal strip with pill/tag styling, large clock above), fullphoto17 (Stacked Cards - prayer times as overlapping/staggered cards cascading down-right), fullphoto18 (Grid Mosaic - asymmetric grid with some cells larger than others, clock integrated), fullphoto19 (Floating Bubbles - prayer cards as floating rounded-3xl bubbles with different sizes, scattered placement), fullphoto20 (Vertical Thermometer - prayer times displayed as a vertical progress/meter on the right side with the active prayer highlighted).",
+    "Each layout MUST include: (a) <div class='slideshow-host absolute inset-0'></div> as first child, (b) dark overlay div for readability, (c) header.row-fixed with identity (#logoBox, #masjidPrefix, #masjidName, #masjidAddress) and dates (#greg-date, #hij-date), (d) main.row-fill with #digital clock, #nextPill countdown, #analogWrap, (e) prayer cards section with all 6 data-key elements (fajr, sunrise, dhuhr, asr, maghrib, isha) each containing a label span and [data-time] span.",
+    "Use creative Tailwind CSS patterns for EACH layout differently: rounded-full for circles, backdrop-blur for glass effects, border gradients via style attributes, grid-cols-2/grid-cols-3 for varied grids, flex with gap variations, translate transforms for overlap effects, ring/ring-offset for decorative borders, shadow-lg/shadow-2xl, tracking-wider/tracking-widest for varied typography. Use clamp() and min() extensively for font-size to prevent overflow.",
+    "Add the 10 new layout keys to the SUPPORTED_LAYOUTS array in app/src/main/assets/web/js/clock.js: 'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto14', 'fullphoto15', 'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20'.",
+    "Add 10 new entries to app/src/main/res/values/arrays.xml in both layout_entries and layout_values arrays. Display names: 'Fullphoto 11 (Hexagonal)' through 'Fullphoto 20 (Thermometer)'. Keys: 'fullphoto11' through 'fullphoto20'.",
+    "CRITICAL anti-clipping rules: (1) All font sizes use clamp() with min(vw,vh) to adapt to viewport, (2) Prayer section uses row-fixed flex (no overflow possible), (3) No fixed px heights that could cause overflow, (4) Prayer card padding uses small values (py-2 to py-3), (5) Label text uses text-[9px] to text-[11px] range, time text uses clamp(12px,X,20px) range.",
+    "CRITICAL identity alignment: When the identity position is set to center, the masjid name and dates should visually center-align together. The logo should not push text off-center. The layout templates should use flex/grid patterns that work well with the JS-driven identity_position feature (the JS modifies inline styles at runtime)."
+  ],
+  "acceptance_criteria": [
+    "10 new <template id='layout-fullphotoXX'> blocks (11-20) exist in index.html",
+    "Each template has slideshow-host as first child for background photo support",
+    "Each template includes all 6 prayer time cards with correct data-key attributes",
+    "Each template includes full identity elements (logoBox, masjidPrefix, masjidName, masjidAddress, greg-date, hij-date)",
+    "Each layout has a visually DISTINCT prayer card arrangement (not all grids, not all horizontal bars)",
+    "SUPPORTED_LAYOUTS in clock.js includes all 10 new keys",
+    "arrays.xml layout_entries and layout_values include all 10 new entries",
+    "All font sizes use clamp() for responsive sizing",
+    "No content is clippable - all prayer sections fit within viewport using flex-shrink and bounded sizes",
+    "./gradlew assembleDebug succeeds"
+  ],
+  "verification": [
+    "grep -c 'template id=\"layout-fullphoto' app/src/main/assets/web/index.html should show 20 (10 existing + 10 new)",
+    "grep 'fullphoto11\\|fullphoto12\\|fullphoto13\\|fullphoto14\\|fullphoto15\\|fullphoto16\\|fullphoto17\\|fullphoto18\\|fullphoto19\\|fullphoto20' app/src/main/assets/web/js/clock.js should find all 10",
+    "grep -c 'fullphoto' app/src/main/res/values/arrays.xml should show 20 entries in layout_values",
+    "Run ./gradlew assembleDebug and confirm BUILD SUCCESSFUL"
+  ],
+  "blocked_reason": null,
+  "findings": "Build requires JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2. All 10 templates verified with correct 6 data-key elements and all required identity IDs. Fullphoto12 (sidebar) and fullphoto20 (vertical meter) use non-standard DOM structure (prayer cards in aside rather than section) but this works fine since JS uses querySelector on class+data-key. Fullphoto18 grid has slight reordering (fajr, sunrise, dhuhr, maghrib, asr, isha) for visual mosaic effect - all keys still present."
+}
