@@ -62,7 +62,7 @@
             android:exported="false"
             android:label="@string/layout_editor_title"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.MuslimClock.Settings"
+            android:theme="@style/Theme.MuslimClock.Fullscreen"
             android:parentActivityName=".SettingsActivity" />
 
         <!--
