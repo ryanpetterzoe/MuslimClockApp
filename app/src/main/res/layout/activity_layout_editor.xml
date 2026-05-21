@@ -1,51 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#1a1a2e">
+    android:layout_height="match_parent">
 
-    <!-- Live preview WebView (top 45% of screen) -->
-    <FrameLayout
+    <!-- Full-screen live preview WebView (background) -->
+    <WebView
+        android:id="@+id/preview_webview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="45">
+        android:layout_height="match_parent" />
 
-        <WebView
-            android:id="@+id/preview_webview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <!-- Semi-transparent label overlay -->
-        <TextView
-            android:id="@+id/preview_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_margin="8dp"
-            android:background="#88000000"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:text="@string/layout_editor_preview_label"
-            android:textColor="#AAFFFFFF"
-            android:textSize="11sp" />
-    </FrameLayout>
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#333355" />
-
-    <!-- Controls panel (bottom 55%) -->
+    <!-- Semi-transparent vertical control panel on the right -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="55"
+        android:id="@+id/control_panel"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:background="#CC1a1a2e"
+        android:padding="12dp">
 
-        <!-- Element selector tabs -->
+        <!-- Header: title + close/done buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/layout_editor_title"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/layout_editor_reset"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:backgroundTint="#88c0392b"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                style="?android:attr/buttonBarButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_done"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/layout_editor_done"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:backgroundTint="#8827ae60"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:layout_marginStart="6dp"
+                style="?android:attr/buttonBarButtonStyle" />
+        </LinearLayout>
+
+        <!-- Element selector tabs (horizontal scroll) -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,42 +80,16 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:fadeScrollbars="true">
 
             <LinearLayout
                 android:id="@+id/slider_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="4dp" />
+                android:orientation="vertical" />
         </ScrollView>
 
-        <!-- Bottom action buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="8dp">
-
-            <Button
-                android:id="@+id/btn_reset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/layout_editor_reset"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#c0392b"
-                style="?android:attr/buttonBarButtonStyle" />
-
-            <Button
-                android:id="@+id/btn_done"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/layout_editor_done"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#27ae60"
-                android:layout_marginStart="12dp"
-                style="?android:attr/buttonBarButtonStyle" />
-        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+</FrameLayout>

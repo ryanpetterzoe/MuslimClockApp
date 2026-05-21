@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -34,6 +35,7 @@ class LayoutEditorActivity : AppCompatActivity() {
 
     private lateinit var previewWebView: WebView
     private lateinit var assetLoader: WebViewAssetLoader
+    private lateinit var controlPanel: LinearLayout
     private lateinit var elementTabs: LinearLayout
     private lateinit var sliderContainer: LinearLayout
 
@@ -72,13 +74,11 @@ class LayoutEditorActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide action bar — we use a fullscreen overlay approach
+        supportActionBar?.hide()
         setContentView(R.layout.activity_layout_editor)
 
-        supportActionBar?.apply {
-            title = getString(R.string.layout_editor_title)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
+        controlPanel = findViewById(R.id.control_panel)
         elementTabs = findViewById(R.id.element_tabs)
         sliderContainer = findViewById(R.id.slider_container)
 
@@ -97,6 +97,18 @@ class LayoutEditorActivity : AppCompatActivity() {
         // Buttons
         findViewById<Button>(R.id.btn_reset).setOnClickListener { confirmReset() }
         findViewById<Button>(R.id.btn_done).setOnClickListener { saveAndFinish() }
+
+        // Tap the preview area (outside panel) to toggle panel visibility
+        previewWebView.setOnTouchListener { _, event ->
+            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                // Only toggle if tap is outside the panel area
+                val panelLeft = controlPanel.left
+                if (event.x < panelLeft) {
+                    togglePanel()
+                }
+            }
+            false // let WebView handle the touch normally
+        }
     }
 
     private fun loadWorkingValues() {
@@ -376,9 +388,27 @@ class LayoutEditorActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun togglePanel() {
+        if (controlPanel.visibility == View.VISIBLE) {
+            controlPanel.visibility = View.GONE
+        } else {
+            controlPanel.visibility = View.VISIBLE
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        // If panel is hidden, show it back first
+        if (controlPanel.visibility == View.GONE) {
+            controlPanel.visibility = View.VISIBLE
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onDestroy() {
