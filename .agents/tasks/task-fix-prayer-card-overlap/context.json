@@ -1,0 +1,20 @@
+{
+  "project_type": "Android Kotlin app with bundled WebView-based display (Muslim prayer clock)",
+  "language": "HTML/CSS/JavaScript (web assets) + Kotlin (Android host)",
+  "build_system": "Gradle (AGP 8.5.2, Kotlin 1.9.24) - web assets are static, no build step for them",
+  "test_framework": "No automated tests for web assets - visual verification only",
+  "build_command": "No build needed for CSS/JS changes (static assets loaded directly by WebView)",
+  "test_command": "Visual inspection - CSS-only changes can be validated by structural analysis",
+  "verification_instructions": "1. Verify screen.css has correct flex properties. 2. Verify no height:100% on .flex-layout. 3. Verify no max-height on .row-fixed. 4. Verify the JS autoFitVertical correctly measures and scales prayer sections when they overflow.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup needed - editing static web assets under app/src/main/assets/web/",
+  "environment_constraints": "No network needed, no build tools needed. Pure CSS/JS file editing. Cannot test visually in sandbox - validation via code review only.",
+  "contribution_requirements": "Each fix should be on a feature branch. Do not add height:100% to .flex-layout. Do not add max-height to section.row-fixed. Do not break the existing layout system where .app-screen provides viewport height via position:fixed+inset:0.",
+  "key_patterns": "Layout system: .app-screen (position:fixed, inset:0, height:var(--app-vh)) > .flex-layout (display:flex, flex-direction:column) > .row-fixed (header/section, flex:0 0 auto) + .row-fill (main, flex:1 1 0). Templates have structure: header.row-fixed > main.row-fill > section.row-fixed. The .app-screen has padding-bottom that accounts for ticker+quran bar heights. There are 80+ layout templates. Existing autoFitPrayerCards() handles horizontal overflow by shrinking font-size. There is NO vertical overflow handling yet.",
+  "relevant_files": [
+    "app/src/main/assets/web/css/screen.css",
+    "app/src/main/assets/web/js/clock.js",
+    "app/src/main/assets/web/index.html"
+  ],
+  "directory_structure": "app/src/main/assets/web/ contains: css/screen.css (2057 lines, all layout styles), js/clock.js (3200+ lines, all display logic), index.html (4176 lines, 80+ layout templates), js/tailwind.js (utility CSS framework)"
+}

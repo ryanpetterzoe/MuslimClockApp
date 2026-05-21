@@ -1,0 +1,33 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix prayer card layout overlap across all 80+ layouts by making row-fixed shrinkable and adding JS-based vertical overflow detection that scales prayer sections when viewport is too short (landscape). This is a two-part fix: CSS makes sections shrinkable so flex can contain them, and JS detects remaining overflow and scales content down.",
+  "status": "in_progress",
+  "steps": [
+    "1. In app/src/main/assets/web/css/screen.css, line 83, change `.flex-layout > .row-fixed` from `flex: 0 0 auto` to `flex: 0 1 auto` (allow shrinking). Add `overflow: hidden` to clip content gracefully when shrunk. Keep min-height:0, position:relative, z-index:1.",
+    "2. Do NOT add height:100% to .flex-layout. Do NOT add max-height to .row-fixed. The .app-screen already provides the definite height constraint via position:fixed + inset:0 + height:var(--app-vh).",
+    "3. In app/src/main/assets/web/js/clock.js, add a new function `autoFitVerticalOverflow()` that: (a) finds the .app-screen element inside #layoutHost, (b) measures the total natural height of all direct flex children (header.row-fixed + main.row-fill + section.row-fixed), (c) if the combined row-fixed heights exceed 60% of the container height (meaning the row-fill main area would be less than 40%), applies CSS transform scale to the prayer section to bring it within bounds. This ensures content remains visible but fits within the viewport.",
+    "4. The autoFitVerticalOverflow function should: get the .app-screen's clientHeight, find all section.row-fixed elements, measure their natural scrollHeight. If the ratio of section height to total available height is too large, apply a scale transform (via CSS transform: scale(X)) to the section element. The scale factor should be calculated as: availableHeight / sectionNaturalHeight, clamped between 0.65 and 1.0 (never shrink below 65% to keep legibility).",
+    "5. Call autoFitVerticalOverflow() from: (a) after mountLayout completes, (b) inside the resize/orientationchange handler alongside syncViewportHeight, (c) after applyConfigToDom completes. Debounce the calls from resize events (similar to how autoFitPrayerCards is debounced at 120ms).",
+    "6. The autoFitVerticalOverflow function should reset any previously applied transform on the section before measuring (set transform to '' first to get natural dimensions), then re-apply if needed. Use transform-origin: center bottom so the section scales toward the bottom edge where it sits.",
+    "7. Add a corresponding landscape media query in screen.css that reduces padding on prayer sections in short viewports: `@media (max-height: 500px) { .flex-layout > .row-fixed { padding-top: 2px; padding-bottom: 2px; } }` - this provides an additional CSS-only safety net for very short viewports without using max-height."
+  ],
+  "acceptance_criteria": [
+    "`.flex-layout > .row-fixed` uses `flex: 0 1 auto` (shrinkable) with `overflow: hidden`",
+    "`.flex-layout` does NOT have `height: 100%` added",
+    "No `max-height` property on `.row-fixed` or `section.row-fixed`",
+    "A new `autoFitVerticalOverflow()` function exists in clock.js that detects vertical overflow and applies scale transform to prayer sections",
+    "autoFitVerticalOverflow is called on mount, resize, orientationchange, and after config apply",
+    "A landscape/short-viewport media query reduces padding to help fit content",
+    "The prayer section transform-origin is 'center bottom' so it scales toward the bottom edge"
+  ],
+  "verification": [
+    "Read screen.css and verify .row-fixed has flex: 0 1 auto and overflow: hidden",
+    "Read screen.css and verify .flex-layout does NOT have height: 100%",
+    "Grep for max-height in screen.css to confirm none is applied to row-fixed",
+    "Read clock.js and verify autoFitVerticalOverflow function exists and is properly integrated",
+    "Verify the media query exists in screen.css for max-height: 500px"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

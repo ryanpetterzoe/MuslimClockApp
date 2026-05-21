@@ -1,0 +1,7 @@
+{
+  "task_id": "task-fix-prayer-card-overlap",
+  "task_description": "Fix prayer schedule card layout overlap across all 80+ layouts. In landscape/short viewports, prayer cards and other elements overlap because row-fixed sections cannot shrink. The fix makes row-fixed shrinkable via CSS flex-shrink and adds JS-based vertical overflow detection with scale transform to keep content visible and non-overlapping.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001"],
+  "blocked_reason": null
+}
