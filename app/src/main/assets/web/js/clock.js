@@ -232,7 +232,7 @@
         // existing colour scheme. The dark variant is the right choice
         // for almost every theme; the light one is for layouts that
         // use dark text on a pale background (e.g. layout-magazine).
-        const lightThemes = [];
+        const lightThemes = ['layout-andalusia'];
         const isLight = lightThemes.some(c => root.classList.contains(c));
 
         const slot = document.createElement('div');
