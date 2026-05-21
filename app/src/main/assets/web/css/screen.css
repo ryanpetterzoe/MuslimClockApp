@@ -86,14 +86,13 @@ body {
 
 /* Posisi jam digital: di bawah header tanpa terpotong.
  * Gap 2px = countdown dan jam digital sangat rapat.
- * overflow: visible = font besar tidak terpotong.
- * Tidak mengubah justify-content agar setiap template tetap
- * menggunakan centering/alignment masing-masing. */
+ * overflow tetap hidden agar konten main tidak meluber ke section
+ * (yang bikin kartu sholat horizontal terdorong ke tengah).
+ * Font besar tetap aman karena #digital sendiri sudah overflow:visible. */
 .flex-layout > main.row-fill {
     gap: 2px !important;
     padding-top: 0;
     padding-bottom: 0;
-    overflow: visible !important;
 }
 
 /* Compact row-fixed padding on very short viewports (landscape phones) */
