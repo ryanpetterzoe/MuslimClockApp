@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "fix",
   "description": "Fix 5 layout/rendering issues: (1) background/scrim z-index stacking blocking content across all themes, (2) background positioned in front of overlay at 100% opacity, (3) excessive gap between countdown pill and digital clock, (4) header overflow:hidden clipping the top of the digital clock, (5) digital clock should render directly below header without clipping",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "In app/src/main/assets/web/css/screen.css, fix the scrim div stacking: add a new CSS rule targeting the scrim divs (the absolute inset-0 gradient overlays that are siblings of .slideshow-host). These must have z-index:0 so they stay behind content. Add: `.flex-layout > .app-screen > .absolute, .app-screen > .absolute { z-index: 0; }` or better: add a dedicated class `.slideshow-scrim { position:absolute; inset:0; z-index:0; pointer-events:none; }` and apply it. However since templates use Tailwind 'absolute inset-0' without a custom class, the most reliable approach is to add CSS: `.slideshow-host ~ .absolute[style*=\"background\"] { z-index: 0 !important; }` -- BUT the cleanest approach is: in the ensureSlideshowHost() function in clock.js, set scrim.style.zIndex = '0' on the created scrim element.",
     "In app/src/main/assets/web/css/screen.css, change `.flex-layout > .row-fixed` to remove `overflow: hidden` (change to `overflow: visible`). This prevents the header from clipping content. The overflow:hidden was there to prevent siblings from pushing off-screen, but position:relative + z-index already handles stacking. Keep overflow:hidden ONLY on `.flex-layout > .row-fill` (the main content area uses it to prevent the clock from expanding beyond its bounds, which is fine since main has flex:1).",
@@ -26,5 +26,5 @@
     "Read clock.js ensureSlideshowHost() and confirm scrim.style.zIndex = '0' is set"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All 5 fixes applied successfully. Used gap:2px per delegation prompt (feature file said 4px). overflow:hidden kept on .row-fill to contain prayer cards; only .row-fixed changed to overflow:visible."
 }
