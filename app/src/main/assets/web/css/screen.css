@@ -84,16 +84,15 @@ body {
 .flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: visible; position: relative; z-index: 5; }
 .flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 2; }
 
-/* Posisi jam digital: langsung di bawah header, tanpa centering
- * vertikal yang bikin jam naik ke atas dan terpotong header.
- * flex-start = konten mulai dari atas area main, tepat di bawah header.
+/* Posisi jam digital: di bawah header tanpa terpotong.
  * Gap 2px = countdown dan jam digital sangat rapat.
- * overflow: visible = font besar tidak terpotong. */
+ * overflow: visible = font besar tidak terpotong.
+ * Tidak mengubah justify-content agar setiap template tetap
+ * menggunakan centering/alignment masing-masing. */
 .flex-layout > main.row-fill {
     gap: 2px !important;
-    padding-top: 1vh;
+    padding-top: 0;
     padding-bottom: 0;
-    justify-content: flex-start !important;
     overflow: visible !important;
 }
 
@@ -2136,13 +2135,11 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 /* --- SPACING: Gap sangat rapat antara countdown dan jam digital ---
  * Template pakai Tailwind gap-3 (12px), kita override ke 2px.
- * "justify-content: flex-start" sudah di-set di atas agar jam
- * tidak di-center secara vertikal (yang bikin keliatan jauh). */
+ * Centering tetap dipertahankan dari template masing-masing. */
 
-/* --- HEADER TIDAK MOTONG JAM: main mulai langsung di bawah header ---
- * Dengan justify-content: flex-start (di rule utama), konten main
- * akan mulai dari atas area main — tepat di bawah header.
- * padding-top kecil (1vh) agar ada sedikit napas, bukan nempel. */
+/* --- HEADER TIDAK MOTONG JAM: overflow visible pada main ---
+ * overflow: visible sudah di-set di rule utama sehingga
+ * font besar tidak terpotong oleh container. */
 
 /* --- Prayer cards section: tidak clip, overflow visible --- */
 .flex-layout > section.row-fixed {
