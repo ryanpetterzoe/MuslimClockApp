@@ -264,6 +264,19 @@
         <item>right</item>
     </string-array>
 
+    <!-- Date position options -->
+    <string-array name="date_position_entries">
+        <item>Kiri</item>
+        <item>Tengah</item>
+        <item>Kanan</item>
+    </string-array>
+
+    <string-array name="date_position_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+
     <string-array name="quran_mode_values">
         <item>fullcard</item>
         <item>card</item>

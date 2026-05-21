@@ -88,6 +88,7 @@
         logo_size: 100,
         identity_size: 100,
         identity_position: 'left',
+        date_position: 'right',
     };
 
     const PRAYER_LABEL_ID = {
@@ -401,19 +402,39 @@
             }
         }
 
-        // When identity_position is 'center', also center the date container.
-        // Use justify-content (not text-align) since date containers are flex in fullphoto layouts.
+        // Date position — independent control over date alignment.
+        // If date_position is not explicitly set, derive from identity_position:
+        // identity left => date right, identity center => date center, identity right => date left.
+        let datePos = cfg.date_position;
+        if (!datePos) {
+            if (idPos === 'left') datePos = 'right';
+            else if (idPos === 'right') datePos = 'left';
+            else datePos = 'center';
+        }
         const gregDate = $('#greg-date');
         const hijDate = $('#hij-date');
         const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
         if (dateContainer) {
             dateContainer.style.justifyContent = '';
             dateContainer.style.textAlign = '';
-            if (idPos === 'center') {
+            dateContainer.style.alignSelf = '';
+            if (datePos === 'center') {
                 dateContainer.style.justifyContent = 'center';
                 dateContainer.style.textAlign = 'center';
+                dateContainer.style.alignSelf = 'center';
+            } else if (datePos === 'right') {
+                dateContainer.style.justifyContent = 'flex-end';
+                dateContainer.style.textAlign = 'right';
+                dateContainer.style.alignSelf = 'flex-end';
+            } else {
+                dateContainer.style.justifyContent = 'flex-start';
+                dateContainer.style.textAlign = 'left';
+                dateContainer.style.alignSelf = 'flex-start';
             }
         }
+        // Also set text-align on individual date elements to override any class-based alignment
+        if (gregDate) gregDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
+        if (hijDate) hijDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
 
         // Friday label
         if (new Date().getDay() === 5) {

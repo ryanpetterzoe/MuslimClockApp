@@ -395,6 +395,8 @@ class SettingsActivity : AppCompatActivity() {
                     }
                     // Reset identity_position ListPreference back to "left"
                     findPreference<androidx.preference.ListPreference>(Settings.K_IDENTITY_POSITION)?.value = "left"
+                    // Reset date_position ListPreference back to "right"
+                    findPreference<androidx.preference.ListPreference>(Settings.K_DATE_POSITION)?.value = "right"
                     Toast.makeText(ctx, R.string.layout_reset_done, Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton(android.R.string.cancel, null)

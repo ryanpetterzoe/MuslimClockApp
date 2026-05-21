@@ -360,6 +360,15 @@
             app:entryValues="@array/identity_position_values"
             app:defaultValue="left"
             app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="date_position"
+            app:title="@string/pref_date_position"
+            app:summary="@string/pref_date_position_sum"
+            app:entries="@array/date_position_entries"
+            app:entryValues="@array/date_position_values"
+            app:defaultValue="right"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cat_layout_editor">
