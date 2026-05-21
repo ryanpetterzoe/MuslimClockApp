@@ -213,5 +213,5 @@
     <string name="pref_identity_position">Posisi Identitas Masjid &amp; Logo</string>
     <string name="pref_identity_position_sum">Atur posisi logo dan nama masjid di layar</string>
     <string name="pref_date_position">Posisi Tanggal (Masehi &amp; Hijriah)</string>
-    <string name="pref_date_position_sum">Atur posisi tanggal di layar. Default: kanan (berlawanan dengan identitas)</string>
+    <string name="pref_date_position_sum">Otomatis = berlawanan dengan identitas. Atau pilih manual: kiri/tengah/kanan.</string>
 </resources>

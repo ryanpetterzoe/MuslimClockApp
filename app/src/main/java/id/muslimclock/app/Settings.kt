@@ -117,8 +117,8 @@ object Settings {
     const val K_IDENTITY_POSITION  = "identity_position"
 
     // Date position — independent control over date (Masehi & Hijriah)
-    // alignment. Defaults to "right" so that when identity is on the left,
-    // the dates sit on the far right and other layouts stay balanced.
+    // alignment. Defaults to "auto" which derives position from identity_position:
+    // identity left => date right, identity center => date center, identity right => date left.
     const val K_DATE_POSITION      = "date_position"
 
     // System: auto-launch the app after the device finishes booting.
@@ -243,7 +243,7 @@ object Settings {
             .putInt(K_LOGO_SIZE,      100)
             .putInt(K_IDENTITY_SIZE,  100)
             .putString(K_IDENTITY_POSITION, "left")
-            .putString(K_DATE_POSITION, "right")
+            .putString(K_DATE_POSITION, "auto")
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -343,7 +343,7 @@ object Settings {
             put("logo_size",       p.getInt(K_LOGO_SIZE,     100).coerceIn(50, 200))
             put("identity_size",   p.getInt(K_IDENTITY_SIZE, 100).coerceIn(50, 200))
             put("identity_position", str(K_IDENTITY_POSITION, "left"))
-            put("date_position", str(K_DATE_POSITION, "right"))
+            put("date_position", str(K_DATE_POSITION, "auto"))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))

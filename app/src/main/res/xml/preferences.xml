@@ -367,7 +367,7 @@
             app:summary="@string/pref_date_position_sum"
             app:entries="@array/date_position_entries"
             app:entryValues="@array/date_position_values"
-            app:defaultValue="right"
+            app:defaultValue="auto"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

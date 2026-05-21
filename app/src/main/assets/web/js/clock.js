@@ -88,7 +88,7 @@
         logo_size: 100,
         identity_size: 100,
         identity_position: 'left',
-        date_position: 'right',
+        date_position: 'auto',
     };
 
     const PRAYER_LABEL_ID = {
@@ -369,70 +369,190 @@
         // Use closest('header') for robust header lookup instead of fragile parentElement traversal.
         const identityEl = box || nameEl;
         const header = identityEl ? identityEl.closest('header') : null;
+
+        // Date position — resolve 'auto' to a concrete position based on identity_position.
+        // auto: identity left => date right, identity center => date center, identity right => date left.
+        let datePos = cfg.date_position;
+        if (!datePos || datePos === 'auto') {
+            if (idPos === 'left') datePos = 'right';
+            else if (idPos === 'right') datePos = 'left';
+            else datePos = 'center';
+        }
+
+        const gregDate = $('#greg-date');
+        const hijDate = $('#hij-date');
+        const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
+
         if (header) {
             // Reset inline styles first
             header.style.justifyContent = '';
             header.style.flexDirection = '';
             header.style.alignItems = '';
             header.style.textAlign = '';
+            header.style.flexWrap = '';
+            header.style.position = '';
+            if (dateContainer) {
+                dateContainer.style.justifyContent = '';
+                dateContainer.style.textAlign = '';
+                dateContainer.style.alignSelf = '';
+                dateContainer.style.marginLeft = '';
+                dateContainer.style.marginRight = '';
+                dateContainer.style.position = '';
+                dateContainer.style.left = '';
+                dateContainer.style.right = '';
+                dateContainer.style.transform = '';
+                dateContainer.style.order = '';
+                dateContainer.style.width = '';
+            }
+            // Reset identity block order
+            const identityBlock = identityEl ? identityEl.closest('header > *') || identityEl.parentElement : null;
+            if (identityBlock && identityBlock !== header) {
+                identityBlock.style.order = '';
+            }
+            // Reset logo positioning (may have been set to absolute in center+center mode)
+            if (box) {
+                box.style.position = '';
+                box.style.left = '';
+                box.style.top = '';
+                // Restore logo scale transform (don't clear transform entirely, re-apply logo_size)
+                const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
+                box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
+                const identParent = box.parentElement;
+                if (identParent && identParent !== header) {
+                    identParent.style.flexDirection = '';
+                    identParent.style.alignItems = '';
+                    identParent.style.textAlign = '';
+                    identParent.style.position = '';
+                    identParent.style.paddingTop = '';
+                }
+            }
+
             // Detect if the header uses column flex-direction (e.g. fullphoto1, fullphoto4).
-            // Class-based flex-col persists even after clearing inline styles.
             const isColumnFlex = header.classList.contains('flex-col') ||
                 getComputedStyle(header).flexDirection === 'column';
-            if (idPos === 'center') {
-                header.style.justifyContent = 'center';
-                header.style.alignItems = 'center';
-                header.style.textAlign = 'center';
+
+            if (idPos === 'center' && datePos === 'center') {
+                // Both centered: stack vertically, center-align all text.
+                // Logo should NOT affect centering of text elements.
                 if (!isColumnFlex) {
                     header.style.flexDirection = 'column';
                 }
-            } else if (idPos === 'right') {
+                header.style.alignItems = 'center';
+                header.style.textAlign = 'center';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'center';
+                    dateContainer.style.alignSelf = 'center';
+                    dateContainer.style.width = '100%';
+                }
+                // Make the logo absolute so it doesn't shift the text centering
+                if (box) {
+                    box.style.position = 'absolute';
+                    box.style.left = '50%';
+                    box.style.transform = 'translateX(-50%)';
+                    box.style.top = '0';
+                    // Adjust the identity block to not include logo in flex flow
+                    const identParent = box.parentElement;
+                    if (identParent && identParent !== header) {
+                        identParent.style.flexDirection = 'column';
+                        identParent.style.alignItems = 'center';
+                        identParent.style.textAlign = 'center';
+                        identParent.style.position = 'relative';
+                        identParent.style.paddingTop = (box.offsetHeight || 40) + 8 + 'px';
+                    }
+                }
+            } else if (idPos === 'center' && datePos !== 'center') {
+                // Identity centered, date on a side: use column for identity, position date absolutely.
+                if (!isColumnFlex) {
+                    header.style.flexDirection = 'column';
+                }
+                header.style.alignItems = 'center';
+                header.style.textAlign = 'center';
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translateY(-50%)';
+                    if (datePos === 'right') {
+                        dateContainer.style.right = '2rem';
+                        dateContainer.style.textAlign = 'right';
+                    } else {
+                        dateContainer.style.left = '2rem';
+                        dateContainer.style.textAlign = 'left';
+                    }
+                }
+            } else if (idPos === 'left' && datePos === 'right') {
+                // Default natural layout: space-between keeps identity left, date right.
+                // Do NOT override justifyContent - let the original class handle it.
+                header.style.justifyContent = 'space-between';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'right';
+                }
+            } else if (idPos === 'right' && datePos === 'left') {
+                // Swap: date goes left, identity goes right. Use row-reverse or order.
+                header.style.justifyContent = 'space-between';
                 if (isColumnFlex) {
-                    // In column layouts, use alignItems to shift children horizontally.
                     header.style.alignItems = 'flex-end';
                 } else {
-                    header.style.justifyContent = 'flex-end';
+                    header.style.flexDirection = 'row-reverse';
                 }
-            } else if (idPos === 'left') {
+                if (dateContainer) {
+                    dateContainer.style.textAlign = 'left';
+                }
+            } else if (idPos === 'left' && datePos === 'left') {
+                // Both left: identity first, date after, both at flex-start.
+                header.style.justifyContent = 'flex-start';
+                if (dateContainer) {
+                    dateContainer.style.marginLeft = '1.5rem';
+                    dateContainer.style.textAlign = 'left';
+                }
+            } else if (idPos === 'right' && datePos === 'right') {
+                // Both right: pack everything to the end.
+                header.style.justifyContent = 'flex-end';
                 if (isColumnFlex) {
-                    header.style.alignItems = 'flex-start';
-                } else {
-                    header.style.justifyContent = 'flex-start';
+                    header.style.alignItems = 'flex-end';
+                }
+                if (dateContainer) {
+                    dateContainer.style.marginLeft = '1.5rem';
+                    dateContainer.style.textAlign = 'right';
+                }
+            } else if (idPos === 'left' && datePos === 'center') {
+                // Identity left, date centered absolutely.
+                header.style.justifyContent = 'flex-start';
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.left = '50%';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translate(-50%, -50%)';
+                    dateContainer.style.textAlign = 'center';
+                }
+            } else if (idPos === 'right' && datePos === 'center') {
+                // Identity right, date centered absolutely.
+                header.style.justifyContent = 'flex-end';
+                if (isColumnFlex) {
+                    header.style.alignItems = 'flex-end';
+                }
+                header.style.position = 'relative';
+                if (dateContainer) {
+                    dateContainer.style.position = 'absolute';
+                    dateContainer.style.left = '50%';
+                    dateContainer.style.top = '50%';
+                    dateContainer.style.transform = 'translate(-50%, -50%)';
+                    dateContainer.style.textAlign = 'center';
+                }
+            } else {
+                // Fallback: space-between
+                header.style.justifyContent = 'space-between';
+                if (dateContainer) {
+                    dateContainer.style.textAlign = datePos === 'right' ? 'right' : (datePos === 'center' ? 'center' : 'left');
                 }
             }
+        } else if (dateContainer) {
+            // No header found, just style the date container directly
+            dateContainer.style.textAlign = datePos === 'right' ? 'right' : (datePos === 'center' ? 'center' : 'left');
+            dateContainer.style.alignSelf = datePos === 'right' ? 'flex-end' : (datePos === 'center' ? 'center' : 'flex-start');
         }
-
-        // Date position — independent control over date alignment.
-        // If date_position is not explicitly set, derive from identity_position:
-        // identity left => date right, identity center => date center, identity right => date left.
-        let datePos = cfg.date_position;
-        if (!datePos) {
-            if (idPos === 'left') datePos = 'right';
-            else if (idPos === 'right') datePos = 'left';
-            else datePos = 'center';
-        }
-        const gregDate = $('#greg-date');
-        const hijDate = $('#hij-date');
-        const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
-        if (dateContainer) {
-            dateContainer.style.justifyContent = '';
-            dateContainer.style.textAlign = '';
-            dateContainer.style.alignSelf = '';
-            if (datePos === 'center') {
-                dateContainer.style.justifyContent = 'center';
-                dateContainer.style.textAlign = 'center';
-                dateContainer.style.alignSelf = 'center';
-            } else if (datePos === 'right') {
-                dateContainer.style.justifyContent = 'flex-end';
-                dateContainer.style.textAlign = 'right';
-                dateContainer.style.alignSelf = 'flex-end';
-            } else {
-                dateContainer.style.justifyContent = 'flex-start';
-                dateContainer.style.textAlign = 'left';
-                dateContainer.style.alignSelf = 'flex-start';
-            }
-        }
-        // Also set text-align on individual date elements to override any class-based alignment
+        // Also set text-align on individual date elements for consistency
         if (gregDate) gregDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
         if (hijDate) hijDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
 
