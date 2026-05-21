@@ -365,29 +365,54 @@
 
         // Identity position — control alignment of the header identity block.
         const idPos = cfg.identity_position || 'left';
-        const header = box ? box.parentElement : (nameEl ? nameEl.parentElement : null);
+        // Use closest('header') for robust header lookup instead of fragile parentElement traversal.
+        const identityEl = box || nameEl;
+        const header = identityEl ? identityEl.closest('header') : null;
         if (header) {
-            // Reset styles first
+            // Reset inline styles first
             header.style.justifyContent = '';
             header.style.flexDirection = '';
             header.style.alignItems = '';
             header.style.textAlign = '';
+            // Detect if the header uses column flex-direction (e.g. fullphoto1, fullphoto4).
+            // Class-based flex-col persists even after clearing inline styles.
+            const isColumnFlex = header.classList.contains('flex-col') ||
+                getComputedStyle(header).flexDirection === 'column';
             if (idPos === 'center') {
                 header.style.justifyContent = 'center';
-                header.style.flexDirection = 'column';
                 header.style.alignItems = 'center';
                 header.style.textAlign = 'center';
+                if (!isColumnFlex) {
+                    header.style.flexDirection = 'column';
+                }
             } else if (idPos === 'right') {
-                header.style.justifyContent = 'flex-end';
+                if (isColumnFlex) {
+                    // In column layouts, use alignItems to shift children horizontally.
+                    header.style.alignItems = 'flex-end';
+                } else {
+                    header.style.justifyContent = 'flex-end';
+                }
+            } else if (idPos === 'left') {
+                if (isColumnFlex) {
+                    header.style.alignItems = 'flex-start';
+                } else {
+                    header.style.justifyContent = 'flex-start';
+                }
             }
         }
 
         // When identity_position is 'center', also center the date container.
+        // Use justify-content (not text-align) since date containers are flex in fullphoto layouts.
         const gregDate = $('#greg-date');
         const hijDate = $('#hij-date');
         const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
         if (dateContainer) {
-            dateContainer.style.textAlign = idPos === 'center' ? 'center' : '';
+            dateContainer.style.justifyContent = '';
+            dateContainer.style.textAlign = '';
+            if (idPos === 'center') {
+                dateContainer.style.justifyContent = 'center';
+                dateContainer.style.textAlign = 'center';
+            }
         }
 
         // Friday label
