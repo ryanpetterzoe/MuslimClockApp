@@ -751,8 +751,25 @@
         if (hdr) setPassthrough(hdr, 'top');
 
         // Apply to bottom sections with prayer cards (section.row-fixed).
+        // IMPORTANT: Never passthrough a section that contains prayer
+        // schedule cards ([data-key]) — those MUST remain in flex flow
+        // so they sit at the bottom of the viewport, not float to center.
         var sections = screen.querySelectorAll('section.row-fixed');
         for (var i = 0; i < sections.length; i++) {
+            if (sections[i].querySelector('[data-key]')) {
+                // Revert any stale passthrough on prayer sections
+                if (sections[i].dataset.passthrough === '1') {
+                    sections[i].style.position = '';
+                    sections[i].style.left = '';
+                    sections[i].style.right = '';
+                    sections[i].style.top = '';
+                    sections[i].style.bottom = '';
+                    sections[i].style.zIndex = '';
+                    sections[i].style.pointerEvents = '';
+                    delete sections[i].dataset.passthrough;
+                }
+                continue;
+            }
             setPassthrough(sections[i], 'bottom');
         }
 
