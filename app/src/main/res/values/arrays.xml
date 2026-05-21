@@ -231,6 +231,19 @@
         <item>Scroll (Gulir Vertikal)</item>
     </string-array>
 
+    <!-- Identity position options -->
+    <string-array name="identity_position_entries">
+        <item>Kiri</item>
+        <item>Tengah</item>
+        <item>Kanan</item>
+    </string-array>
+
+    <string-array name="identity_position_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+
     <string-array name="quran_mode_values">
         <item>fullcard</item>
         <item>card</item>

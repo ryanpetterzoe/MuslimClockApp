@@ -330,6 +330,38 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/cat_identity_settings">
+
+        <SeekBarPreference
+            app:key="logo_size"
+            app:title="@string/pref_logo_size"
+            app:summary="@string/pref_logo_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="identity_size"
+            app:title="@string/pref_identity_size"
+            app:summary="@string/pref_identity_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <ListPreference
+            app:key="identity_position"
+            app:title="@string/pref_identity_position"
+            app:summary="@string/pref_identity_position_sum"
+            app:entries="@array/identity_position_entries"
+            app:entryValues="@array/identity_position_values"
+            app:defaultValue="left"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/cat_layout_editor">
 
         <Preference

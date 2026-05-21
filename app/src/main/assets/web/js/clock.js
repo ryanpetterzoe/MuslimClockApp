@@ -84,6 +84,10 @@
         quran_size:   100, quran_x_pct:   0, quran_y_pct:   0,
         date_size:    100, date_x_pct:    0, date_y_pct:    0,
         next_size:    100, next_x_pct:    0, next_y_pct:    0,
+        // Identity sizing & position
+        logo_size: 100,
+        identity_size: 100,
+        identity_position: 'left',
     };
 
     const PRAYER_LABEL_ID = {
@@ -342,6 +346,45 @@
                 // the template gets re-cloned cleanly on the next
                 // layout switch.
             }
+        }
+
+        // Logo size — scale the #logoBox based on logo_size/100.
+        if (box) {
+            const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
+            box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
+            box.style.transformOrigin = 'center center';
+        }
+
+        // Identity text size — scale #masjidName and #masjidAddress font-size.
+        const identityScale = Math.max(50, Math.min(200, parseInt(cfg.identity_size, 10) || 100)) / 100;
+        if (nameEl) nameEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
+        if (addrEl) addrEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
+
+        // Identity position — control alignment of the header identity block.
+        const idPos = cfg.identity_position || 'left';
+        const header = box ? box.parentElement : (nameEl ? nameEl.parentElement : null);
+        if (header) {
+            // Reset styles first
+            header.style.justifyContent = '';
+            header.style.flexDirection = '';
+            header.style.alignItems = '';
+            header.style.textAlign = '';
+            if (idPos === 'center') {
+                header.style.justifyContent = 'center';
+                header.style.flexDirection = 'column';
+                header.style.alignItems = 'center';
+                header.style.textAlign = 'center';
+            } else if (idPos === 'right') {
+                header.style.justifyContent = 'flex-end';
+            }
+        }
+
+        // When identity_position is 'center', also center the date container.
+        const gregDate = $('#greg-date');
+        const hijDate = $('#hij-date');
+        const dateContainer = gregDate ? gregDate.parentElement : (hijDate ? hijDate.parentElement : null);
+        if (dateContainer) {
+            dateContainer.style.textAlign = idPos === 'center' ? 'center' : '';
         }
 
         // Friday label

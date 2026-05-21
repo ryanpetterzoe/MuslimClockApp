@@ -110,6 +110,12 @@ object Settings {
     const val K_NEXT_X_PCT    = "next_x_pct"
     const val K_NEXT_Y_PCT    = "next_y_pct"
 
+    // Identity sizing & position — controls the logo box dimensions,
+    // masjid name/address font size, and header alignment (left/center/right).
+    const val K_LOGO_SIZE          = "logo_size"
+    const val K_IDENTITY_SIZE      = "identity_size"
+    const val K_IDENTITY_POSITION  = "identity_position"
+
     // System: auto-launch the app after the device finishes booting.
     // Default ON because the primary deployment is a TV permanently
     // mounted on a masjid wall — when power blinks the user expects
@@ -229,6 +235,9 @@ object Settings {
             .putInt(K_NEXT_SIZE,      100)
             .putInt(K_NEXT_X_PCT,     0)
             .putInt(K_NEXT_Y_PCT,     0)
+            .putInt(K_LOGO_SIZE,      100)
+            .putInt(K_IDENTITY_SIZE,  100)
+            .putString(K_IDENTITY_POSITION, "left")
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -325,6 +334,9 @@ object Settings {
             put("next_size",       p.getInt(K_NEXT_SIZE,     100).coerceIn(50, 200))
             put("next_x_pct",      p.getInt(K_NEXT_X_PCT,    0).coerceIn(-50, 50))
             put("next_y_pct",      p.getInt(K_NEXT_Y_PCT,    0).coerceIn(-50, 50))
+            put("logo_size",       p.getInt(K_LOGO_SIZE,     100).coerceIn(50, 200))
+            put("identity_size",   p.getInt(K_IDENTITY_SIZE, 100).coerceIn(50, 200))
+            put("identity_position", str(K_IDENTITY_POSITION, "left"))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))
