@@ -1,0 +1,32 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix prayer card layout overflow in horizontal/landscape mode. Prayer cards in horizontal layouts (grid-cols-6, grid-cols-3, flex-wrap) get pushed below the visible viewport on landscape screens because the flex layout does not properly constrain content to fit within the available height after accounting for ticker and quran bar space. The fix involves: (1) making the prayer section able to shrink, (2) reducing internal padding/gaps on short viewports via media queries, (3) ensuring proper min-height:0 on flex children so flexbox overflow is handled correctly.",
+  "status": "in_progress",
+  "steps": [
+    "In app/src/main/assets/web/css/screen.css, modify the .flex-layout > .row-fixed rule to change from `flex: 0 0 auto` to `flex: 0 1 auto` (allow shrinking). This lets the prayer section compress slightly rather than overflowing the viewport. Keep min-height:0 which is already set.",
+    "In app/src/main/assets/web/css/screen.css, add a `@media (max-height: 600px)` block that targets the prayer sections: reduce padding (pb-4 is 16px from Tailwind - use pb-2 equivalent i.e. 8px), reduce gap in grid layouts, and shrink font sizes slightly. This handles landscape TV/tablet where vertical space is around 480-600px.",
+    "In app/src/main/assets/web/css/screen.css, add a general rule for `.row-fixed` sections that contain prayer cards: add `max-height: 30vh` with `overflow: hidden` to guarantee they never push below the viewport. Use the selector `.flex-layout > section.row-fixed` to target only the prayer sections (not the header which is also row-fixed).",
+    "In app/src/main/assets/web/css/screen.css, add a compact mode for prayer cards inside the landscape media query: `.prayer-card`, `.prayer-grid-cell`, `.neon-card`, `.arch-card`, `.float-prayer`, `.scoreboard-row`, `.prayer-pill` should all get reduced padding (p-2 instead of p-3, py-1 instead of py-2).",
+    "In app/src/main/assets/web/css/screen.css, adjust the .row-fill rule to ensure it has `overflow: hidden` (already done) and verify that the main section properly absorbs excess rather than expanding beyond available space. Add `max-height: calc(100% - var(--header-h, 60px) - var(--prayer-h, 80px))` as a safety net if feasible, or rely on flex shrink.",
+    "Verify that #quranBar positioning remains correct: it uses `position: fixed; bottom: var(--ticker-h, 0px)` which is independent of the flex layout, and the .app-screen padding-bottom already reserves space for it. No changes needed for quran positioning, but verify the CSS variable --quran-h calculation in clock.js reserveQuranSpace() still works correctly with the new shrinkable prayer sections.",
+    "Test edge cases mentally: (a) when show_quran=false, --quran-h=0px so more room is available for prayers; (b) when show_ticker=false, --ticker-h=0px; (c) when both are shown, the combined padding-bottom could be ~140px on a 720px viewport (19%), leaving ~580px for header+main+prayers which should be fine with the shrink fix."
+  ],
+  "acceptance_criteria": [
+    "The CSS changes compile without syntax errors (valid CSS)",
+    "The .row-fixed prayer sections have flex-shrink allowed (flex: 0 1 auto)",
+    "A max-height constraint exists on prayer sections to prevent them from exceeding viewport bounds",
+    "Media query for max-height:600px exists with compact padding/font rules for prayer cards",
+    "The quran bar CSS (#quranBar) is NOT modified - it remains position:fixed with bottom:var(--ticker-h)",
+    "No layout template HTML changes that would break existing rendering at normal resolutions",
+    "The flex-layout system still functions correctly: header stays at top, main fills middle, prayer section sits at bottom"
+  ],
+  "verification": [
+    "Read the modified screen.css and verify the CSS rules are syntactically correct",
+    "Verify the .flex-layout > .row-fixed selector now uses flex: 0 1 auto",
+    "Verify a @media (max-height:...) block exists with prayer card compact rules",
+    "Verify the quran bar CSS is untouched"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

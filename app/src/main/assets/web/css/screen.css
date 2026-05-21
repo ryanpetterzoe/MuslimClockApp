@@ -80,8 +80,14 @@ body {
  * slideshow background — never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
 .flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 0 auto; min-height: 0; position: relative; z-index: 1; }
+.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; position: relative; z-index: 1; }
 .flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+
+/* Prayer section max-height safety net: never exceed 25% of viewport height */
+.flex-layout > section.row-fixed {
+    max-height: 25vh;
+    overflow: hidden;
+}
 
 /* ---------- Slideshow stacking guarantee ----------
  * The slideshow-host (and its inner .slide/<video> children) must
@@ -2055,3 +2061,40 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto10 .prayer.next { border-color: var(--accent); background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent); }
 .layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto10 .prayer.next::before { display: none; }
+
+/* ===================== LANDSCAPE / SHORT-VIEWPORT COMPACT PRAYER CARDS ===================== */
+@media (max-height: 640px) {
+    /* Prayer section: tighter padding */
+    .flex-layout > section.row-fixed {
+        padding-bottom: 8px !important;
+        padding-top: 4px !important;
+    }
+    /* Prayer card internals: reduce padding */
+    section.row-fixed .prayer-card,
+    section.row-fixed .prayer-grid-cell,
+    section.row-fixed .neon-card,
+    section.row-fixed .arch-card,
+    section.row-fixed .float-prayer,
+    section.row-fixed .scoreboard-row {
+        padding: 6px !important;
+    }
+    section.row-fixed .prayer-pill {
+        padding: 4px 10px !important;
+    }
+    /* Reduce grid gap */
+    section.row-fixed .grid {
+        gap: 4px !important;
+    }
+    section.row-fixed .flex-wrap {
+        gap: 4px !important;
+    }
+    /* Slightly smaller prayer card fonts */
+    section.row-fixed [data-time] {
+        font-size: clamp(12px, 1.8vw, 22px) !important;
+    }
+    section.row-fixed .label,
+    section.row-fixed .truncate,
+    section.row-fixed [class*="tracking-"] {
+        font-size: 8px !important;
+    }
+}
