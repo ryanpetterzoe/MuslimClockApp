@@ -81,18 +81,20 @@ body {
  * slideshow background -- never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
 .flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: visible; position: relative; z-index: 1; }
-.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
+.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: visible; position: relative; z-index: 5; }
+.flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 2; }
 
-/* Bring the clock content closer to the prayer cards section by
- * shifting the visual center downward. Without this, justify-center
- * in a tall row-fill places the clock too high because the bottom
- * of the viewport is occupied by quran bar + ticker + prayer cards.
- * A small top-padding bias + tighter gap creates a more balanced look. */
+/* Posisi jam digital: langsung di bawah header, tanpa centering
+ * vertikal yang bikin jam naik ke atas dan terpotong header.
+ * flex-start = konten mulai dari atas area main, tepat di bawah header.
+ * Gap 2px = countdown dan jam digital sangat rapat.
+ * overflow: visible = font besar tidak terpotong. */
 .flex-layout > main.row-fill {
     gap: 2px !important;
-    padding-top: 0;
+    padding-top: 1vh;
     padding-bottom: 0;
+    justify-content: flex-start !important;
+    overflow: visible !important;
 }
 
 /* Compact row-fixed padding on very short viewports (landscape phones) */
@@ -102,28 +104,21 @@ body {
 
 /* ---------- Slideshow stacking guarantee ----------
  * The slideshow-host (and its inner .slide/<video> children) must
- * ALWAYS render at the bottom of the layout stack. Without an explicit
- * z-index, an `absolute`-positioned slideshow-host paints above any
- * non-positioned siblings (header/main/section that forgot to declare
- * `relative z-10`), which causes the slideshow to cover content when
- * opacity is high — the bug users see at slideshow_opacity=100%.
- *
- * Pinning to z-index: 0 (combined with z-index: 1 on .row-fixed/.row-fill
- * above and z-index: 10+ in templates) means a positioned slideshow will
- * always sit beneath content, regardless of which template mounts. */
+ * ALWAYS render at the bottom of the layout stack. z-index: -1
+ * ensures it NEVER covers content even at opacity 100%. */
 .slideshow-host {
-    z-index: 0;
+    z-index: -1;
 }
 /* Scrim / overlay gradient divs that sit behind content.
  * These are always absolute-positioned direct children of the
  * flex-layout root (class="absolute inset-0" in templates).
- * Must stay at z-index 0 so .row-fixed/.row-fill (z-index:1)
- * always paint above them. */
+ * Must stay at z-index 0 so content (z-index:2+) always paints
+ * above them, but they remain visible above the slideshow (-1). */
 .flex-layout > .absolute {
     z-index: 0;
 }
 .slide {
-    z-index: 0;
+    z-index: -1;
 }
 
 .font-digital { font-family: var(--font-digital, 'Orbitron', monospace); }
@@ -2085,53 +2080,78 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 
 
 /* ===================== LAYOUT FIX: Anti-kepotong + Spacing + Z-index =====================
- * Targeted fixes for:
- * 1. Jam digital default posisinya dibawah header (bukan keatasan)
- * 2. Jarak antara jam digital dan "Menuju Maghrib" lebih dekat
- * 3. Frame gambar/slideshow tidak nutupi header
- * 4. Kartu jadwal sholat tidak kepotong atas/bawah
+ *
+ * MASALAH YANG DIPERBAIKI:
+ * 1. Background/slideshow menutupi konten (z-index salah) — PALING BELAKANG
+ * 2. Jarak countdown & jam digital terlalu jauh — rapat
+ * 3. Header motong jam digital — jam posisi dibawah header tanpa overlap
+ * 4. Semua tema layout harus konsisten
+ *
+ * Z-INDEX HIERARCHY (dari belakang ke depan):
+ *   z-index: -1  → slideshow-host (paling belakang, TIDAK BOLEH menutupi)
+ *   z-index: 0   → gradient overlay / scrim (di atas slideshow, di bawah konten)
+ *   z-index: 2   → main content (row-fill: jam digital, countdown)
+ *   z-index: 5   → header & prayer section (row-fixed)
  */
 
-/* FIX 1: Slideshow NEVER covers header - stronger z-index */
+/* --- Z-INDEX: Slideshow paling belakang --- */
 .slideshow-host {
+    z-index: -1 !important;
+    position: absolute !important;
+    inset: 0 !important;
+}
+.slideshow-host .slide,
+.slideshow-host video {
+    z-index: -1 !important;
+}
+
+/* --- Z-INDEX: Gradient/scrim overlay di atas slideshow, di bawah konten --- */
+.flex-layout > .absolute {
     z-index: 0 !important;
 }
+
+/* --- Z-INDEX: Content rows (header, main, section) di atas background --- */
+.flex-layout > .row-fixed {
+    position: relative !important;
+    z-index: 5 !important;
+    overflow: visible !important;
+}
+.flex-layout > .row-fill {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* --- Explicit header: selalu z-index tinggi, posisi relative --- */
 [class*="layout-"] > header {
-    position: relative;
+    position: relative !important;
     z-index: 10 !important;
 }
 
-/* FIX 2: row-fixed (header & prayer section) - no clip, higher z */
-.flex-layout > .row-fixed {
-    overflow: visible !important;
-    z-index: 5;
-}
-
-/* FIX 3: Gap between digital clock and countdown - tighter */
-.flex-layout > main.row-fill {
-    gap: 4px !important;
-}
-
-/* FIX 4: Gradient overlays stay behind content */
-[class*="layout-"] > .absolute:not(.slideshow-host) {
-    z-index: 1 !important;
-}
-
-/* FIX 5: Fullphoto layouts - content always above BG */
-[class*="layout-fullphoto"] > header,
-[class*="layout-fullphoto"] > main,
-[class*="layout-fullphoto"] > section {
+/* --- Fullphoto & semua layout: konten SELALU di atas BG --- */
+[class*="layout-"] > main,
+[class*="layout-"] > section {
     position: relative !important;
     z-index: 5 !important;
 }
 
-/* FIX 6: Prayer cards section never clips content */
+/* --- SPACING: Gap sangat rapat antara countdown dan jam digital ---
+ * Template pakai Tailwind gap-3 (12px), kita override ke 2px.
+ * "justify-content: flex-start" sudah di-set di atas agar jam
+ * tidak di-center secara vertikal (yang bikin keliatan jauh). */
+
+/* --- HEADER TIDAK MOTONG JAM: main mulai langsung di bawah header ---
+ * Dengan justify-content: flex-start (di rule utama), konten main
+ * akan mulai dari atas area main — tepat di bawah header.
+ * padding-top kecil (1vh) agar ada sedikit napas, bukan nempel. */
+
+/* --- Prayer cards section: tidak clip, overflow visible --- */
 .flex-layout > section.row-fixed {
     overflow: visible !important;
 }
 
-/* FIX 7: Prayer time digits - allow vertical overflow for tall fonts */
+/* --- Prayer time digits: allow vertical overflow for tall fonts --- */
 .prayer [data-time],
 .prayer .digit-cell {
     overflow-y: visible !important;
 }
+
