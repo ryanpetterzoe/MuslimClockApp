@@ -81,7 +81,7 @@ body {
  * slideshow background -- never the other way around. Templates that
  * already declare `relative z-10` keep working because z-10 > z-1. */
 .flex-layout         { display: flex; flex-direction: column; }
-.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: hidden; position: relative; z-index: 1; }
+.flex-layout > .row-fixed { flex: 0 1 auto; min-height: 0; overflow: visible; position: relative; z-index: 1; }
 .flex-layout > .row-fill  { flex: 1 1 0;    min-height: 0; min-width: 0; overflow: hidden; position: relative; z-index: 1; }
 
 /* Bring the clock content closer to the prayer cards section by
@@ -90,8 +90,8 @@ body {
  * of the viewport is occupied by quran bar + ticker + prayer cards.
  * A small top-padding bias + tighter gap creates a more balanced look. */
 .flex-layout > main.row-fill {
-    gap: 8px !important;
-    padding-top: 1vh;
+    gap: 2px !important;
+    padding-top: 0;
     padding-bottom: 0;
 }
 
@@ -112,6 +112,14 @@ body {
  * above and z-index: 10+ in templates) means a positioned slideshow will
  * always sit beneath content, regardless of which template mounts. */
 .slideshow-host {
+    z-index: 0;
+}
+/* Scrim / overlay gradient divs that sit behind content.
+ * These are always absolute-positioned direct children of the
+ * flex-layout root (class="absolute inset-0" in templates).
+ * Must stay at z-index 0 so .row-fixed/.row-fill (z-index:1)
+ * always paint above them. */
+.flex-layout > .absolute {
     z-index: 0;
 }
 .slide {

@@ -241,6 +241,7 @@
         const scrim = document.createElement('div');
         scrim.className = 'absolute inset-0';
         scrim.style.pointerEvents = 'none';
+        scrim.style.zIndex = '0';
         scrim.style.background = isLight
             ? 'linear-gradient(180deg,rgba(250,249,246,0.55) 0%,rgba(250,249,246,0.82) 100%)'
             : 'linear-gradient(180deg,rgba(0,0,0,0.40) 0%,rgba(0,0,0,0.72) 100%)';
