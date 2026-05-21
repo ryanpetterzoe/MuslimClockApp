@@ -122,6 +122,18 @@
         <item>Spesial A1 (Custom Background)</item>
         <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
+        <item>Exhibit (Foto + Ribbon) ★ FOTO</item>
+        <item>Pavilion (3 Kolom Foto) ★ FOTO</item>
+        <item>Shrine (Foto BG + Grid 3x2) ★ FOTO</item>
+        <item>Atrium (Foto Kanan + Grid 2x3) ★ FOTO</item>
+        <item>Dome (Foto Kubah + Arch Cards) ★ FOTO</item>
+        <item>Minaret (Foto Kiri + List Dots) ★ FOTO</item>
+        <item>Oasis (Timeline + Foto Bawah) ★ FOTO</item>
+        <item>Sanctuary (Foto Tengah + Side) ★ FOTO</item>
+        <item>Arch (Foto Lengkung + Arch) ★ FOTO</item>
+        <item>Courtyard (Panorama + Pills) ★ FOTO</item>
+        <item>Terrace (Foto Besar + Step) ★ FOTO</item>
+        <item>Panorama (Wide + Gradient) ★ FOTO</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -191,6 +203,18 @@
         <item>special1</item>
         <item>special2</item>
         <item>special3</item>
+        <item>exhibit</item>
+        <item>pavilion</item>
+        <item>shrine</item>
+        <item>atrium</item>
+        <item>dome</item>
+        <item>minaret</item>
+        <item>oasis</item>
+        <item>sanctuary</item>
+        <item>arch</item>
+        <item>courtyard</item>
+        <item>terrace</item>
+        <item>panorama</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
