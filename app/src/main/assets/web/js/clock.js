@@ -199,6 +199,7 @@
         // slideshow is visible across all themes.
         ensureSlideshowHost(host);
         buildAnalogStatic();   // populate ticks/numerals on the freshly cloned SVG
+        setTimeout(autoFitVerticalOverflow, 50);
         return true;
     }
 
@@ -613,6 +614,7 @@
         // adjacent content. Only sections with a visible background
         // should reserve space and visually block things behind them.
         applyTransparentPassthrough();
+        setTimeout(autoFitVerticalOverflow, 50);
     }
 
     /* ===== Transparent passthrough helpers ===== */
@@ -2720,6 +2722,82 @@
     }
 
     /**
+     * Detect vertical overflow in the flex layout and scale down prayer
+     * sections (section.row-fixed) to prevent overlap. Works by measuring
+     * the natural height of all row-fixed children vs. available container
+     * height. If row-fixed items consume more than 60% of the viewport,
+     * scale the largest section down to fit.
+     */
+    function autoFitVerticalOverflow() {
+        var host = document.getElementById('layoutHost');
+        if (!host) return;
+        var screen = host.querySelector('.app-screen');
+        if (!screen) return;
+
+        var containerH = screen.clientHeight;
+        if (containerH <= 0) return;
+
+        var rowFixed = screen.querySelectorAll(':scope > .row-fixed');
+        if (!rowFixed.length) return;
+
+        // Reset transforms first so we measure natural sizes
+        rowFixed.forEach(function(el) {
+            if (el.dataset.vfitScale) {
+                el.style.transform = '';
+                el.style.transformOrigin = '';
+                el.style.height = '';
+                delete el.dataset.vfitScale;
+            }
+        });
+
+        // Wait one frame for layout to settle after reset
+        requestAnimationFrame(function() {
+            var containerH2 = screen.clientHeight;
+            if (containerH2 <= 0) return;
+
+            var totalFixed = 0;
+            var sections = [];
+            rowFixed.forEach(function(el) {
+                var pos = window.getComputedStyle(el).position;
+                if (pos === 'absolute' || pos === 'fixed') return;
+                var h = el.scrollHeight || el.offsetHeight || 0;
+                totalFixed += h;
+                if (el.tagName === 'SECTION' || (el.tagName !== 'HEADER' && el.querySelector('[data-key]'))) {
+                    sections.push({ el: el, h: h });
+                }
+            });
+
+            var maxFixed = containerH2 * 0.60;
+            if (totalFixed <= maxFixed) return;
+
+            var headerH = 0;
+            rowFixed.forEach(function(el) {
+                var pos = window.getComputedStyle(el).position;
+                if (pos === 'absolute' || pos === 'fixed') return;
+                if (el.tagName === 'HEADER') {
+                    headerH += el.scrollHeight || el.offsetHeight || 0;
+                }
+            });
+
+            var sectionBudget = maxFixed - headerH;
+            var totalSectionH = 0;
+            sections.forEach(function(s) { totalSectionH += s.h; });
+
+            if (totalSectionH <= 0 || sectionBudget <= 0) return;
+
+            var scaleFactor = Math.max(0.65, Math.min(1.0, sectionBudget / totalSectionH));
+            if (scaleFactor >= 0.98) return;
+
+            sections.forEach(function(s) {
+                s.el.style.transform = 'scale(' + scaleFactor + ')';
+                s.el.style.height = Math.ceil(s.h * scaleFactor) + 'px';
+                s.el.style.transformOrigin = 'center bottom';
+                s.el.dataset.vfitScale = String(scaleFactor);
+            });
+        });
+    }
+
+    /**
      * Autofit the #digital clock element so it never overflows its
      * parent container horizontally, regardless of which digital_style
      * is active. This is critical when switching between styles like
@@ -3175,6 +3253,15 @@
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', scheduleAutoFit);
         }
+
+        // Vertical overflow auto-fit on resize/orientation change
+        var _vfitTimer = null;
+        function scheduleVfit() {
+            if (_vfitTimer) clearTimeout(_vfitTimer);
+            _vfitTimer = setTimeout(autoFitVerticalOverflow, 150);
+        }
+        window.addEventListener('resize', scheduleVfit);
+        window.addEventListener('orientationchange', function() { setTimeout(scheduleVfit, 300); });
 
         loadHijri();
         loadPrayerTimes();
