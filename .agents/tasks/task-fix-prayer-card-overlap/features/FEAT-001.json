@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "fix",
   "description": "Fix prayer card layout overlap across all 80+ layouts by making row-fixed shrinkable and adding JS-based vertical overflow detection that scales prayer sections when viewport is too short (landscape). This is a two-part fix: CSS makes sections shrinkable so flex can contain them, and JS detects remaining overflow and scales content down.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "1. In app/src/main/assets/web/css/screen.css, line 83, change `.flex-layout > .row-fixed` from `flex: 0 0 auto` to `flex: 0 1 auto` (allow shrinking). Add `overflow: hidden` to clip content gracefully when shrunk. Keep min-height:0, position:relative, z-index:1.",
     "2. Do NOT add height:100% to .flex-layout. Do NOT add max-height to .row-fixed. The .app-screen already provides the definite height constraint via position:fixed + inset:0 + height:var(--app-vh).",
@@ -29,5 +29,5 @@
     "Verify the media query exists in screen.css for max-height: 500px"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "Successfully implemented all changes. The fix applies globally across all 80+ layouts because: (1) the CSS flex change on .row-fixed is a global rule that affects all templates, (2) the autoFitVerticalOverflow() function dynamically queries whichever layout is active at runtime, (3) the media query applies universally. No max-height was added to row-fixed and no height:100% was added to flex-layout, respecting all constraints."
 }
