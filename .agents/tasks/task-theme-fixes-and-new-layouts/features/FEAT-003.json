@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "chore",
   "description": "Remove dome theme and 8 unused ornamental themes (mihrab, mosaic, crescent, persian, mecca, marrakesh, ottoman, jannah) from the codebase",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "1. Remove 'dome' from SUPPORTED_LAYOUTS array in clock.js (it's in the photo-frame section around line 141).",
     "2. Remove the entire <template id='layout-dome'> block from index.html (starts at line ~2808, ends at next template or closing tag).",
@@ -31,5 +31,5 @@
     "grep 'dome' clock.js SUPPORTED_LAYOUTS section should return no results"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "Build requires JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2. All 9 templates (dome, mihrab, mosaic, crescent, persian, mecca, marrakesh, ottoman, jannah) removed from index.html, dome removed from SUPPORTED_LAYOUTS and arrays.xml, CSS rules for all removed layouts cleaned from screen.css including the prayer.next::before suppression block. Build successful with 807 lines removed total."
 }
