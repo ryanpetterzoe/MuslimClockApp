@@ -115,6 +115,9 @@ object Settings {
     const val K_LOGO_SIZE          = "logo_size"
     const val K_IDENTITY_SIZE      = "identity_size"
     const val K_IDENTITY_POSITION  = "identity_position"
+    const val K_IDENTITY_X_PCT     = "identity_x_pct"
+    const val K_IDENTITY_Y_PCT     = "identity_y_pct"
+    const val K_LOGO_POSITION      = "logo_position"
 
     // Date position — independent control over date (Masehi & Hijriah)
     // alignment. Defaults to "auto" which derives position from identity_position:
@@ -243,6 +246,9 @@ object Settings {
             .putInt(K_LOGO_SIZE,      100)
             .putInt(K_IDENTITY_SIZE,  100)
             .putString(K_IDENTITY_POSITION, "left")
+            .putInt(K_IDENTITY_X_PCT, 0)
+            .putInt(K_IDENTITY_Y_PCT, 0)
+            .putString(K_LOGO_POSITION, "right")
             .putString(K_DATE_POSITION, "auto")
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
@@ -343,6 +349,9 @@ object Settings {
             put("logo_size",       p.getInt(K_LOGO_SIZE,     100).coerceIn(50, 200))
             put("identity_size",   p.getInt(K_IDENTITY_SIZE, 100).coerceIn(50, 200))
             put("identity_position", str(K_IDENTITY_POSITION, "left"))
+            put("identity_x_pct",  p.getInt(K_IDENTITY_X_PCT, 0).coerceIn(-50, 50))
+            put("identity_y_pct",  p.getInt(K_IDENTITY_Y_PCT, 0).coerceIn(-50, 50))
+            put("logo_position",   str(K_LOGO_POSITION, "right"))
             put("date_position", str(K_DATE_POSITION, "auto"))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))

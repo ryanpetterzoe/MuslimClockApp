@@ -180,6 +180,9 @@
     <string name="layout_editor_reset">Reset</string>
     <string name="layout_editor_done">Simpan</string>
     <string name="layout_editor_saved">Tata letak tersimpan</string>
+    <string name="layout_editor_dropdown_digital_style">Jenis Jam Digital</string>
+    <string name="layout_editor_dropdown_identity_position">Posisi Identitas</string>
+    <string name="layout_editor_dropdown_logo_position">Posisi Logo</string>
     <string name="pref_open_layout_editor">Buka Editor Live Preview</string>
     <string name="pref_open_layout_editor_sum">Atur posisi elemen dengan live preview — langsung terlihat hasilnya saat digeser</string>
 
