@@ -205,6 +205,8 @@
         <item>Glow (Cahaya Bersinar)</item>
         <item>Minimal (Teks Bersih)</item>
         <item>Scroll (Gulir Vertikal)</item>
+        <item>Accent Typewriter (Ketik + Aksen)</item>
+        <item>Clean Typewriter (Ketik + Transparan)</item>
     </string-array>
 
     <!-- Identity position options -->
@@ -257,6 +259,8 @@
         <item>glow</item>
         <item>minimalcard</item>
         <item>scroll</item>
+        <item>accentcard</item>
+        <item>cleancard</item>
     </string-array>
 
     <!-- Ticker / running text display styles -->

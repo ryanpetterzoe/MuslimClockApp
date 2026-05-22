@@ -1025,7 +1025,7 @@
     let quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
     let quranBuilt = '';        // last-built mode signature
 
-    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee', 'fade', 'flip', 'glow', 'minimalcard', 'scroll'];
+    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee', 'fade', 'flip', 'glow', 'minimalcard', 'scroll', 'accentcard', 'cleancard'];
 
     function clearQuranTimers() {
         if (quranTimer)       { clearInterval(quranTimer);     quranTimer = null; }
@@ -1146,6 +1146,8 @@
             case 'glow':       renderGlow(ayat);       break;
             case 'minimalcard':renderMinimalCard(ayat); break;
             case 'scroll':     renderScroll(ayat);     break;
+            case 'accentcard': renderAccentCard(ayat); break;
+            case 'cleancard':  renderCleanCard(ayat);  break;
             case 'card':
             default:           renderCard(ayat);       break;
         }
@@ -1357,6 +1359,53 @@
             card.style.opacity = '1';
         }, 350);
         reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderAccentCard(ayat) {
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        const refEl   = document.querySelector('#quranBar .q-ref');
+        if (!arabEl || !transEl || !refEl) return;
+
+        if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
+
+        arabEl.innerHTML  = '<span class="quran-cursor">|</span>';
+        transEl.innerHTML = '';
+        refEl.textContent = '';
+
+        const arabChars  = Array.from(ayat.arab);
+        const transChars = Array.from(ayat.trans);
+        const refText    = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
+
+        const intervalMs = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30) * 1000;
+        const totalChars = arabChars.length + transChars.length + refText.length;
+        const charDelay  = Math.max(15, Math.min(60, Math.floor(intervalMs * 0.6 / totalChars)));
+
+        let phase = 0, idx = 0;
+        let arabBuf = '', transBuf = '';
+        quranTypingTimer = setInterval(() => {
+            if (phase === 0) {
+                if (idx < arabChars.length) {
+                    arabBuf += arabChars[idx++];
+                    arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
+                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; transEl.innerHTML = '<span class="quran-cursor">|</span>'; }
+            } else if (phase === 1) {
+                if (idx < transChars.length) {
+                    transBuf += transChars[idx++];
+                    transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
+                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; }
+            } else if (phase === 2) {
+                if (idx < refText.length) {
+                    refEl.textContent = refText.slice(0, ++idx);
+                } else { phase = 3; clearInterval(quranTypingTimer); quranTypingTimer = null; }
+            }
+        }, charDelay);
+
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderCleanCard(ayat) {
+        renderAccentCard(ayat);
     }
 
     /* ===== Layout editor =====
