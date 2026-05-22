@@ -1,0 +1,27 @@
+{
+  "project_type": "Android Kotlin app (WebView-based Muslim Clock for TV/tablet/landscape)",
+  "language": "Kotlin",
+  "build_system": "Gradle 8.14 wrapper, AGP 8.5.2, Kotlin 1.9.24, compileSdk 34, minSdk 21, JDK 17 target",
+  "test_framework": "No test suite present - validation via build success",
+  "build_command": "cd /projects/sandbox/MuslimClockApp && ./gradlew assembleDebug --no-daemon",
+  "test_command": "cd /projects/sandbox/MuslimClockApp && ./gradlew assembleDebug --no-daemon",
+  "verification_instructions": "Run ./gradlew assembleDebug --no-daemon and confirm it produces app/build/outputs/apk/debug/app-debug.apk without errors",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "Java 25 and Gradle 8.14 available on host. JAVA_HOME may need to be set. Run: export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 or similar if needed. The project compileOptions target JDK 17.",
+  "environment_constraints": "OPEN_INTERNET network mode. No Android device for runtime testing - build verification only. No test suite exists.",
+  "contribution_requirements": "Each fix/feature = branch new = PR new. Keep all existing preference keys and functionality intact.",
+  "key_patterns": "SettingsActivity hosts a SettingsFragment (PreferenceFragmentCompat) inside a FrameLayout container. Settings use res/xml/preferences.xml. Custom preferences: ColorPickerPreference (DialogPreference subclass with swatch grid), LocationSearchPreference (plain Preference that opens a DialogFragment). Both have extension functions (maybeShowColorPicker, maybeShowLocationSearch) that hook into onDisplayPreferenceDialog and onPreferenceTreeClick. ActivityResultLaunchers (pickImagesLauncher, pickLogoLauncher, pickAdzanAudioLauncher) are registered in SettingsFragment.onCreate. Copyright text at bottom of preferences.",
+  "relevant_files": [
+    "app/src/main/java/id/muslimclock/app/SettingsActivity.kt",
+    "app/src/main/res/layout/activity_settings.xml",
+    "app/src/main/res/xml/preferences.xml",
+    "app/src/main/res/values/strings.xml",
+    "app/src/main/res/values/arrays.xml",
+    "app/src/main/java/id/muslimclock/app/Settings.kt",
+    "app/src/main/java/id/muslimclock/app/ColorPickerPreference.kt",
+    "app/src/main/java/id/muslimclock/app/LocationSearchPreference.kt",
+    "app/src/main/java/id/muslimclock/app/LayoutEditorActivity.kt",
+    "app/build.gradle.kts"
+  ],
+  "directory_structure": "app/src/main/java/id/muslimclock/app/ - all Kotlin sources (single package). app/src/main/res/xml/ - preference XML. app/src/main/res/layout/ - activity layouts. app/src/main/res/values/ - strings.xml, arrays.xml. app/src/main/res/drawable/ - vector drawables."
+}

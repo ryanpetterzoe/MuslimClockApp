@@ -1,0 +1,34 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Replace the flat PreferenceScreen settings with a grid/card-based landing page. Each card (9 total) navigates to a sub-PreferenceFragment for that category, except 'Editor Tata Letak' which opens LayoutEditorActivity directly. The manual layout-editor slider preferences are hidden from settings UI. All existing preference keys and functionality remain intact.",
+  "status": "completed",
+  "steps": [
+    "1. Create a grid landing page layout XML at `app/src/main/res/layout/fragment_settings_grid.xml`. Use a RecyclerView or ScrollView with a GridLayout (3 columns) containing 9 card items. Each card has an icon (ImageView) and title (TextView). Include a copyright text at the bottom.",
+    "2. Create a card item layout XML at `app/src/main/res/layout/item_settings_card.xml` for each grid cell - a MaterialCardView or styled CardView with an icon and title centered.",
+    "3. Split the current monolithic `app/src/main/res/xml/preferences.xml` into 8 separate preference XML files (one per sub-screen category): `pref_masjid.xml`, `pref_location.xml`, `pref_appearance.xml`, `pref_feature.xml` (running text + quran), `pref_slideshow.xml`, `pref_imam.xml`, `pref_adzan.xml`, `pref_system.xml`. Each file contains only the relevant PreferenceCategory content from the original preferences.xml. The identity settings (logo_size, identity_size, identity_position, date_position) go into pref_appearance.xml. The adzan content overlay preferences go into pref_adzan.xml. The layout editor slider preferences (analog_size, analog_x_pct, etc.) are NOT included in any preference XML - they are removed from the settings UI.",
+    "4. Rewrite `app/src/main/java/id/muslimclock/app/SettingsActivity.kt`: (a) Replace the single SettingsFragment with a new SettingsGridFragment that inflates fragment_settings_grid.xml and sets up grid click handlers. (b) Create 8 sub-fragment classes (MasjidSettingsFragment, LocationSettingsFragment, AppearanceSettingsFragment, FeatureSettingsFragment, SlideshowSettingsFragment, ImamSettingsFragment, AdzanSettingsFragment, SystemSettingsFragment) each extending PreferenceFragmentCompat and loading their respective XML. (c) The ActivityResultLaunchers (pickImagesLauncher, pickLogoLauncher, pickAdzanAudioLauncher) and their callbacks must be registered in the appropriate sub-fragment (pickLogoLauncher in MasjidSettingsFragment, pickImagesLauncher in SlideshowSettingsFragment, pickAdzanAudioLauncher in AdzanSettingsFragment). (d) maybeShowColorPicker and maybeShowLocationSearch extension functions must be called in the appropriate sub-fragments' onDisplayPreferenceDialog/onPreferenceTreeClick. (e) The 'Editor Tata Letak' card click opens LayoutEditorActivity directly via Intent. (f) Navigation: clicking a card does a fragment transaction to replace settings_container with the sub-fragment, adding to back stack. The action bar title updates to the sub-screen name. Back press returns to the grid.",
+    "5. Update `app/src/main/res/layout/activity_settings.xml` if needed (the FrameLayout container should work as-is for hosting both the grid fragment and sub-fragments).",
+    "6. Add new string resources in `app/src/main/res/values/strings.xml` for the grid card titles: 'Masjid', 'Lokasi Dan Hisab', 'Tampilan', 'Pengaturan Fitur', 'Slideshow', 'Jadwal Imam', 'Editor Tata Letak', 'Adzan dan Istiqomah', 'Sistem dan Aktivasi'. Also add drawable resource references for card icons (use existing android.R.drawable icons or create simple vector drawables).",
+    "7. Add vector drawable icons for each settings card in `app/src/main/res/drawable/`: ic_settings_masjid.xml, ic_settings_location.xml, ic_settings_appearance.xml, ic_settings_feature.xml, ic_settings_slideshow.xml, ic_settings_imam.xml, ic_settings_editor.xml, ic_settings_adzan.xml, ic_settings_system.xml. Use simple Material Design style paths.",
+    "8. Ensure the 'Sistem' category is renamed to 'Sistem dan Aktivasi' in its string resource and grid card title.",
+    "9. Verify the build compiles successfully with `./gradlew assembleDebug --no-daemon`."
+  ],
+  "acceptance_criteria": [
+    "Running `./gradlew assembleDebug --no-daemon` succeeds without errors",
+    "The SettingsActivity first shows a grid of 9 cards with icons and titles",
+    "Clicking any card (except Editor Tata Letak) navigates to a PreferenceFragment sub-screen",
+    "Clicking 'Editor Tata Letak' card opens LayoutEditorActivity",
+    "All existing preference keys are preserved in their respective sub-screen XML files",
+    "The manual layout editor slider preferences (analog_size, analog_x_pct, etc.) are removed from the settings UI",
+    "ActivityResultLaunchers (file pickers) work correctly in their respective sub-fragments",
+    "ColorPickerPreference and LocationSearchPreference dialogs work in their respective sub-fragments",
+    "Copyright text is visible at the bottom of the grid page",
+    "Back navigation from sub-screens returns to the grid"
+  ],
+  "verification": [
+    "cd /projects/sandbox/MuslimClockApp && ./gradlew assembleDebug --no-daemon"
+  ],
+  "blocked_reason": null,
+  "findings": "Build successful. Android SDK was not pre-installed - had to install commandline-tools and platform-34 + build-tools-34. JAVA_HOME must be set to /opt/toolchains/.local/share/mise/installs/java/17.0.2. local.properties created with sdk.dir=/opt/android-sdk. The original preferences.xml is left in place as a backup since sub-fragments reference their own XML files."
+}
