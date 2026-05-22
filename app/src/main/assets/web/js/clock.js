@@ -142,8 +142,8 @@
         // Full-background-photo layouts (slideshow as full BG)
         'fullphoto1', 'fullphoto2', 'fullphoto3', 'fullphoto4', 'fullphoto5',
         'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',
-        'fullphoto11', 'fullphoto13', 'fullphoto14', 'fullphoto15',
-        'fullphoto16', 'fullphoto17', 'fullphoto19', 'fullphoto20'
+        'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto14', 'fullphoto15',
+        'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20'
     ];
 
     /* ===== State (mutable) ===== */

@@ -2050,6 +2050,16 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto5 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
 .layout-fullphoto5 .prayer.next::before { display: none; }
 
+/* Fullphoto 12 (Sidebar Kaca) */
+.layout-fullphoto12 .prayer.next { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), rgba(255,255,255,0.06)) !important; border-color: var(--accent) !important; box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent), inset 0 0 0 1px var(--accent); transform: scale(1.03); }
+.layout-fullphoto12 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto12 .prayer.next::before { display: none; }
+
+/* Fullphoto 18 (Grid Mosaic) */
+.layout-fullphoto18 .prayer.next { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45)), rgba(0,0,0,0.45)) !important; border-color: var(--accent) !important; box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.05); }
+.layout-fullphoto18 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto18 .prayer.next::before { display: none; }
+
 /* Fullphoto 6 (Lanskap) */
 .layout-fullphoto6 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto6 .prayer.next::before { display: none; }
