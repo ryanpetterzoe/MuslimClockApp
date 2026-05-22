@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "fix",
   "description": "Fix photo frame opacity on cinema/gallery/studio/memory themes, fix prayer highlight on fullphoto13/15/16/17/19, and fix adzan overlay text clipping when imam is active",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "1. In index.html line ~499 (cinema template), the slideshow section has style='background:rgba(15,23,42,0.85);' - remove this hardcoded dark background. The slideshow-host div inside it already has the slideshow images that use --slide-opacity.",
     "2. In index.html line ~1308 (gallery template), the photo frame div has style='...background:rgba(15,23,42,0.6);border:6px solid rgba(255,255,255,0.15);' - remove the rgba(15,23,42,0.6) background but keep the border. The slideshow-host inside already respects --slide-opacity.",
@@ -24,5 +24,5 @@
     "grep for '.layout-fullphoto13 .prayer.next' in screen.css and confirm it exists with glow styling"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "Build requires JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2 and ANDROID_HOME=/opt/android-sdk. All 3 parts implemented successfully: photo frame opacity fix on 4 themes, prayer highlight CSS for 5 fullphoto themes, and adzan overlay responsive text sizing."
 }
