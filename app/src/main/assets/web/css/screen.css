@@ -2098,6 +2098,16 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto19 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
 .layout-fullphoto19 .prayer.next::before { display: none; }
 
+/* Oasis */
+.layout-oasis .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(0,128,128,0.15)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.05); }
+.layout-oasis .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-oasis .prayer.next::before { display: none; }
+
+/* Arch */
+.layout-arch .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)) !important; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.06); }
+.layout-arch .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-arch .prayer.next::before { display: none; }
+
 
 
 
