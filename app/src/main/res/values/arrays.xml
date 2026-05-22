@@ -88,6 +88,7 @@
         <item>Lantern (Lentera Maroko) ★ ORNAMEN</item>
         <item>Spesial A1 (Custom Background)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
+        <item>Spesial A4 (Custom Background 2)</item>
         <item>Pavilion (3 Kolom Foto) ★ FOTO</item>
         <item>Atrium (Foto Kanan + Grid 2x3) ★ FOTO</item>
         <item>Minaret (Foto Kiri + List Dots) ★ FOTO</item>
@@ -157,6 +158,7 @@
         <item>lantern</item>
         <item>special1</item>
         <item>special3</item>
+        <item>special4</item>
         <item>pavilion</item>
         <item>atrium</item>
         <item>minaret</item>

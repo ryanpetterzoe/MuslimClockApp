@@ -2082,7 +2082,8 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 /* ===================== SPECIAL3 LAYOUT (Vertical Prayer Left) ===================== */
 .layout-special3 .special3-bg { z-index: 0; }
 .layout-special3 .special3-card {
-    background: url('../img/temaspesial/a1/card.png') center/cover no-repeat;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.15);
     transition: transform .3s ease, box-shadow .3s ease;
@@ -2095,6 +2096,24 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-special3 .special3-card.next .label { color: var(--accent) !important; }
 .layout-special3 .special3-card.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
 .layout-special3 .prayer.next::before { display: none; }
+
+/* ===================== SPECIAL4 LAYOUT (Horizontal Prayer Bottom) ===================== */
+.layout-special4 .special4-bg { z-index: 0; }
+.layout-special4 .special4-card {
+    background: rgba(0,0,0,0.55);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 0;
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.layout-special4 .special4-card.next {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--accent), 0 6px 24px -4px rgba(0,0,0,0.5);
+    border-color: var(--accent);
+    background: rgba(0,0,0,0.7);
+}
+.layout-special4 .special4-card.next .label { color: var(--accent) !important; }
+.layout-special4 .special4-card.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 12px var(--accent); }
+.layout-special4 .prayer.next::before { display: none; }
 
 
 /* ===================== FULLPHOTO LAYOUTS NEXT-STATE STYLES ===================== */
