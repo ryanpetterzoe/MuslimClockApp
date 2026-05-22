@@ -308,7 +308,14 @@ body {
 
         if(cfg.masjid_logo){
             const box = document.getElementById('logoBox');
-            if(box) box.innerHTML = '<img src="'+cfg.masjid_logo+'" class="w-full h-full object-contain" alt="logo">';
+            if(box) {
+                const img = document.createElement('img');
+                img.src = cfg.masjid_logo;
+                img.className = 'w-full h-full object-contain';
+                img.alt = 'logo';
+                box.innerHTML = '';
+                box.appendChild(img);
+            }
         }
 
         if(cfg.show_ticker !== false && cfg.ticker_text){
@@ -417,6 +424,18 @@ body {
         }
         const labelEl = document.getElementById('nextLabel');
         const countEl = document.getElementById('nextCountdown');
+        if(!nextKey && times.fajr){
+            const [fh,fm] = times.fajr.split(':').map(Number);
+            const fajrSec = fh*3600 + fm*60;
+            const diff = (24*3600 - nowSec) + fajrSec;
+            nextKey = 'fajr';
+            const dh = String(Math.floor(diff/3600)).padStart(2,'0');
+            const dm = String(Math.floor((diff%3600)/60)).padStart(2,'0');
+            const ds = String(diff%60).padStart(2,'0');
+            if(labelEl) labelEl.textContent = prayerNames.fajr;
+            if(countEl) countEl.textContent = dh+':'+dm+':'+ds;
+            return;
+        }
         if(!nextKey){ if(labelEl) labelEl.textContent='Subuh'; if(countEl) countEl.textContent='--:--:--'; return; }
         const diff = nextSec - nowSec;
         const dh = String(Math.floor(diff/3600)).padStart(2,'0');
