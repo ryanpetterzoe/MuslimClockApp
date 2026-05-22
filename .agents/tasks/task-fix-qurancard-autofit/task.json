@@ -8,6 +8,6 @@
     "build": "skipped - no JS build step, static asset",
     "tests": "skipped - no unit tests for web assets",
     "syntax": "pass - brace/bracket count delta matches pre-existing state",
-    "summary": "Added autoFitToTwoLines pre-measurement to renderAccentCard. The function now sets full text (including ref line), calls autoFit to shrink font to fit 2 lines, saves computed font sizes, locks .q-card container + individual element min-heights, reserves quran space at FULL measured size, then clears elements and types with saved sizes. cleancard inherits fix via renderAccentCard delegation. Second fix (d7bf47f) resolved remaining layout shift caused by ref line not being included in pre-measurement."
+    "summary": "Added lockQuranCardHeight() helper that pre-measures, auto-fits, locks min-height on .q-card + individual elements, and reserves space. Applied to ALL render functions (renderCard, renderFullCard, renderSlide, renderTypewriter, renderFade, renderFlip, renderGlow, renderMinimalCard, renderScroll, renderAccentCard/renderCleanCard). Card is now static at its largest size across all modes. renderMarquee unchanged (different paradigm)."
   }
 }
