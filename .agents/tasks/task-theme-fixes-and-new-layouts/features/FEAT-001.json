@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix photo frame opacity on cinema/gallery/studio/memory themes, fix prayer highlight on fullphoto13/15/16/17/19, and fix adzan overlay text clipping when imam is active",
+  "status": "completed",
+  "steps": [
+    "1. In index.html line ~499 (cinema template), the slideshow section has style='background:rgba(15,23,42,0.85);' - remove this hardcoded dark background. The slideshow-host div inside it already has the slideshow images that use --slide-opacity.",
+    "2. In index.html line ~1308 (gallery template), the photo frame div has style='...background:rgba(15,23,42,0.6);border:6px solid rgba(255,255,255,0.15);' - remove the rgba(15,23,42,0.6) background but keep the border. The slideshow-host inside already respects --slide-opacity.",
+    "3. In index.html line ~1373 (studio template), the photo frame div has style='...background:rgba(10,10,10,0.6);box-shadow:...' - remove the rgba(10,10,10,0.6) from background but keep box-shadow and border styling.",
+    "4. In index.html line ~1404 (memory template), find the photo frame container with dark background and remove the dark rgba background.",
+    "5. In screen.css, add proper .prayer.next styling for fullphoto13, fullphoto15, fullphoto16, fullphoto17, fullphoto19 with glow/scale effects instead of the default ugly yellow bar. Use: transform:scale(1.08), box-shadow with accent glow, background gradient with accent color, and hide the ::before bar. Each theme should have slightly different treatment matching its design aesthetic.",
+    "6. Fix the adzan overlay (#adzanOverlay in index.html) text clipping: The inner content div uses fixed large font sizes (text-5xl, text-4xl, 8rem) that overflow vertically when imam info is shown. Fix by: (a) change the inner container from having no overflow control to having overflow-y:auto and max-height:100vh with proper padding, (b) reduce the fixed font sizes to use clamp() or vh-based units that scale down, (c) ensure the entire overlay content fits within viewport even with imam + khatib + quran card showing. Specifically change the container div inside #adzanOverlay from 'relative text-center text-white' to include max-h-[100vh] overflow-y-auto py-6 and reduce ovPrayer from text-5xl to text-[clamp(1.5rem,5vh,3rem)], ovMsg from text-5xl to text-[clamp(1.2rem,4vh,2.5rem)], ovCount from font-size:8rem to font-size:clamp(3rem,12vh,8rem), ovSub from text-3xl to text-[clamp(1rem,3vh,1.8rem)], and imam name/label elements to use responsive sizes."
+  ],
+  "acceptance_criteria": [
+    "cinema template slideshow section no longer has hardcoded background:rgba(15,23,42,0.85)",
+    "gallery/studio/memory photo frame containers no longer have hardcoded dark rgba backgrounds",
+    "screen.css has .layout-fullphoto13 .prayer.next, .layout-fullphoto15 .prayer.next, .layout-fullphoto16 .prayer.next, .layout-fullphoto17 .prayer.next, .layout-fullphoto19 .prayer.next rules with glow/scale effects and ::before { display: none }",
+    "Adzan overlay inner content uses responsive font sizing with clamp() that prevents text from being cut off when imam schedule is displayed",
+    "./gradlew assembleDebug succeeds"
+  ],
+  "verification": [
+    "Run ./gradlew assembleDebug and confirm build success",
+    "grep for 'rgba(15,23,42,0.85)' in the cinema section and confirm it is gone",
+    "grep for '.layout-fullphoto13 .prayer.next' in screen.css and confirm it exists with glow styling"
+  ],
+  "blocked_reason": null,
+  "findings": "Build requires JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2 and ANDROID_HOME=/opt/android-sdk. All 3 parts implemented successfully: photo frame opacity fix on 4 themes, prayer highlight CSS for 5 fullphoto themes, and adzan overlay responsive text sizing."
+}
