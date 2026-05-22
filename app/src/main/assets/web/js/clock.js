@@ -1369,25 +1369,32 @@
 
         if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
 
-        // Pre-measure: set full text to compute auto-fit font sizes
+        // Pre-measure: set ALL text (including ref) to compute full card size
         arabEl.textContent = ayat.arab;
         transEl.textContent = ayat.trans;
+        refEl.textContent = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
         arabEl.style.fontSize = '';
         transEl.style.fontSize = '';
+        arabEl.style.minHeight = '';
+        transEl.style.minHeight = '';
         autoFitToTwoLines(arabEl, 14);
         autoFitToTwoLines(transEl, 10);
         var arabFontSize = arabEl.style.fontSize || '';
         var transFontSize = transEl.style.fontSize || '';
 
-        // Lock element heights to prevent layout shift during typewriter.
-        // Measure at full-text size so the card stays static at its largest.
-        var arabHeight = arabEl.getBoundingClientRect().height;
-        var transHeight = transEl.getBoundingClientRect().height;
-        arabEl.style.minHeight = arabHeight + 'px';
-        transEl.style.minHeight = transHeight + 'px';
+        // Lock the ENTIRE card container height so nothing shifts
+        var cardEl = arabEl.closest('.q-card');
+        if (cardEl) {
+            cardEl.style.minHeight = cardEl.getBoundingClientRect().height + 'px';
+        }
 
-        // Reserve quran space NOW while card is at full measured size,
-        // before clearing text for typewriter animation.
+        // Also lock individual element heights for safety
+        arabEl.style.minHeight = arabEl.getBoundingClientRect().height + 'px';
+        transEl.style.minHeight = transEl.getBoundingClientRect().height + 'px';
+        refEl.style.minHeight = refEl.getBoundingClientRect().height + 'px';
+
+        // Reserve quran space NOW while card is at FULL measured size
+        // (includes arab + trans + ref heights)
         reserveQuranSpace(document.getElementById('quranBar'));
 
         // Clear and start typewriter with the pre-computed sizes
