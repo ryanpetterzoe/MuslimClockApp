@@ -844,7 +844,7 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-/* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas / memory) ===================== */
+/* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas) ===================== */
 
 /* Shared base for the prayer-row cards in photo layouts. Each layout has
  * its own .*-card class that picks distinct colours / borders. */
@@ -901,19 +901,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     color: var(--accent) !important;
 }
 
-.layout-memory .mem-card {
-    background: rgba(251,191,36,0.06);
-    border: 1px solid rgba(251,191,36,0.25);
-    border-radius: 10px;
-    transition: background .3s ease, border-color .3s ease, transform .3s ease;
-}
-.layout-memory .prayer.next .mem-card,
-.layout-memory .mem-card.next {
-    background: linear-gradient(180deg, rgba(251,191,36,0.22), rgba(180,83,9,0.12));
-    border-color: #fbbf24;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px -8px rgba(251,191,36,0.55);
-}
 
 /* ===================== BIG-SCHEDULE LAYOUTS (bigboard / pulpit / bulletin / tower / beacon) ===================== */
 
@@ -1003,7 +990,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-journal .prayer.next::before,
 .layout-studio .prayer.next::before,
 .layout-canvas .prayer.next::before,
-.layout-memory .prayer.next::before,
 .layout-bigboard .prayer.next::before,
 .layout-pulpit .prayer.next::before,
 .layout-bulletin .prayer.next::before,
@@ -1019,8 +1005,7 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-gallery .slideshow-host,
 .layout-journal .slideshow-host,
 .layout-studio  .slideshow-host,
-.layout-canvas  .slideshow-host,
-.layout-memory  .slideshow-host {
+.layout-canvas  .slideshow-host {
     inset: 0;
 }
 
@@ -1949,18 +1934,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     transition: all 0.3s ease;
 }
 
-/* Exhibit — gradient background + subtle border */
-.layout-exhibit .prayer.next::before { display: none; }
-.layout-exhibit .prayer.next {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent) !important;
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-    border-radius: 8px;
-    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent);
-    transform: scale(1.03);
-    transition: all 0.3s ease;
-}
-.layout-exhibit .prayer.next [data-time] { color: var(--accent) !important; }
-
 /* Pavilion — gradient background + border accent */
 .layout-pavilion .prayer.next::before { display: none; }
 .layout-pavilion .prayer.next {
@@ -1973,18 +1946,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 .layout-pavilion .prayer.next [data-time] { color: var(--accent) !important; }
 
-/* Shrine — glow + scale */
-.layout-shrine .prayer.next::before { display: none; }
-.layout-shrine .prayer.next {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent) !important;
-    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent),
-                inset 0 0 8px color-mix(in srgb, var(--accent) 8%, transparent);
-    border-radius: 8px;
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-}
-.layout-shrine .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
-
 /* Atrium — soft glow + scale */
 .layout-atrium .prayer.next::before { display: none; }
 .layout-atrium .prayer.next {
@@ -1996,18 +1957,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     transition: all 0.3s ease;
 }
 .layout-atrium .prayer.next [data-time] { color: var(--accent) !important; }
-
-/* Sanctuary — accent shadow + scale */
-.layout-sanctuary .prayer.next::before { display: none; }
-.layout-sanctuary .prayer.next {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent) !important;
-    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
-                0 4px 12px rgba(0,0,0,0.2);
-    border-radius: 8px;
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-}
-.layout-sanctuary .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
 
 /* Terrace — glow + subtle lift */
 .layout-terrace .prayer.next::before { display: none; }
@@ -2088,4 +2037,63 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .prayer .digit-cell {
     overflow-y: visible !important;
 }
+
+/* ===================== LUMINA / PRISM / FOLIO / SPIRE / GAZETTE prayer highlights ===================== */
+
+/* Lumina - frosted glow */
+.layout-lumina .prayer.next::before { display: none; }
+.layout-lumina .prayer.next {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 40%, transparent),
+                0 0 40px color-mix(in srgb, var(--accent) 15%, transparent);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+.layout-lumina .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+
+/* Prism - glass edge glow */
+.layout-prism .prayer.next::before { display: none; }
+.layout-prism .prayer.next {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 6%, transparent)) !important;
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent) !important;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
+                inset 0 0 12px color-mix(in srgb, var(--accent) 8%, transparent);
+    transform: scale(1.06);
+    transition: all 0.3s ease;
+}
+.layout-prism .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+
+/* Folio - flat accent block */
+.layout-folio .prayer.next::before { display: none; }
+.layout-folio .prayer.next {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 30%, transparent),
+                inset 0 -2px 0 var(--accent);
+    transform: scale(1.04);
+    transition: all 0.3s ease;
+}
+.layout-folio .prayer.next [data-time] { color: var(--accent) !important; }
+
+/* Spire - vertical glow card */
+.layout-spire .prayer.next::before { display: none; }
+.layout-spire .prayer.next {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent)) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 40%, transparent),
+                0 4px 16px rgba(0,0,0,0.3);
+    transform: scale(1.06);
+    transition: all 0.3s ease;
+}
+.layout-spire .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+
+/* Gazette - accent underline glow */
+.layout-gazette .prayer.next::before { display: none; }
+.layout-gazette .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent) !important;
+    box-shadow: 0 3px 0 var(--accent),
+                0 6px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+    transition: all 0.3s ease;
+}
+.layout-gazette .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 4px var(--accent); }
 
