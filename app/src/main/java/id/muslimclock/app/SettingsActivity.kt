@@ -123,6 +123,8 @@ class SettingsActivity : AppCompatActivity() {
             )
 
             val inflater = LayoutInflater.from(requireContext())
+            val density = resources.displayMetrics.density
+            val margin = (12 * density).toInt()
             for ((index, item) in items.withIndex()) {
                 val card = inflater.inflate(R.layout.item_settings_card, grid, false) as LinearLayout
                 card.findViewById<ImageView>(R.id.card_icon).setImageResource(item.iconRes)
@@ -134,7 +136,7 @@ class SettingsActivity : AppCompatActivity() {
                     height = GridLayout.LayoutParams.WRAP_CONTENT
                     columnSpec = GridLayout.spec(index % 3, 1f)
                     rowSpec = GridLayout.spec(index / 3)
-                    setMargins(8, 8, 8, 8)
+                    setMargins(margin, margin, margin, margin)
                 }
                 grid.addView(card, params)
             }
@@ -188,14 +190,14 @@ class SettingsActivity : AppCompatActivity() {
                 .setTitle(R.string.clear_logo_title)
                 .setMessage(R.string.clear_logo_message)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    LogoStorage.clear(ctx)
+                    val removed = LogoStorage.clear(ctx)
                     val pref = findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)
                     if (pref != null && LogoStorage.isLocalLogoUrl(pref.text)) {
                         pref.text = ""
                     }
                     Toast.makeText(
                         ctx,
-                        if (LogoStorage.clear(ctx)) R.string.logo_cleared
+                        if (removed) R.string.logo_cleared
                         else R.string.logo_nothing_to_clear,
                         Toast.LENGTH_SHORT
                     ).show()
