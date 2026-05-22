@@ -2,7 +2,7 @@
   "id": "FEAT-002",
   "type": "feat",
   "description": "Create 8 new unique templates for themes that currently fall back to cinema (oasis, arch, courtyard, panorama, fullphoto4, fullphoto5, fullphoto12, fullphoto18) and add them to SUPPORTED_LAYOUTS",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "1. Add 'oasis', 'arch', 'courtyard', 'panorama', 'fullphoto4', 'fullphoto5', 'fullphoto12', 'fullphoto18' to the SUPPORTED_LAYOUTS array in clock.js (around line 121-146). Place oasis/arch/courtyard/panorama after 'terrace' in the photo-frame section, and fullphoto4/5/12/18 in the fullphoto section.",
     "2. Create <template id='layout-oasis'> in index.html: Warm desert theme with gold/teal accents. Timeline-style prayer layout at bottom. Full-width photo strip at bottom third. Use gradient background from warm sand (#1a1508) to dark. Prayer cards as horizontal timeline dots with connecting line. Large centered clock. Slideshow-host in bottom section.",
@@ -32,5 +32,5 @@
     "grep for all 8 names in SUPPORTED_LAYOUTS section of clock.js"
   ],
   "blocked_reason": null,
-  "findings": "Partial implementation: oasis, arch, courtyard, panorama, fullphoto4, and fullphoto5 templates added to index.html, SUPPORTED_LAYOUTS in clock.js, and next-state CSS in screen.css. Build passes. JAVA_HOME needed to be set to /opt/toolchains/.local/share/mise/installs/java/17.0.2. Remaining templates (fullphoto12, fullphoto18) still need to be created."
+  "findings": "All 8 templates (oasis, arch, courtyard, panorama, fullphoto4, fullphoto5, fullphoto12, fullphoto18) implemented and verified. All added to SUPPORTED_LAYOUTS in clock.js, templates in index.html, and next-state CSS in screen.css. Build passes with JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2."
 }
