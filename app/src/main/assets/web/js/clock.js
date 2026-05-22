@@ -38,8 +38,8 @@
         adzan_audio_loops: 1,
         show_analog: true,
         show_countdown: true,
-        layout: 'minimal',
-        digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave
+        layout: 'cinema',
+        digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave | stencil | glitch | emboss | pixel | brush
         hide_seconds: false,        // hide seconds display on digital clock
         analog_style: 'classic',    // classic | modern | minimal | roman | arabic | dots | skeleton | luxury | sport | radar
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
@@ -48,7 +48,7 @@
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
-        ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
+        ticker_style: 'classic', // classic | bounce | fade | neon | typewriter | slide | glow | karaoke | gradient_text | zoom
         ticker_bg: 'solid_dark', // solid_dark | transparent | glass | accent | gradient_sunset | gradient_ocean | gradient_purple | green_islamic | red_dark
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
@@ -88,6 +88,9 @@
         logo_size: 100,
         identity_size: 100,
         identity_position: 'left',
+        identity_x_pct: 0,
+        identity_y_pct: 0,
+        logo_position: 'right',
         date_position: 'auto',
     };
 
@@ -116,33 +119,35 @@
     };
 
     const SUPPORTED_LAYOUTS = [
-        'minimal', 'mosque', 'cinema', 'neon', 'classic',
-        'aurora', 'frame',
+        'cinema', 'classic',
         'theater', 'showcase', 'polaroid',
         'window', 'festival',
         'galaxy', 'geometric', 'marble', 'sunset',
-        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
-        'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
-        'celestial', 'rumi', 'andalusia', 'medina', 'batik',
+        'glass', 'newspaper', 'heritage', 'mono',
+        'arabesque', 'royal', 'jade',
         // Photo-frame themes (foto + jam besar + jadwal horizontal)
-        'gallery', 'journal', 'studio', 'memory',
+        'gallery', 'studio',
         // Big-schedule themes (kartu jadwal sholat besar/jelas)
-        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
+        'bigboard', 'pulpit', 'tower', 'beacon',
         // Vertical prayer-card themes (jadwal sholat tersusun tegak)
         'vertical', 'pillar', 'stack', 'rack', 'column',
         // Ornament-rich themes (Islamic visual languages)
-        'mihrab', 'lantern', 'mosaic', 'crescent',
-        'persian', 'mecca', 'marrakesh', 'jannah',
+        'lantern',
         // Special themed layouts with custom assets
         'special1', 'special3',
         // Photo-frame + centered-logo themes
-        'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
-        'sanctuary', 'terrace',
+        'pavilion', 'atrium', 'minaret',
+        'terrace',
+        'arch', 'courtyard',
         // Full-background-photo layouts (slideshow as full BG)
-        'fullphoto1', 'fullphoto2', 'fullphoto3',
-        'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',
-        'fullphoto11', 'fullphoto13', 'fullphoto14', 'fullphoto15',
-        'fullphoto16', 'fullphoto17', 'fullphoto19', 'fullphoto20'
+        'fullphoto1', 'fullphoto2', 'fullphoto3', 'fullphoto4', 'fullphoto5',
+        'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',
+        'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto15',
+        'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20',
+        // Glass/modern themes
+        'lumina', 'prism', 'folio', 'spire', 'gazette',
+        // Flat design themes (solid colors, no gradients/shadows/blur)
+        'flat1', 'flat2', 'flat3', 'flat4', 'flat5'
     ];
 
     /* ===== State (mutable) ===== */
@@ -177,7 +182,7 @@
     function mountLayout(name) {
         const host = $('#layoutHost');
         if (!host) return false;
-        const safe = SUPPORTED_LAYOUTS.includes(name) ? name : 'minimal';
+        const safe = SUPPORTED_LAYOUTS.includes(name) ? name : 'cinema';
         const tmpl = document.getElementById('layout-' + safe);
         if (!tmpl) {
             console.warn('Layout template missing:', safe);
@@ -267,6 +272,13 @@
             document.documentElement.style.setProperty('--accent', cfg.theme_accent);
             document.documentElement.style.setProperty(
                 '--accent-shadow', `color-mix(in srgb, ${cfg.theme_accent} 40%, transparent)`);
+            // Compute accent contrast color based on luminance
+            const accentHex = cfg.theme_accent || '#F5B301';
+            const rr = parseInt(accentHex.slice(1,3), 16) || 0;
+            const gg = parseInt(accentHex.slice(3,5), 16) || 0;
+            const bb = parseInt(accentHex.slice(5,7), 16) || 0;
+            const lum = (0.299 * rr + 0.587 * gg + 0.114 * bb) / 255;
+            document.documentElement.style.setProperty('--accent-contrast', lum > 0.6 ? '#101820' : '#ffffff');
         }
 
         // Slideshow visual intensity. The user picks 0..100% in Settings;
@@ -361,6 +373,28 @@
             const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
             box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
             box.style.transformOrigin = 'center center';
+        }
+
+        // Logo position — controls whether the logo appears to the right
+        // of the identity text ("right", default) or above it ("top").
+        // We achieve this by setting flex-direction on the logo's parent
+        // container (which typically holds logo + name/address as siblings).
+        if (box) {
+            const logoPos = cfg.logo_position || 'right';
+            const identParent = box.parentElement;
+            if (identParent && identParent.tagName !== 'HEADER') {
+                if (logoPos === 'top') {
+                    identParent.style.flexDirection = 'column';
+                    identParent.style.alignItems = identParent.style.alignItems || 'flex-start';
+                    // Move logo before text siblings by reinserting as first child
+                    if (box !== identParent.firstElementChild) {
+                        identParent.insertBefore(box, identParent.firstElementChild);
+                    }
+                } else {
+                    // "right" — default row layout, logo after text
+                    identParent.style.flexDirection = '';
+                }
+            }
         }
 
         // Identity text size — scale #masjidName and #masjidAddress font-size.
@@ -929,6 +963,31 @@
                     content.style.animationName = 'ticker';
                     content.style.animationTimingFunction = 'linear';
                     break;
+                case 'slide':
+                    content.style.animationName = 'tickerSlide';
+                    content.style.animationTimingFunction = 'ease';
+                    content.style.paddingLeft = '0';
+                    break;
+                case 'glow':
+                    content.classList.add('ticker-glow');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'karaoke':
+                    content.classList.add('ticker-karaoke');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'gradient_text':
+                    content.classList.add('ticker-gradient');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'zoom':
+                    content.style.animationName = 'tickerZoom';
+                    content.style.animationTimingFunction = 'ease-in-out';
+                    content.style.paddingLeft = '0';
+                    break;
             }
         }
     }
@@ -966,7 +1025,7 @@
     let quranIdx = Math.floor(Math.random() * QURAN_AYAT.length);
     let quranBuilt = '';        // last-built mode signature
 
-    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee', 'fade', 'flip', 'glow', 'minimalcard', 'scroll'];
+    const QURAN_MODES = ['fullcard', 'card', 'typewriter', 'slide', 'marquee', 'fade', 'flip', 'glow', 'minimalcard', 'scroll', 'accentcard', 'cleancard'];
 
     function clearQuranTimers() {
         if (quranTimer)       { clearInterval(quranTimer);     quranTimer = null; }
@@ -1087,6 +1146,8 @@
             case 'glow':       renderGlow(ayat);       break;
             case 'minimalcard':renderMinimalCard(ayat); break;
             case 'scroll':     renderScroll(ayat);     break;
+            case 'accentcard': renderAccentCard(ayat); break;
+            case 'cleancard':  renderCleanCard(ayat);  break;
             case 'card':
             default:           renderCard(ayat);       break;
         }
@@ -1300,6 +1361,53 @@
         reserveQuranSpace(document.getElementById('quranBar'));
     }
 
+    function renderAccentCard(ayat) {
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        const refEl   = document.querySelector('#quranBar .q-ref');
+        if (!arabEl || !transEl || !refEl) return;
+
+        if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
+
+        arabEl.innerHTML  = '<span class="quran-cursor">|</span>';
+        transEl.innerHTML = '';
+        refEl.textContent = '';
+
+        const arabChars  = Array.from(ayat.arab);
+        const transChars = Array.from(ayat.trans);
+        const refText    = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
+
+        const intervalMs = Math.max(10, parseInt(state.cfg.quran_interval, 10) || 30) * 1000;
+        const totalChars = arabChars.length + transChars.length + refText.length;
+        const charDelay  = Math.max(15, Math.min(60, Math.floor(intervalMs * 0.6 / totalChars)));
+
+        let phase = 0, idx = 0;
+        let arabBuf = '', transBuf = '';
+        quranTypingTimer = setInterval(() => {
+            if (phase === 0) {
+                if (idx < arabChars.length) {
+                    arabBuf += arabChars[idx++];
+                    arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
+                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; transEl.innerHTML = '<span class="quran-cursor">|</span>'; }
+            } else if (phase === 1) {
+                if (idx < transChars.length) {
+                    transBuf += transChars[idx++];
+                    transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
+                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; }
+            } else if (phase === 2) {
+                if (idx < refText.length) {
+                    refEl.textContent = refText.slice(0, ++idx);
+                } else { phase = 3; clearInterval(quranTypingTimer); quranTypingTimer = null; }
+            }
+        }, charDelay);
+
+        reserveQuranSpace(document.getElementById('quranBar'));
+    }
+
+    function renderCleanCard(ayat) {
+        renderAccentCard(ayat);
+    }
+
     /* ===== Layout editor =====
      *
      * Lets the user resize and translate each major UI element (analog
@@ -1388,6 +1496,22 @@
             apply(uniqueDateSelector(dateWrap),
                   cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
                   'top right');
+        }
+
+        // Identity header block — translate the entire header (logo +
+        // name + address) using identity_x_pct / identity_y_pct. The
+        // identity_size scaling is handled separately in applyConfigToDom
+        // (per-text element), so here we only apply the translate offset.
+        const identityHeader = (function () {
+            const el = document.getElementById('logoBox') || document.getElementById('masjidName');
+            return el ? el.closest('header') : null;
+        })();
+        if (identityHeader) {
+            const ix = Math.max(-50, Math.min(50, parseInt(cfg.identity_x_pct, 10) || 0));
+            const iy = Math.max(-50, Math.min(50, parseInt(cfg.identity_y_pct, 10) || 0));
+            const isDefault = ix === 0 && iy === 0;
+            identityHeader.style.transform = isDefault ? '' : `translate(${ix}vw, ${iy}vh)`;
+            identityHeader.style.willChange = isDefault ? '' : 'transform';
         }
 
         // After all transforms are applied, schedule a collision check
@@ -2280,7 +2404,7 @@
 
     /* ===== Digital clock + date ===== */
 
-    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone', 'matrix', 'retro', 'minimal', 'gradient', 'outline', 'shadow', 'lcd', 'binary', 'dots', 'wave'];
+    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone', 'matrix', 'retro', 'minimal', 'gradient', 'outline', 'shadow', 'lcd', 'binary', 'dots', 'wave', 'stencil', 'glitch', 'emboss', 'pixel', 'brush'];
 
     function tickDigital() {
         const now = new Date();
@@ -2413,6 +2537,40 @@
                 }
                 waveHtml += '</span>';
                 return waveHtml;
+
+            case 'stencil':
+                // Stencil/cutout style with inner gaps
+                return `<span class="digi-stencil">${pad(h)}</span>` +
+                    `<span class="digi-stencil-sep">:</span>` +
+                    `<span class="digi-stencil">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-stencil-sep">:</span><span class="digi-stencil" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'glitch':
+                // Glitch/distortion effect
+                return `<span class="digi-glitch" data-text="${pad(h)}:${pad(m)}${hideSeconds ? '' : ':' + pad(s)}">${pad(h)}<span class="digi-glitch-sep">:</span>${pad(m)}${hideSeconds ? '' : `<span class="digi-glitch-sep">:</span><span style="font-size:0.6em;">${pad(s)}</span>`}</span>`;
+
+            case 'emboss':
+                // Embossed/raised 3D effect
+                return `<span class="digi-emboss">${pad(h)}</span>` +
+                    `<span class="digi-emboss-sep">:</span>` +
+                    `<span class="digi-emboss">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-emboss-sep">:</span><span class="digi-emboss" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'pixel':
+                // Pixel/8-bit style
+                return `<span class="digi-pixel-wrap">` +
+                    `<span class="digi-pixel">${pad(h)}</span>` +
+                    `<span class="digi-pixel-sep">:</span>` +
+                    `<span class="digi-pixel">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-pixel-sep">:</span><span class="digi-pixel" style="font-size:0.65em;">${pad(s)}</span>`) +
+                    `</span>`;
+
+            case 'brush':
+                // Brush/handwritten style
+                return `<span class="digi-brush">${pad(h)}</span>` +
+                    `<span class="digi-brush-sep">:</span>` +
+                    `<span class="digi-brush">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-brush-sep">:</span><span class="digi-brush" style="font-size:0.6em;">${pad(s)}</span>`);
 
             case 'classic':
             default:

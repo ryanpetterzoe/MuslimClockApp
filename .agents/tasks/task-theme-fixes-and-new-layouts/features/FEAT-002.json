@@ -1,0 +1,36 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Create 8 new unique templates for themes that currently fall back to cinema (oasis, arch, courtyard, panorama, fullphoto4, fullphoto5, fullphoto12, fullphoto18) and add them to SUPPORTED_LAYOUTS",
+  "status": "completed",
+  "steps": [
+    "1. Add 'oasis', 'arch', 'courtyard', 'panorama', 'fullphoto4', 'fullphoto5', 'fullphoto12', 'fullphoto18' to the SUPPORTED_LAYOUTS array in clock.js (around line 121-146). Place oasis/arch/courtyard/panorama after 'terrace' in the photo-frame section, and fullphoto4/5/12/18 in the fullphoto section.",
+    "2. Create <template id='layout-oasis'> in index.html: Warm desert theme with gold/teal accents. Timeline-style prayer layout at bottom. Full-width photo strip at bottom third. Use gradient background from warm sand (#1a1508) to dark. Prayer cards as horizontal timeline dots with connecting line. Large centered clock. Slideshow-host in bottom section.",
+    "3. Create <template id='layout-arch'> in index.html: Elegant arched frames with curves. Photo displayed inside an arch-shaped (border-radius: 50% 50% 0 0) container. Prayer cards in rounded arch-shaped pills. Rich jewel-tone palette with accent colors.",
+    "4. Create <template id='layout-courtyard'> in index.html: Garden/courtyard feel with 3-column grid. Green/nature accents (#0a4a2a palette). Prayer cards as leaf-shaped or garden-tile styled elements. Middle column has clock, left column has mosque identity, right column has prayer times.",
+    "5. Create <template id='layout-panorama'> in index.html: Wide panoramic photo strip (height ~35% viewport) with gradient overlay at top. Large clock above the panoramic strip. Prayer cards below in a minimal horizontal strip. Use cinematic wide feel.",
+    "6. Create <template id='layout-fullphoto4'> in index.html: Full background photo with dome/arch shaped prayer card overlay. Prayer cards arranged in a dome/arch arc pattern (using translateY transforms to create a dome shape). Glass morphism background on cards. Slideshow-host as full background.",
+    "7. Create <template id='layout-fullphoto5'> in index.html: Full background photo with calligraphy-inspired floating prayer cards. Cards styled with decorative left borders, varying sizes, slight rotations to look like handwritten labels. Use elegant serif feel.",
+    "8. Create <template id='layout-fullphoto12'> in index.html: Full background photo with glass sidebar for prayers. Left or right sidebar (width ~280px) with glass/blur effect containing vertically stacked prayer cards. Main area shows clock centered over the full photo background.",
+    "9. Create <template id='layout-fullphoto18'> in index.html: Full background photo with mosaic grid prayer cards. Prayer cards arranged in an asymmetric grid (2 larger cards, 4 smaller ones) with varied sizes to create a mosaic/masonry feel. Glass effect on cards.",
+    "10. Add corresponding .prayer.next styles for all 8 new themes in screen.css with glow/accent effects (not plain yellow borders). Use varying visual treatments per theme: scale, gradient, shadow, border-glow.",
+    "11. IMPORTANT: Every template must include ALL required IDs and elements: id='digital' (with font-digital class), id='nextPill' containing id='nextLabel' and id='nextCountdown', id='analogWrap' with child having data-analog attribute, id='greg-date', id='hij-date', id='masjidPrefix', id='masjidName', id='masjidAddress', id='logoBox'. Prayer cards: 6x .prayer divs with data-key='fajr/sunrise/dhuhr/asr/maghrib/isha' each containing a child with data-time attribute. The dhuhr label should have id='dhuhrLabel'."
+  ],
+  "acceptance_criteria": [
+    "All 8 theme keys are in SUPPORTED_LAYOUTS in clock.js",
+    "All 8 templates exist in index.html with correct id='layout-{name}' format",
+    "Each template has all required IDs: digital, nextPill, nextLabel, nextCountdown, analogWrap, data-analog, greg-date, hij-date, masjidPrefix, masjidName, masjidAddress, logoBox",
+    "Each template has 6 .prayer divs with correct data-key attributes and data-time children",
+    "Each template has a .slideshow-host div",
+    "screen.css has .prayer.next rules for all 8 new themes with glow/scale effects",
+    "Prayer cards are NOT monotone - they use gradients, varied sizes, glow effects, or accent colors",
+    "./gradlew assembleDebug succeeds"
+  ],
+  "verification": [
+    "Run ./gradlew assembleDebug and confirm build success",
+    "grep -c 'layout-oasis\\|layout-arch\\|layout-courtyard\\|layout-panorama\\|layout-fullphoto4\\|layout-fullphoto5\\|layout-fullphoto12\\|layout-fullphoto18' index.html should return 8",
+    "grep for all 8 names in SUPPORTED_LAYOUTS section of clock.js"
+  ],
+  "blocked_reason": null,
+  "findings": "All 8 templates (oasis, arch, courtyard, panorama, fullphoto4, fullphoto5, fullphoto12, fullphoto18) implemented and verified. All added to SUPPORTED_LAYOUTS in clock.js, templates in index.html, and next-state CSS in screen.css. Build passes with JAVA_HOME=/opt/toolchains/.local/share/mise/installs/java/17.0.2."
+}

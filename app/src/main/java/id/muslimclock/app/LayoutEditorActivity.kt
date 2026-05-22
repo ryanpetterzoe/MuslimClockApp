@@ -12,9 +12,13 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
+import android.widget.Spinner
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -59,9 +63,7 @@ class LayoutEditorActivity : AppCompatActivity() {
         EditableElement("Menuju Sholat", Settings.K_NEXT_SIZE, Settings.K_NEXT_X_PCT, Settings.K_NEXT_Y_PCT),
         EditableElement("Tanggal", Settings.K_DATE_SIZE, Settings.K_DATE_X_PCT, Settings.K_DATE_Y_PCT),
         EditableElement("Qur'an", Settings.K_QURAN_SIZE, Settings.K_QURAN_X_PCT, Settings.K_QURAN_Y_PCT),
-        EditableElement("Logo", Settings.K_LOGO_SIZE, "logo_x_pct", "logo_y_pct",
-            sizeMin = 50, sizeMax = 200),
-        EditableElement("Identitas", Settings.K_IDENTITY_SIZE, "identity_x_pct", "identity_y_pct",
+        EditableElement("Identitas", Settings.K_IDENTITY_SIZE, Settings.K_IDENTITY_X_PCT, Settings.K_IDENTITY_Y_PCT,
             sizeMin = 50, sizeMax = 200),
     )
 
@@ -70,6 +72,10 @@ class LayoutEditorActivity : AppCompatActivity() {
 
     // Local working copy of layout values (written to SharedPreferences on Done)
     private val workingValues = mutableMapOf<String, Int>()
+    // Local working copy of string-type settings (dropdowns)
+    private val workingStrings = mutableMapOf<String, String>()
+    // Local working copy of boolean-type settings (toggles/switches)
+    private val workingBooleans = mutableMapOf<String, Boolean>()
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,8 +137,10 @@ class LayoutEditorActivity : AppCompatActivity() {
 
     private fun loadWorkingValues() {
         val p = Settings.prefs(this)
-        // Load all layout editor keys
-        val allKeys = elements.flatMap { listOf(it.sizeKey, it.xKey, it.yKey) }.distinct()
+        // Load all layout editor int keys
+        val allKeys = elements.flatMap { listOf(it.sizeKey, it.xKey, it.yKey) }.distinct().toMutableList()
+        // Also load logo_size since it appears in the Identitas tab
+        allKeys.add(Settings.K_LOGO_SIZE)
         for (key in allKeys) {
             val default = if (key.endsWith("_size")) 100 else 0
             workingValues[key] = try {
@@ -141,6 +149,13 @@ class LayoutEditorActivity : AppCompatActivity() {
                 default
             }
         }
+        // Load string-type settings for dropdowns
+        workingStrings[Settings.K_DIGITAL_STYLE] = p.getString(Settings.K_DIGITAL_STYLE, "classic") ?: "classic"
+        workingStrings[Settings.K_IDENTITY_POSITION] = p.getString(Settings.K_IDENTITY_POSITION, "left") ?: "left"
+        workingStrings[Settings.K_LOGO_POSITION] = p.getString(Settings.K_LOGO_POSITION, "right") ?: "right"
+        workingStrings[Settings.K_QURAN_MODE] = p.getString(Settings.K_QURAN_MODE, "fullcard") ?: "fullcard"
+        // Load boolean-type settings
+        workingBooleans[Settings.K_HIDE_SECONDS] = p.getBoolean(Settings.K_HIDE_SECONDS, false)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -212,8 +227,16 @@ class LayoutEditorActivity : AppCompatActivity() {
         // Start with the real saved config
         val baseJson = Settings.toJson(this)
         val json = JSONObject(baseJson)
-        // Override layout keys with working values
+        // Override layout keys with working int values
         for ((key, value) in workingValues) {
+            json.put(key, value)
+        }
+        // Override layout keys with working string values
+        for ((key, value) in workingStrings) {
+            json.put(key, value)
+        }
+        // Override layout keys with working boolean values
+        for ((key, value) in workingBooleans) {
             json.put(key, value)
         }
         return json.toString()
@@ -291,6 +314,37 @@ class LayoutEditorActivity : AppCompatActivity() {
         sliderContainer.removeAllViews()
         val elem = elements[idx]
 
+        // Special controls per element
+        when (elem.label) {
+            "Jam Digital" -> {
+                // Digital style dropdown at the top
+                val entries = resources.getStringArray(R.array.digital_style_entries)
+                val values = resources.getStringArray(R.array.digital_style_values)
+                addDropdown(
+                    label = getString(R.string.layout_editor_dropdown_digital_style),
+                    key = Settings.K_DIGITAL_STYLE,
+                    entries = entries,
+                    values = values
+                )
+                // Hide seconds toggle
+                addToggle(
+                    label = getString(R.string.layout_editor_hide_seconds),
+                    key = Settings.K_HIDE_SECONDS
+                )
+            }
+            "Qur'an" -> {
+                // Quran mode dropdown at the top
+                val entries = resources.getStringArray(R.array.quran_mode_entries)
+                val values = resources.getStringArray(R.array.quran_mode_values)
+                addDropdown(
+                    label = getString(R.string.layout_editor_dropdown_quran_mode),
+                    key = Settings.K_QURAN_MODE,
+                    entries = entries,
+                    values = values
+                )
+            }
+        }
+
         // Size slider
         addSlider(
             label = getString(R.string.layout_editor_size_label),
@@ -301,27 +355,141 @@ class LayoutEditorActivity : AppCompatActivity() {
             suffix = "%"
         )
 
-        // Only show X/Y sliders for elements that support positioning
-        // (Logo and Identity only have size control in the current codebase)
-        if (elem.xKey != "logo_x_pct" && elem.xKey != "identity_x_pct") {
+        // X/Y sliders for all elements
+        addSlider(
+            label = getString(R.string.layout_editor_x_label),
+            key = elem.xKey,
+            min = elem.offsetMin,
+            max = elem.offsetMax,
+            step = 1,
+            suffix = "%"
+        )
+
+        addSlider(
+            label = getString(R.string.layout_editor_y_label),
+            key = elem.yKey,
+            min = elem.offsetMin,
+            max = elem.offsetMax,
+            step = 1,
+            suffix = "%"
+        )
+
+        // Additional controls for Identitas tab
+        if (elem.label == "Identitas") {
+            // Identity position dropdown
+            val idPosEntries = resources.getStringArray(R.array.identity_position_entries)
+            val idPosValues = resources.getStringArray(R.array.identity_position_values)
+            addDropdown(
+                label = getString(R.string.layout_editor_dropdown_identity_position),
+                key = Settings.K_IDENTITY_POSITION,
+                entries = idPosEntries,
+                values = idPosValues
+            )
+
+            // Logo size slider
             addSlider(
-                label = getString(R.string.layout_editor_x_label),
-                key = elem.xKey,
-                min = elem.offsetMin,
-                max = elem.offsetMax,
-                step = 1,
+                label = getString(R.string.pref_logo_size),
+                key = Settings.K_LOGO_SIZE,
+                min = 50,
+                max = 200,
+                step = 5,
                 suffix = "%"
             )
 
-            addSlider(
-                label = getString(R.string.layout_editor_y_label),
-                key = elem.yKey,
-                min = elem.offsetMin,
-                max = elem.offsetMax,
-                step = 1,
-                suffix = "%"
+            // Logo position dropdown
+            val logoPosEntries = resources.getStringArray(R.array.logo_position_entries)
+            val logoPosValues = resources.getStringArray(R.array.logo_position_values)
+            addDropdown(
+                label = getString(R.string.layout_editor_dropdown_logo_position),
+                key = Settings.K_LOGO_POSITION,
+                entries = logoPosEntries,
+                values = logoPosValues
             )
         }
+    }
+
+    private fun addDropdown(label: String, key: String, entries: Array<String>, values: Array<String>) {
+        val currentValue = workingStrings[key] ?: ""
+
+        // Container
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 16)
+        }
+
+        // Label
+        val labelText = TextView(this).apply {
+            text = label
+            textSize = 14f
+            setTextColor(Color.parseColor("#ecf0f1"))
+            setPadding(0, 0, 0, 8)
+        }
+
+        // Spinner
+        val spinner = Spinner(this).apply {
+            isFocusable = true
+            isFocusableInTouchMode = true
+        }
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, entries)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        // Set current selection
+        val currentIdx = values.indexOf(currentValue)
+        if (currentIdx >= 0) {
+            spinner.setSelection(currentIdx)
+        }
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val newValue = values[position]
+                if (workingStrings[key] != newValue) {
+                    workingStrings[key] = newValue
+                    pushConfigToPreview()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        container.addView(labelText)
+        container.addView(spinner)
+        sliderContainer.addView(container)
+    }
+
+    @Suppress("UseSwitchCompatOrMaterialCode")
+    private fun addToggle(label: String, key: String) {
+        val currentValue = workingBooleans[key] ?: false
+
+        // Container
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 8, 0, 16)
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        // Label
+        val labelText = TextView(this).apply {
+            text = label
+            textSize = 14f
+            setTextColor(Color.parseColor("#ecf0f1"))
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+
+        // Switch
+        val switch = Switch(this).apply {
+            isChecked = currentValue
+            isFocusable = true
+            isFocusableInTouchMode = true
+            setOnCheckedChangeListener { _, isChecked ->
+                workingBooleans[key] = isChecked
+                pushConfigToPreview()
+            }
+        }
+
+        container.addView(labelText)
+        container.addView(switch)
+        sliderContainer.addView(container)
     }
 
     private fun addSlider(label: String, key: String, min: Int, max: Int, step: Int, suffix: String) {
@@ -393,11 +561,18 @@ class LayoutEditorActivity : AppCompatActivity() {
                 // Reset all working values to defaults
                 for (elem in elements) {
                     workingValues[elem.sizeKey] = 100
-                    if (elem.xKey != "logo_x_pct" && elem.xKey != "identity_x_pct") {
-                        workingValues[elem.xKey] = 0
-                        workingValues[elem.yKey] = 0
-                    }
+                    workingValues[elem.xKey] = 0
+                    workingValues[elem.yKey] = 0
                 }
+                // Reset logo size
+                workingValues[Settings.K_LOGO_SIZE] = 100
+                // Reset string settings to defaults
+                workingStrings[Settings.K_IDENTITY_POSITION] = "left"
+                workingStrings[Settings.K_LOGO_POSITION] = "right"
+                workingStrings[Settings.K_DIGITAL_STYLE] = "classic"
+                workingStrings[Settings.K_QURAN_MODE] = "fullcard"
+                // Reset boolean settings to defaults
+                workingBooleans[Settings.K_HIDE_SECONDS] = false
                 // Refresh sliders and preview
                 showSlidersForElement(selectedElementIdx)
                 pushConfigToPreview()
@@ -411,10 +586,15 @@ class LayoutEditorActivity : AppCompatActivity() {
         // Write all working values to SharedPreferences
         val editor = Settings.prefs(this).edit()
         for ((key, value) in workingValues) {
-            // Skip fake keys for logo/identity X/Y (they don't exist in Settings)
-            if (key == "logo_x_pct" || key == "logo_y_pct" ||
-                key == "identity_x_pct" || key == "identity_y_pct") continue
             editor.putInt(key, value)
+        }
+        // Save string-type settings
+        for ((key, value) in workingStrings) {
+            editor.putString(key, value)
+        }
+        // Save boolean-type settings
+        for ((key, value) in workingBooleans) {
+            editor.putBoolean(key, value)
         }
         editor.apply()
         Toast.makeText(this, R.string.layout_editor_saved, Toast.LENGTH_SHORT).show()

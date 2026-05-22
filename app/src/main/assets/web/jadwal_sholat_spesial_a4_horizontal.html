@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jadwal Sholat Spesial A4 - Horizontal</title>
+<script src="js/tailwind.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<script>
+window.MC_CONFIG = {
+    masjid_name: "Muslim Clock",
+    masjid_address: "Jakarta, Indonesia",
+    masjid_logo: "",
+    location_lat: -6.2,
+    location_lng: 106.816666,
+    timezone: "Asia/Jakarta",
+    calc_method: 20,
+    theme_primary: "#0a4ea3",
+    theme_accent: "#f5b301",
+    font_display: "Inter",
+    font_digital: "Orbitron",
+    adzan_message: "Saatnya Waktu Sholat",
+    adzan_duration: 600,
+    iqomah_duration: 600,
+    show_ticker: true,
+    ticker_text: "Selamat Datang di Masjid Muslim Clock",
+    ticker_speed: 30,
+    slideshow_urls: "",
+    slide_duration: 10,
+    show_imam: false,
+    imam_fajr: "", imam_dhuhr: "", imam_asr: "", imam_maghrib: "", imam_isha: "", imam_jumat: "", khatib_jumat: ""
+};
+</script>
+<style>
+:root {
+    --primary: #0a4ea3;
+    --accent: #f5b301;
+    --font-display: 'Inter', sans-serif;
+    --font-digital: 'Orbitron', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: var(--font-display);
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+.bg-cover-full {
+    position: fixed; inset: 0;
+    background: url('img/temaspesial/background.png') center/cover no-repeat;
+    z-index: 0;
+}
+.main-container {
+    position: fixed; inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    padding: 2vh 2vw;
+    padding-bottom: 40px;
+    gap: 2vw;
+}
+.geo-card {
+    background: rgba(5, 10, 25, 0.88);
+    border: 2px solid rgba(245, 179, 1, 0.5);
+    border-radius: 2px;
+    padding: 1rem 1.2rem;
+}
+.font-digital { font-family: var(--font-digital); }
+#digital {
+    font-size: clamp(2rem, 6vh, 4rem);
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(245, 179, 1, 0.4);
+}
+.prayer-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid var(--accent);
+}
+.prayer-table th {
+    background: rgba(245, 179, 1, 0.2);
+    color: var(--accent);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.7rem;
+    border-bottom: 2px solid var(--accent);
+    text-align: left;
+}
+.prayer-table td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(245, 179, 1, 0.2);
+    font-size: 0.85rem;
+}
+.prayer-table tr:nth-child(even) td {
+    background: rgba(245, 179, 1, 0.05);
+}
+.prayer-table tr:nth-child(odd) td {
+    background: rgba(5, 10, 25, 0.6);
+}
+.prayer-table .time-cell {
+    font-family: var(--font-digital);
+    font-weight: 700;
+    color: var(--accent);
+    text-align: right;
+}
+.left-panel {
+    flex: 0 0 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vh;
+}
+.center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vh;
+}
+.right-panel {
+    flex: 0 0 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.slideshow-wrapper {
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(245, 179, 1, 0.5);
+}
+.slideshow-wrapper img.slide {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+.slideshow-wrapper img.slide.active { opacity: 1; }
+.slideshow-wrapper img.frame-overlay {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 10;
+}
+@keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+.marquee { overflow: hidden; }
+.marquee-inner {
+    display: inline-block;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+    padding-left: 100%;
+}
+</style>
+</head>
+<body>
+<div class="bg-cover-full"></div>
+<div class="main-container">
+    <!-- Left Panel: Identity + Clock + Countdown -->
+    <div class="left-panel">
+        <!-- Identity -->
+        <div class="flex items-center justify-center gap-3">
+            <div id="logoBox" class="w-12 h-12 flex items-center justify-center" style="background: rgba(245,179,1,0.1); border: 2px solid var(--accent);">
+                <svg viewBox="0 0 24 24" class="w-7 h-7" fill="none"><text x="5" y="18" font-size="14" fill="var(--accent)" font-family="serif">&#9770;</text></svg>
+            </div>
+            <div class="text-center">
+                <div class="text-base font-black uppercase tracking-wider" style="color: var(--accent);"><span id="masjidPrefix">Masjid</span> <span id="masjidName">Muslim Clock</span></div>
+                <div class="text-xs opacity-80 tracking-wide" id="masjidAddress">Jakarta, Indonesia</div>
+            </div>
+        </div>
+
+        <!-- Clock -->
+        <div class="geo-card text-center w-full">
+            <div id="digital" class="font-digital">--:--:--</div>
+            <div class="flex items-center justify-center gap-3 mt-1 text-xs opacity-80">
+                <span id="greg-date">-</span>
+                <span>|</span>
+                <span id="hij-date">-</span>
+            </div>
+        </div>
+
+        <!-- Countdown -->
+        <div id="nextPill" class="geo-card flex items-center gap-3 px-4 py-2 w-full justify-center">
+            <span id="nextLabel" class="text-xs font-black uppercase tracking-widest" style="color:var(--accent);">Berikutnya</span>
+            <span id="nextCountdown" class="font-digital text-base font-bold">--:--:--</span>
+        </div>
+    </div>
+
+    <!-- Center Panel: Prayer Table -->
+    <div class="center-panel">
+        <div class="geo-card w-full p-0 overflow-hidden" style="padding:0;">
+            <table class="prayer-table">
+                <thead>
+                    <tr><th>Waktu Sholat</th><th class="text-right">Jam</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="prayer" data-key="fajr"><td>Subuh</td><td class="time-cell" data-time>--:--</td></tr>
+                    <tr class="prayer" data-key="sunrise"><td>Syuruq</td><td class="time-cell" data-time>--:--</td></tr>
+                    <tr class="prayer" data-key="dhuhr"><td>Dzuhur</td><td class="time-cell" data-time>--:--</td></tr>
+                    <tr class="prayer" data-key="asr"><td>Ashar</td><td class="time-cell" data-time>--:--</td></tr>
+                    <tr class="prayer" data-key="maghrib"><td>Maghrib</td><td class="time-cell" data-time>--:--</td></tr>
+                    <tr class="prayer" data-key="isha"><td>Isya</td><td class="time-cell" data-time>--:--</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Panel: Slideshow -->
+    <div class="right-panel">
+        <div class="slideshow-wrapper">
+            <div class="slideshow-container" id="slideshowContainer"></div>
+            <img src="img/temaspesial/frame.png" class="frame-overlay absolute inset-0 w-full h-full object-contain pointer-events-none z-10" alt="">
+        </div>
+    </div>
+</div>
+
+<!-- Ticker -->
+<div id="tickerBar" class="fixed bottom-0 left-0 right-0 z-30" style="display:none; background: rgba(5,10,25,0.92); border-top: 2px solid var(--accent);">
+    <div class="marquee w-full" style="padding:6px 0;">
+        <div class="marquee-inner text-sm font-bold tracking-wide uppercase" id="tickerContent" style="color:var(--accent);">
+            Selamat Datang di Masjid Muslim Clock
+        </div>
+    </div>
+</div>
+
+<!-- Adzan Overlay -->
+<div id="adzanOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(3,7,18,.96); backdrop-filter: blur(6px);">
+    <div class="absolute inset-0" style="background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--primary) 30%, transparent), transparent 60%), radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 60%);"></div>
+    <div class="relative text-center text-white max-h-screen overflow-y-auto py-4 px-4 w-full">
+        <div class="font-black tracking-[10px]" id="ovPrayer" style="color: var(--accent);font-size:clamp(1.5rem,5vh,3rem);">MAGHRIB</div>
+        <div class="font-extrabold mt-3 mb-4" id="ovMsg" style="font-size:clamp(1.2rem,4.5vh,2.8rem);">Saatnya Waktu Sholat</div>
+        <div id="ovImamBlock" class="mt-2 mb-6" style="display:none;">
+            <div class="tracking-[4px] uppercase font-semibold" style="font-size:clamp(0.9rem,2.5vh,1.25rem);color: color-mix(in srgb, var(--accent) 70%, white);" id="ovImamLabel">Imam</div>
+            <div class="font-bold mt-2" id="ovImamName" style="font-size:clamp(1.2rem,4vh,2.25rem);color:#fff;">-</div>
+            <div class="mt-3" id="ovKhatibLine" style="display:none;font-size:clamp(0.9rem,2.5vh,1.25rem);color: color-mix(in srgb, var(--accent) 70%, white);">
+                <span class="tracking-[4px] uppercase font-semibold">Khatib</span>
+                <span class="font-bold ml-3" style="color:#fff;" id="ovKhatibName">-</span>
+            </div>
+        </div>
+        <div class="font-digital font-black leading-none tabular-nums text-white" id="ovCount" style="font-size:clamp(3rem,12vh,8rem);">10:00</div>
+        <div class="mt-4 tracking-[6px] uppercase" id="ovSub" style="font-size:clamp(1rem,3vh,1.8rem);color: color-mix(in srgb, var(--accent) 80%, white);">Berlangsung</div>
+        <div id="ovContent" class="mt-4 max-w-4xl mx-auto px-6" style="display:none;">
+            <div id="ovQuranCard" style="display:none;">
+                <div class="leading-relaxed" id="ovQuranArab" style="font-size:clamp(1.5rem,4vh,2.25rem);font-family: 'Amiri', serif; direction: rtl;"></div>
+                <div class="mt-4 opacity-80" id="ovQuranTrans" style="font-size:clamp(0.9rem,2.5vh,1.25rem);"></div>
+                <div class="text-base mt-2 opacity-60" id="ovQuranRef"></div>
+            </div>
+            <div id="ovCustomText" class="text-3xl leading-relaxed" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    let cfg = {};
+    let times = {};
+    let adzanActive = false;
+    let iqomahActive = false;
+    let triggered = {};
+    let adzanTimer = null;
+    let iqomahTimer = null;
+    let slideIdx = 0;
+    let slideInterval = null;
+
+    const prayerNames = {fajr:'Subuh', sunrise:'Syuruq', dhuhr:'Dzuhur', asr:'Ashar', maghrib:'Maghrib', isha:'Isya'};
+    const prayerKeys = ['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+    const adzanKeys = ['fajr','dhuhr','asr','maghrib','isha'];
+
+    function init(){
+        let raw = null;
+        try { raw = window.MCAndroid && MCAndroid.getConfig(); } catch(e){}
+        if(raw){
+            try { cfg = JSON.parse(raw); } catch(e){ cfg = window.MC_CONFIG || {}; }
+        } else {
+            cfg = window.MC_CONFIG || {};
+        }
+        applyConfig(cfg);
+    }
+
+    window.applyConfig = function(c){
+        if(typeof c === 'string') { try { c = JSON.parse(c); } catch(e){ return; } }
+        cfg = c;
+        document.documentElement.style.setProperty('--primary', cfg.theme_primary || '#0a4ea3');
+        document.documentElement.style.setProperty('--accent', cfg.theme_accent || '#f5b301');
+        document.documentElement.style.setProperty('--font-display', cfg.font_display || 'Inter');
+        document.documentElement.style.setProperty('--font-digital', cfg.font_digital || 'Orbitron');
+        document.body.style.fontFamily = (cfg.font_display || 'Inter') + ', sans-serif';
+
+        const nameEl = document.getElementById('masjidName');
+        const addrEl = document.getElementById('masjidAddress');
+        if(nameEl) nameEl.textContent = cfg.masjid_name || 'Muslim Clock';
+        if(addrEl) addrEl.textContent = cfg.masjid_address || '';
+
+        if(cfg.masjid_logo){
+            const box = document.getElementById('logoBox');
+            if(box) {
+                const img = document.createElement('img');
+                img.src = cfg.masjid_logo;
+                img.className = 'w-full h-full object-contain';
+                img.alt = 'logo';
+                box.innerHTML = '';
+                box.appendChild(img);
+            }
+        }
+
+        if(cfg.show_ticker !== false && cfg.ticker_text){
+            const bar = document.getElementById('tickerBar');
+            const content = document.getElementById('tickerContent');
+            if(bar) bar.style.display = 'block';
+            if(content) content.textContent = cfg.ticker_text;
+            if(content && cfg.ticker_speed) content.style.animationDuration = cfg.ticker_speed + 's';
+        } else {
+            const bar = document.getElementById('tickerBar');
+            if(bar) bar.style.display = 'none';
+        }
+
+        setupSlideshow();
+        fetchPrayerTimes();
+    };
+
+    function setupSlideshow(){
+        const container = document.getElementById('slideshowContainer');
+        if(!container) return;
+        container.innerHTML = '';
+        const urls = (cfg.slideshow_urls || '').split(',').map(u=>u.trim()).filter(Boolean);
+        if(urls.length === 0){
+            container.innerHTML = '<div class="absolute inset-0 flex items-center justify-center bg-black/50"><span class="text-white/50 text-sm">Slideshow</span></div>';
+            return;
+        }
+        urls.forEach((url, i) => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'slide' + (i === 0 ? ' active' : '');
+            container.appendChild(img);
+        });
+        if(urls.length > 1){
+            if(slideInterval) clearInterval(slideInterval);
+            slideIdx = 0;
+            slideInterval = setInterval(()=>{
+                const slides = container.querySelectorAll('.slide');
+                slides[slideIdx].classList.remove('active');
+                slideIdx = (slideIdx + 1) % slides.length;
+                slides[slideIdx].classList.add('active');
+            }, (cfg.slide_duration || 10) * 1000);
+        }
+    }
+
+    async function fetchPrayerTimes(){
+        try {
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+            const lat = cfg.location_lat || -6.2;
+            const lng = cfg.location_lng || 106.816666;
+            const method = cfg.calc_method || 20;
+            const tz = cfg.timezone || 'Asia/Jakarta';
+            const url = `https://api.aladhan.com/v1/calendar/${month}/${year}?latitude=${lat}&longitude=${lng}&method=${method}&school=0&timezonestring=${encodeURIComponent(tz)}`;
+            const r = await fetch(url);
+            const data = await r.json();
+            const today = data.data[now.getDate() - 1];
+            const timings = today.timings;
+            Object.keys(timings).forEach(k => { timings[k] = timings[k].split(' ')[0]; });
+
+            times = {
+                fajr: timings.Fajr, sunrise: timings.Sunrise, dhuhr: timings.Dhuhr,
+                asr: timings.Asr, maghrib: timings.Maghrib, isha: timings.Isha
+            };
+
+            document.querySelectorAll('.prayer').forEach(el => {
+                const key = el.dataset.key;
+                const timeEl = el.querySelector('[data-time]');
+                if(timeEl && times[key]) timeEl.textContent = times[key];
+            });
+
+            if(today.date && today.date.hijri){
+                const h = today.date.hijri;
+                const hijEl = document.getElementById('hij-date');
+                if(hijEl) hijEl.textContent = h.day + ' ' + h.month.en + ' ' + h.year + ' H';
+            }
+
+            const gregEl = document.getElementById('greg-date');
+            if(gregEl){
+                const opts = {weekday:'long', day:'numeric', month:'long', year:'numeric'};
+                gregEl.textContent = now.toLocaleDateString('id-ID', opts);
+            }
+            triggered = {};
+        } catch(e){ console.error('Failed to fetch prayer times:', e); }
+    }
+
+    function updateClock(){
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+        const s = String(now.getSeconds()).padStart(2,'0');
+        const clockEl = document.getElementById('digital');
+        if(clockEl) clockEl.textContent = h + ':' + m + ':' + s;
+        updateCountdown(now);
+        checkAdzan(now);
+    }
+
+    function updateCountdown(now){
+        const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+        let nextKey = null, nextSec = Infinity;
+        for(const key of adzanKeys){
+            const t = times[key]; if(!t) continue;
+            const [hh,mm] = t.split(':').map(Number);
+            const target = hh*3600 + mm*60;
+            if(target > nowSec && target < nextSec){ nextSec = target; nextKey = key; }
+        }
+        const labelEl = document.getElementById('nextLabel');
+        const countEl = document.getElementById('nextCountdown');
+        if(!nextKey && times.fajr){
+            const [fh,fm] = times.fajr.split(':').map(Number);
+            const fajrSec = fh*3600 + fm*60;
+            const diff = (24*3600 - nowSec) + fajrSec;
+            nextKey = 'fajr';
+            const dh = String(Math.floor(diff/3600)).padStart(2,'0');
+            const dm = String(Math.floor((diff%3600)/60)).padStart(2,'0');
+            const ds = String(diff%60).padStart(2,'0');
+            if(labelEl) labelEl.textContent = prayerNames.fajr;
+            if(countEl) countEl.textContent = dh+':'+dm+':'+ds;
+            return;
+        }
+        if(!nextKey){ if(labelEl) labelEl.textContent='Subuh'; if(countEl) countEl.textContent='--:--:--'; return; }
+        const diff = nextSec - nowSec;
+        const dh = String(Math.floor(diff/3600)).padStart(2,'0');
+        const dm = String(Math.floor((diff%3600)/60)).padStart(2,'0');
+        const ds = String(diff%60).padStart(2,'0');
+        if(labelEl) labelEl.textContent = prayerNames[nextKey] || nextKey;
+        if(countEl) countEl.textContent = dh+':'+dm+':'+ds;
+    }
+
+    function checkAdzan(now){
+        if(adzanActive || iqomahActive) return;
+        const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+        for(const key of adzanKeys){
+            const t = times[key]; if(!t) continue;
+            const [hh,mm] = t.split(':').map(Number);
+            const targetSec = hh*3600 + mm*60;
+            const diff = nowSec - targetSec;
+            if(diff >= 0 && diff < 60 && !triggered[key]){ triggered[key] = true; showAdzan(key); break; }
+        }
+    }
+
+    function showAdzan(key){
+        adzanActive = true;
+        const overlay = document.getElementById('adzanOverlay');
+        if(!overlay) return;
+        overlay.classList.remove('hidden');
+        document.getElementById('ovPrayer').textContent = (prayerNames[key] || key).toUpperCase();
+        document.getElementById('ovMsg').textContent = cfg.adzan_message || 'Saatnya Waktu Sholat';
+        document.getElementById('ovSub').textContent = 'Berlangsung';
+
+        const imamBlock = document.getElementById('ovImamBlock');
+        const imamKey = 'imam_' + key;
+        if(cfg.show_imam && cfg[imamKey]){ imamBlock.style.display='block'; document.getElementById('ovImamName').textContent=cfg[imamKey]; }
+        else { imamBlock.style.display='none'; }
+        const khatibLine = document.getElementById('ovKhatibLine');
+        if(key==='dhuhr' && new Date().getDay()===5 && cfg.khatib_jumat){ khatibLine.style.display='block'; document.getElementById('ovKhatibName').textContent=cfg.khatib_jumat; }
+        else { khatibLine.style.display='none'; }
+
+        let remaining = cfg.adzan_duration || 600;
+        updateOvCount(remaining);
+        adzanTimer = setInterval(()=>{
+            remaining--;
+            updateOvCount(remaining);
+            if(remaining<=0){ clearInterval(adzanTimer); adzanActive=false; startIqomah(key); }
+        }, 1000);
+    }
+
+    function startIqomah(key){
+        iqomahActive = true;
+        document.getElementById('ovSub').textContent = 'Iqomah';
+        let remaining = cfg.iqomah_duration || 600;
+        updateOvCount(remaining);
+        iqomahTimer = setInterval(()=>{
+            remaining--;
+            updateOvCount(remaining);
+            if(remaining<=0){ clearInterval(iqomahTimer); iqomahActive=false; document.getElementById('adzanOverlay').classList.add('hidden'); }
+        }, 1000);
+    }
+
+    function updateOvCount(sec){
+        const m = String(Math.floor(sec/60)).padStart(2,'0');
+        const s = String(sec%60).padStart(2,'0');
+        document.getElementById('ovCount').textContent = m+':'+s;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+    setInterval(fetchPrayerTimes, 3600000);
+
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();
+</script>
+</body>
+</html>

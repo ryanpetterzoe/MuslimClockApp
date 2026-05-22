@@ -56,52 +56,28 @@
       selections by index/key keep working).
     -->
     <string-array name="layout_entries">
-        <item>Minimal</item>
-        <item>Mosque (Kubah)</item>
         <item>Cinema (3 kolom)</item>
-        <item>Neon (Cyber)</item>
         <item>Classic (Ornamen)</item>
-        <item>Aurora (Gradient)</item>
-        <item>Frame (Bingkai)</item>
-        <item>Stadium (Scoreboard)</item>
-        <item>Magazine (Editorial)</item>
         <item>Theater (Slideshow)</item>
         <item>Showcase (Galeri)</item>
-        <item>Split (Dua Sisi)</item>
         <item>Polaroid (Foto)</item>
         <item>Window (Jendela)</item>
         <item>Festival (Pearl)</item>
-        <item>Portrait (Potret)</item>
         <item>Galaxy (Angkasa)</item>
         <item>Geometric (Pola)</item>
-        <item>Kinetic (Dinamis)</item>
         <item>Marble (Marmer)</item>
-        <item>Terminal (Hacker)</item>
         <item>Sunset (Senja)</item>
         <item>Glass (Glassmorphism)</item>
         <item>Newspaper (Koran)</item>
-        <item>Brutalist (Berani)</item>
         <item>Heritage (Pola Klasik)</item>
         <item>Mono (Hitam Putih)</item>
-        <item>Sunrise (Fajar)</item>
         <item>Arabesque (Islam Klasik)</item>
         <item>Royal (Kerajaan)</item>
-        <item>Calligraphy (Kaligrafi)</item>
         <item>Jade (Giok)</item>
-        <item>Ottoman (Turki Usmani)</item>
-        <item>Celestial (Langit)</item>
-        <item>Rumi (Persia)</item>
-        <item>Andalusia (Moor)</item>
-        <item>Medina (Madinah)</item>
-        <item>Batik (Jawa)</item>
         <item>Gallery (Foto + Jam Besar) ★ BARU</item>
-        <item>Journal (Album Vintage) ★ BARU</item>
         <item>Studio (Foto Premium) ★ BARU</item>
-        <item>Canvas (Editorial Putih) ★ BARU</item>
-        <item>Memory (Album Hangat) ★ BARU</item>
         <item>Bigboard (Jam Sholat Besar) ★ BARU</item>
         <item>Pulpit (Mimbar Hijau Emas) ★ BARU</item>
-        <item>Bulletin (Newsroom) ★ BARU</item>
         <item>Tower (Indigo Besar) ★ BARU</item>
         <item>Beacon (Aksen Glow) ★ BARU</item>
         <item>Vertical (Daftar Tegak) ★ VERTIKAL</item>
@@ -109,37 +85,20 @@
         <item>Stack (Tumpukan Tengah) ★ VERTIKAL</item>
         <item>Rack (Rak Kayu Sholat) ★ VERTIKAL</item>
         <item>Column (Kolom Klasik Ornamen) ★ VERTIKAL</item>
-        <item>Mihrab (Lengkung Mihrab) ★ ORNAMEN</item>
         <item>Lantern (Lentera Maroko) ★ ORNAMEN</item>
-        <item>Mosaic (Zellige Cobalt) ★ ORNAMEN</item>
-        <item>Crescent (Hilal Konstelasi) ★ ORNAMEN</item>
-        <item>Damascus (Logam Damaskus) ★ ORNAMEN</item>
-        <item>Persian (Karpet Medallion) ★ ORNAMEN</item>
-        <item>Mecca (Cahaya Haram) ★ ORNAMEN</item>
-        <item>Marrakesh (Tile Multi-Warna) ★ ORNAMEN</item>
-        <item>Imperial (Tugra Utsmani) ★ ORNAMEN</item>
-        <item>Jannah (Kebun Surga) ★ ORNAMEN</item>
         <item>Spesial A1 (Custom Background)</item>
-        <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
-        <item>Exhibit (Foto + Ribbon) ★ FOTO</item>
         <item>Pavilion (3 Kolom Foto) ★ FOTO</item>
-        <item>Shrine (Foto BG + Grid 3x2) ★ FOTO</item>
         <item>Atrium (Foto Kanan + Grid 2x3) ★ FOTO</item>
-        <item>Dome (Foto Kubah + Arch Cards) ★ FOTO</item>
         <item>Minaret (Foto Kiri + List Dots) ★ FOTO</item>
-        <item>Oasis (Timeline + Foto Bawah) ★ FOTO</item>
-        <item>Sanctuary (Foto Tengah + Side) ★ FOTO</item>
         <item>Arch (Foto Lengkung + Arch) ★ FOTO</item>
         <item>Courtyard (Panorama + Pills) ★ FOTO</item>
         <item>Terrace (Foto Besar + Step) ★ FOTO</item>
-        <item>Panorama (Wide + Gradient) ★ FOTO</item>
         <item>Fullphoto 1 (BG Foto Elegan) ★ BACKGROUND</item>
         <item>Fullphoto 2 (BG Foto Neon) ★ BACKGROUND</item>
         <item>Fullphoto 3 (BG Foto Minimal) ★ BACKGROUND</item>
         <item>Fullphoto 4 (BG Foto Kubah) ★ BACKGROUND</item>
         <item>Fullphoto 5 (BG Foto Kaligrafi) ★ BACKGROUND</item>
-        <item>Fullphoto 6 (BG Foto Lanskap) ★ BACKGROUND</item>
         <item>Fullphoto 7 (BG Foto Jadwal Besar) ★ BACKGROUND</item>
         <item>Fullphoto 8 (BG Foto Sinematik) ★ BACKGROUND</item>
         <item>Fullphoto 9 (BG Foto Kaca) ★ BACKGROUND</item>
@@ -147,62 +106,47 @@
         <item>Fullphoto 11 (Heksagonal) ★ BACKGROUND</item>
         <item>Fullphoto 12 (Sidebar Kaca) ★ BACKGROUND</item>
         <item>Fullphoto 13 (Diagonal Ribbon) ★ BACKGROUND</item>
-        <item>Fullphoto 14 (Horizon Split) ★ BACKGROUND</item>
         <item>Fullphoto 15 (Orbit Arc) ★ BACKGROUND</item>
         <item>Fullphoto 16 (Pil Jadwal) ★ BACKGROUND</item>
         <item>Fullphoto 17 (Cascade Tumpuk) ★ BACKGROUND</item>
         <item>Fullphoto 18 (Grid Mosaic) ★ BACKGROUND</item>
         <item>Fullphoto 19 (Bubble Melayang) ★ BACKGROUND</item>
         <item>Fullphoto 20 (Meter Vertikal) ★ BACKGROUND</item>
+        <item>Lumina (Glass Transparan)</item>
+        <item>Prism (Kartu Kaca)</item>
+        <item>Folio (Flat + Bingkai Foto)</item>
+        <item>Spire (Jadwal Vertikal Kanan)</item>
+        <item>Gazette (Jadwal Vertikal Kiri)</item>
+        <item>Flat Blok (Primer) &#x2605; FLAT</item>
+        <item>Flat Split (Dua Warna) &#x2605; FLAT</item>
+        <item>Flat Grid (Kotak) &#x2605; FLAT</item>
+        <item>Flat Card (Kartu Datar) &#x2605; FLAT</item>
+        <item>Flat Minimal (Super Bersih) &#x2605; FLAT</item>
     </string-array>
 
     <string-array name="layout_values">
-        <item>minimal</item>
-        <item>mosque</item>
         <item>cinema</item>
-        <item>neon</item>
         <item>classic</item>
-        <item>aurora</item>
-        <item>frame</item>
-        <item>stadium</item>
-        <item>magazine</item>
         <item>theater</item>
         <item>showcase</item>
-        <item>split</item>
         <item>polaroid</item>
         <item>window</item>
         <item>festival</item>
-        <item>portrait</item>
         <item>galaxy</item>
         <item>geometric</item>
-        <item>kinetic</item>
         <item>marble</item>
-        <item>terminal</item>
         <item>sunset</item>
         <item>glass</item>
         <item>newspaper</item>
-        <item>brutalist</item>
         <item>heritage</item>
         <item>mono</item>
-        <item>sunrise</item>
         <item>arabesque</item>
         <item>royal</item>
-        <item>calligraphy</item>
         <item>jade</item>
-        <item>ottoman</item>
-        <item>celestial</item>
-        <item>rumi</item>
-        <item>andalusia</item>
-        <item>medina</item>
-        <item>batik</item>
         <item>gallery</item>
-        <item>journal</item>
         <item>studio</item>
-        <item>canvas</item>
-        <item>memory</item>
         <item>bigboard</item>
         <item>pulpit</item>
-        <item>bulletin</item>
         <item>tower</item>
         <item>beacon</item>
         <item>vertical</item>
@@ -210,37 +154,20 @@
         <item>stack</item>
         <item>rack</item>
         <item>column</item>
-        <item>mihrab</item>
         <item>lantern</item>
-        <item>mosaic</item>
-        <item>crescent</item>
-        <item>damascus</item>
-        <item>persian</item>
-        <item>mecca</item>
-        <item>marrakesh</item>
-        <item>imperial</item>
-        <item>jannah</item>
         <item>special1</item>
-        <item>special2</item>
         <item>special3</item>
-        <item>exhibit</item>
         <item>pavilion</item>
-        <item>shrine</item>
         <item>atrium</item>
-        <item>dome</item>
         <item>minaret</item>
-        <item>oasis</item>
-        <item>sanctuary</item>
         <item>arch</item>
         <item>courtyard</item>
         <item>terrace</item>
-        <item>panorama</item>
         <item>fullphoto1</item>
         <item>fullphoto2</item>
         <item>fullphoto3</item>
         <item>fullphoto4</item>
         <item>fullphoto5</item>
-        <item>fullphoto6</item>
         <item>fullphoto7</item>
         <item>fullphoto8</item>
         <item>fullphoto9</item>
@@ -248,13 +175,22 @@
         <item>fullphoto11</item>
         <item>fullphoto12</item>
         <item>fullphoto13</item>
-        <item>fullphoto14</item>
         <item>fullphoto15</item>
         <item>fullphoto16</item>
         <item>fullphoto17</item>
         <item>fullphoto18</item>
         <item>fullphoto19</item>
         <item>fullphoto20</item>
+        <item>lumina</item>
+        <item>prism</item>
+        <item>folio</item>
+        <item>spire</item>
+        <item>gazette</item>
+        <item>flat1</item>
+        <item>flat2</item>
+        <item>flat3</item>
+        <item>flat4</item>
+        <item>flat5</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -269,6 +205,8 @@
         <item>Glow (Cahaya Bersinar)</item>
         <item>Minimal (Teks Bersih)</item>
         <item>Scroll (Gulir Vertikal)</item>
+        <item>Accent Typewriter (Ketik + Aksen)</item>
+        <item>Clean Typewriter (Ketik + Transparan)</item>
     </string-array>
 
     <!-- Identity position options -->
@@ -299,6 +237,17 @@
         <item>right</item>
     </string-array>
 
+    <!-- Logo position relative to identity -->
+    <string-array name="logo_position_entries">
+        <item>Kanan Identitas</item>
+        <item>Atas Identitas</item>
+    </string-array>
+
+    <string-array name="logo_position_values">
+        <item>right</item>
+        <item>top</item>
+    </string-array>
+
     <string-array name="quran_mode_values">
         <item>fullcard</item>
         <item>card</item>
@@ -310,6 +259,8 @@
         <item>glow</item>
         <item>minimalcard</item>
         <item>scroll</item>
+        <item>accentcard</item>
+        <item>cleancard</item>
     </string-array>
 
     <!-- Ticker / running text display styles -->
@@ -319,6 +270,11 @@
         <item>Fade (Pudar Ganti)</item>
         <item>Neon (Glow Berjalan)</item>
         <item>Typewriter (Ketik Satu-Satu)</item>
+        <item>Slide (Geser Vertikal)</item>
+        <item>Glow (Bercahaya)</item>
+        <item>Karaoke (Highlight Progresif)</item>
+        <item>Gradient (Warna Bergerak)</item>
+        <item>Zoom (Besar-Kecil)</item>
     </string-array>
 
     <string-array name="ticker_style_values">
@@ -327,6 +283,11 @@
         <item>fade</item>
         <item>neon</item>
         <item>typewriter</item>
+        <item>slide</item>
+        <item>glow</item>
+        <item>karaoke</item>
+        <item>gradient_text</item>
+        <item>zoom</item>
     </string-array>
 
     <!-- Ticker / running text background variations -->
@@ -371,6 +332,11 @@
         <item>Binary (Desimal + Biner)</item>
         <item>Dots (Titik Pemisah)</item>
         <item>Wave (Gelombang Animasi)</item>
+        <item>Stencil (Potongan Huruf)</item>
+        <item>Glitch (Efek Rusak)</item>
+        <item>Emboss (Timbul 3D)</item>
+        <item>Pixel (Kotak 8-bit)</item>
+        <item>Brush (Kuas Tangan)</item>
     </string-array>
 
     <string-array name="digital_style_values">
@@ -389,6 +355,11 @@
         <item>binary</item>
         <item>dots</item>
         <item>wave</item>
+        <item>stencil</item>
+        <item>glitch</item>
+        <item>emboss</item>
+        <item>pixel</item>
+        <item>brush</item>
     </string-array>
 
     <!-- Analog clock display styles -->
