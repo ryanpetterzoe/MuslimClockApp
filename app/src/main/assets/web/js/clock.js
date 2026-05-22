@@ -136,7 +136,7 @@
         // Special themed layouts with custom assets
         'special1', 'special3',
         // Photo-frame + centered-logo themes
-        'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
+        'exhibit', 'pavilion', 'shrine', 'atrium', 'minaret',
         'sanctuary', 'terrace',
         'oasis', 'arch', 'courtyard', 'panorama',
         // Full-background-photo layouts (slideshow as full BG)

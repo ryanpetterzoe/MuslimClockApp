@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "chore",
   "description": "Remove dome theme and 8 unused ornamental themes (mihrab, mosaic, crescent, persian, mecca, marrakesh, ottoman, jannah) from the codebase",
-  "status": "pending",
+  "status": "in_progress",
   "steps": [
     "1. Remove 'dome' from SUPPORTED_LAYOUTS array in clock.js (it's in the photo-frame section around line 141).",
     "2. Remove the entire <template id='layout-dome'> block from index.html (starts at line ~2808, ends at next template or closing tag).",
