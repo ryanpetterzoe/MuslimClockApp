@@ -606,7 +606,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 #quranBar .q-arab, #quranBar .q-trans { overflow-wrap: anywhere; }
 
 
-
 /* ===================== SLIDESHOW-CENTRIC LAYOUTS NEXT-STATE ===================== */
 
 /* Theater */
@@ -759,7 +758,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== NEW LAYOUTS (set 2): GLASS / NEWSPAPER / BRUTALIST / HERITAGE / MONO / SUNRISE ===================== */
 
 /* Glass — frosted card highlight on next prayer. */
@@ -838,7 +836,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-sunrise .prayer.next::before {
     display: none;
 }
-
 
 
 /* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas / memory) ===================== */
@@ -1022,7 +1019,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== PRAYER-CARD CROSS-FONT SAFETY =====================
  *
  * Fonts vary wildly in glyph width and ascender height. Wide-glyph picks
@@ -1066,7 +1062,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .prayer-col .prayer > * {
     min-width: 0;
 }
-
 
 
 /* ===================== VERTICAL PRAYER-CARD LAYOUTS =====================
@@ -1204,7 +1199,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== ORNAMENT-RICH LAYOUTS (set v2) =====================
  *
  * Card / next-state styling for the 10 ornament-heavy layouts in
@@ -1217,25 +1211,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
  * every layout in this set because each owns a richer highlight.
  */
 
-/* ----- MIHRAB (deep teal + gold) ----- */
-.layout-mihrab .mh-card {
-    padding: 12px;
-    text-align: center;
-    background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));
-    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-    border-radius: 12px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-mihrab .prayer.next .mh-card,
-.layout-mihrab .mh-card.next {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, rgba(0,0,0,0.45)), color-mix(in srgb, var(--accent) 4%, rgba(0,0,0,0.25)));
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px -10px var(--accent);
-}
-.layout-mihrab .prayer.next .mh-card [data-time] { color: var(--accent); }
 
 /* ----- LANTERN (warm bronze + cream) ----- */
 .layout-lantern .ln-card {
@@ -1254,189 +1229,12 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     box-shadow: 0 12px 36px -10px rgba(212, 163, 106, 0.7), inset 0 0 16px rgba(253, 230, 138, 0.18);
 }
 
-/* ----- MOSAIC (cobalt + ivory + terracotta) ----- */
-.layout-mosaic .ms-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(14, 42, 74, 0.85);
-    border: 2px solid #f5e6c4;
-    border-radius: 8px;
-    transition: background .25s ease, border-color .25s ease, transform .25s ease;
-}
-.layout-mosaic .prayer.next .ms-card,
-.layout-mosaic .ms-card.next {
-    background: #c84a32;
-    border-color: #fcd34d;
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.4), 0 12px 36px -10px rgba(200, 74, 50, 0.7);
-}
-.layout-mosaic .prayer.next .ms-card [style*="color:#fcd34d"] { color: #f5e6c4 !important; }
-.layout-mosaic .prayer.next .ms-card [data-time] { color: #fcd34d !important; }
-
-/* ----- CRESCENT (navy + warm gold) ----- */
-.layout-crescent .cr-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(7, 10, 26, 0.62);
-    border: 1px solid rgba(253, 230, 138, 0.30);
-    border-radius: 14px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-crescent .prayer.next .cr-card,
-.layout-crescent .cr-card.next {
-    background: rgba(7, 10, 26, 0.85);
-    border-color: #fde68a;
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 1px #fde68a, 0 12px 36px -8px #d4a36a, inset 0 0 16px rgba(253, 230, 138, 0.12);
-}
-.layout-crescent .prayer.next .cr-card [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 12px rgba(253, 230, 138, 0.6);
-}
-
-/* ----- DAMASCUS (brass + bronze) ----- */
-.layout-damascus .dm-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(58, 38, 20, 0.55);
-    border: 1px solid #d4a36a;
-    border-radius: 4px;
-    box-shadow: inset 0 0 8px rgba(184, 144, 96, 0.25);
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-}
-.layout-damascus .prayer.next .dm-card,
-.layout-damascus .dm-card.next {
-    background: linear-gradient(180deg, rgba(212, 163, 106, 0.30), rgba(58, 38, 20, 0.65));
-    border-color: #fde68a;
-    box-shadow: 0 0 0 1px #fde68a, 0 12px 32px -10px #d4a36a, inset 0 0 14px rgba(253, 230, 138, 0.18);
-}
-
-/* ----- PERSIAN (wine + ivory + gold) ----- */
-.layout-persian .ps-card2 {
-    padding: 12px;
-    text-align: center;
-    background: rgba(91, 14, 34, 0.50);
-    border: 1px solid #daa520;
-    border-radius: 6px;
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-persian .prayer.next .ps-card2,
-.layout-persian .ps-card2.next {
-    background: linear-gradient(180deg, rgba(218, 165, 32, 0.28), rgba(91, 14, 34, 0.7));
-    border-color: #f3e0c2;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px -10px #daa520;
-}
-.layout-persian .prayer.next .ps-card2 [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 10px rgba(218, 165, 32, 0.55);
-}
-
-/* ----- MECCA (deep black + radiant gold) ----- */
-.layout-mecca .mc-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(10, 10, 10, 0.65);
-    border: 1px solid rgba(218, 165, 32, 0.45);
-    border-radius: 10px;
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-mecca .prayer.next .mc-card,
-.layout-mecca .mc-card.next {
-    background: rgba(10, 10, 10, 0.9);
-    border-color: #fde68a;
-    transform: scale(1.04);
-    box-shadow: 0 0 30px #daa520, 0 0 0 1px #fde68a, inset 0 0 18px rgba(218, 165, 32, 0.22);
-}
-.layout-mecca .prayer.next .mc-card [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 14px #daa520;
-}
-
-/* ----- MARRAKESH (multicoloured zellige) ----- */
-.layout-marrakesh .mk-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(16, 42, 58, 0.85);
-    border: 2px solid #f4d35e;
-    border-radius: 6px;
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-marrakesh .prayer.next .mk-card,
-.layout-marrakesh .mk-card.next {
-    background: #e63946;
-    border-color: #f4d35e;
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 3px #3a86ff, 0 12px 36px -8px rgba(230, 57, 70, 0.7);
-}
-.layout-marrakesh .prayer.next .mk-card > div:first-child {
-    color: #102a3a !important;
-}
-.layout-marrakesh .prayer.next .mk-card [data-time] {
-    color: #f4d35e !important;
-}
-
-/* ----- IMPERIAL (deep red + gold) ----- */
-.layout-imperial .im-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(91, 14, 14, 0.55);
-    border: 1px solid #daa520;
-    border-top: 2px solid #fde68a;
-    border-bottom: 2px solid #fde68a;
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-}
-.layout-imperial .prayer.next .im-card,
-.layout-imperial .im-card.next {
-    background: linear-gradient(180deg, rgba(218, 165, 32, 0.30), rgba(91, 14, 14, 0.7));
-    border-color: #fde68a;
-    box-shadow: 0 0 0 1px #fde68a, 0 12px 36px -10px #daa520, inset 0 0 18px rgba(218, 165, 32, 0.20);
-}
-.layout-imperial .prayer.next .im-card [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 10px #daa520;
-}
-
-/* ----- JANNAH (emerald + gold) ----- */
-.layout-jannah .jn-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(10, 64, 48, 0.55);
-    border: 1px solid rgba(218, 165, 32, 0.40);
-    border-radius: 14px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.layout-jannah .prayer.next .jn-card,
-.layout-jannah .jn-card.next {
-    background: linear-gradient(180deg, rgba(218, 165, 32, 0.25), rgba(10, 64, 48, 0.8));
-    border-color: #fde68a;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px -10px #daa520, inset 0 0 18px rgba(253, 230, 138, 0.16);
-}
-.layout-jannah .prayer.next .jn-card [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 12px rgba(218, 165, 32, 0.55);
-}
 
 /* Suppress the universal `.prayer.next::before` left-bar for every
  * ornament-rich theme — each one supplies its own next-state. */
-.layout-mihrab    .prayer.next::before,
-.layout-lantern   .prayer.next::before,
-.layout-mosaic    .prayer.next::before,
-.layout-crescent  .prayer.next::before,
-.layout-damascus  .prayer.next::before,
-.layout-persian   .prayer.next::before,
-.layout-mecca     .prayer.next::before,
-.layout-marrakesh .prayer.next::before,
-.layout-imperial  .prayer.next::before,
-.layout-jannah    .prayer.next::before {
+.layout-lantern .prayer.next::before {
     display: none;
 }
-
 
 
 /* ===================== NEW DIGITAL CLOCK STYLES ===================== */
@@ -1713,7 +1511,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== DIGITAL CLOCK AUTOFIT =====================
  * Ensure #digital never overflows its parent container when switching
  * between styles that produce wider output (Binary, Dots, LCD, etc.).
@@ -1725,7 +1522,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     word-break: keep-all;
     white-space: nowrap;
 }
-
 
 
 /* ===================== TICKER STYLES ===================== */
@@ -2041,14 +1837,24 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto3 .prayer.next::before { display: none; }
 
 /* Fullphoto 4 (Kubah) */
-.layout-fullphoto4 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent); }
-.layout-fullphoto4 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto4 .prayer.next { background: rgba(0,0,0,0.7) !important; border-color: var(--accent) !important; box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 40%, transparent), inset 0 0 12px color-mix(in srgb, var(--accent) 15%, transparent); transform: translateY(-20px) scale(1.08) !important; }
+.layout-fullphoto4 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto4 .prayer.next::before { display: none; }
 
 /* Fullphoto 5 (Kaligrafi) */
-.layout-fullphoto5 .prayer.next { border-left-color: var(--accent) !important; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent); }
-.layout-fullphoto5 .prayer.next [data-time] { color: var(--accent) !important; }
+.layout-fullphoto5 .prayer.next { background: rgba(0,0,0,0.55) !important; border-left: 5px solid var(--accent) !important; box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent); transform: rotate(0deg) scale(1.06) !important; }
+.layout-fullphoto5 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
 .layout-fullphoto5 .prayer.next::before { display: none; }
+
+/* Fullphoto 12 (Sidebar Kaca) */
+.layout-fullphoto12 .prayer.next { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), rgba(255,255,255,0.06)) !important; border-color: var(--accent) !important; box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent), inset 0 0 0 1px var(--accent); transform: scale(1.03); }
+.layout-fullphoto12 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto12 .prayer.next::before { display: none; }
+
+/* Fullphoto 18 (Grid Mosaic) */
+.layout-fullphoto18 .prayer.next { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45)), rgba(0,0,0,0.45)) !important; border-color: var(--accent) !important; box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.05); }
+.layout-fullphoto18 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto18 .prayer.next::before { display: none; }
 
 /* Fullphoto 6 (Lanskap) */
 .layout-fullphoto6 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
@@ -2073,7 +1879,50 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto10 .prayer.next::before { display: none; }
 
+/* Fullphoto 13 (Diagonal Ribbon) */
+.layout-fullphoto13 .prayer.next { transform: scale(1.08); border-left-color: var(--accent) !important; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), rgba(0,0,0,0.5)); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent), 0 4px 15px rgba(0,0,0,0.3); z-index: 10; }
+.layout-fullphoto13 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto13 .prayer.next::before { display: none; }
 
+/* Fullphoto 15 (Orbit Arc) */
+.layout-fullphoto15 .prayer.next { transform: scale(1.12); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(0,0,0,0.5)) !important; box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 0 2px var(--accent) !important; z-index: 10; }
+.layout-fullphoto15 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
+.layout-fullphoto15 .prayer.next::before { display: none; }
+
+/* Fullphoto 16 (Pil Jadwal) */
+.layout-fullphoto16 .prayer.next { transform: scale(1.08); background: color-mix(in srgb, var(--accent) 90%, black) !important; box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent), 0 4px 20px rgba(0,0,0,0.4); }
+.layout-fullphoto16 .prayer.next span { color: #000 !important; text-shadow: none; }
+.layout-fullphoto16 .prayer.next::before { display: none; }
+
+/* Fullphoto 17 (Cascade Tumpuk) */
+.layout-fullphoto17 .prayer.next { transform: scale(1.06) translateY(-2px); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, rgba(0,0,0,0.6)), rgba(0,0,0,0.6)) !important; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent), 0 8px 25px rgba(0,0,0,0.4); z-index: 20; }
+.layout-fullphoto17 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto17 .prayer.next::before { display: none; }
+
+/* Fullphoto 19 (Bubble Melayang) */
+.layout-fullphoto19 .prayer.next { transform: scale(1.1); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45)), rgba(0,0,0,0.45)) !important; border-color: var(--accent) !important; box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 0 1px var(--accent); z-index: 10; }
+.layout-fullphoto19 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
+.layout-fullphoto19 .prayer.next::before { display: none; }
+
+/* Oasis */
+.layout-oasis .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(0,128,128,0.15)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.05); }
+.layout-oasis .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-oasis .prayer.next::before { display: none; }
+
+/* Arch */
+.layout-arch .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)) !important; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.06); }
+.layout-arch .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-arch .prayer.next::before { display: none; }
+
+/* Courtyard */
+.layout-courtyard .prayer.next { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(34,197,94,0.12)) !important; border-color: var(--accent) !important; box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.06); }
+.layout-courtyard .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-courtyard .prayer.next::before { display: none; }
+
+/* Panorama */
+.layout-panorama .prayer.next { background: color-mix(in srgb, var(--accent) 20%, rgba(255,255,255,0.08)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.08); }
+.layout-panorama .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-panorama .prayer.next::before { display: none; }
 
 
 /* ===================== LAYOUT FIX: Anti-kepotong + Spacing + Z-index =====================
