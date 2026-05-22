@@ -32,5 +32,5 @@
     "grep for all 8 names in SUPPORTED_LAYOUTS section of clock.js"
   ],
   "blocked_reason": null,
-  "findings": "Partial implementation: oasis and arch templates added to index.html, SUPPORTED_LAYOUTS in clock.js, and next-state CSS in screen.css. Build passes. JAVA_HOME needed to be set to /opt/toolchains/.local/share/mise/installs/java/17.0.2. Remaining templates (courtyard, panorama, fullphoto4, fullphoto5, fullphoto12, fullphoto18) still need to be created."
+  "findings": "Partial implementation: oasis, arch, courtyard, and panorama templates added to index.html, SUPPORTED_LAYOUTS in clock.js, and next-state CSS in screen.css. Build passes. JAVA_HOME needed to be set to /opt/toolchains/.local/share/mise/installs/java/17.0.2. Remaining templates (fullphoto4, fullphoto5, fullphoto12, fullphoto18) still need to be created."
 }
