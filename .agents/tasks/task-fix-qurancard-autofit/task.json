@@ -1,0 +1,7 @@
+{
+  "task_id": "task-fix-qurancard-autofit",
+  "task_description": "Fix accentcard and cleancard Quran display modes to auto-fit text like fullcard mode, keeping typewriter animation. Card size should follow the longest surah so text never gets cut off.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001"],
+  "blocked_reason": null
+}

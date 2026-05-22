@@ -1369,8 +1369,21 @@
 
         if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
 
-        arabEl.innerHTML  = '<span class="quran-cursor">|</span>';
+        // Pre-measure: set full text to compute auto-fit font sizes
+        arabEl.textContent = ayat.arab;
+        transEl.textContent = ayat.trans;
+        arabEl.style.fontSize = '';
+        transEl.style.fontSize = '';
+        autoFitToTwoLines(arabEl, 14);
+        autoFitToTwoLines(transEl, 10);
+        var arabFontSize = arabEl.style.fontSize || '';
+        var transFontSize = transEl.style.fontSize || '';
+
+        // Clear and start typewriter with the pre-computed sizes
+        arabEl.innerHTML = '<span class="quran-cursor">|</span>';
+        if (arabFontSize) arabEl.style.fontSize = arabFontSize;
         transEl.innerHTML = '';
+        if (transFontSize) transEl.style.fontSize = transFontSize;
         refEl.textContent = '';
 
         const arabChars  = Array.from(ayat.arab);
@@ -1388,12 +1401,14 @@
                 if (idx < arabChars.length) {
                     arabBuf += arabChars[idx++];
                     arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
-                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; transEl.innerHTML = '<span class="quran-cursor">|</span>'; }
+                    if (arabFontSize) arabEl.style.fontSize = arabFontSize;
+                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; if (arabFontSize) arabEl.style.fontSize = arabFontSize; transEl.innerHTML = '<span class="quran-cursor">|</span>'; if (transFontSize) transEl.style.fontSize = transFontSize; }
             } else if (phase === 1) {
                 if (idx < transChars.length) {
                     transBuf += transChars[idx++];
                     transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
-                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; }
+                    if (transFontSize) transEl.style.fontSize = transFontSize;
+                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; if (transFontSize) transEl.style.fontSize = transFontSize; }
             } else if (phase === 2) {
                 if (idx < refText.length) {
                     refEl.textContent = refText.slice(0, ++idx);
