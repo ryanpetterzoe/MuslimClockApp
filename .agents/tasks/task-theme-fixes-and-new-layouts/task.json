@@ -1,0 +1,7 @@
+{
+  "task_id": "task-theme-fixes-and-new-layouts",
+  "task_description": "Fix photo frame opacity on 4 themes, create 8 missing theme templates, remove dome + 8 ornamental themes, fix prayer highlight on 5 fullphoto themes, and fix adzan overlay text clipping with imam enabled",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

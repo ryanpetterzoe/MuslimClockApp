@@ -1,0 +1,29 @@
+{
+  "project_type": "Android Kotlin WebView app with bundled HTML/CSS/JS clock display",
+  "language": "Kotlin + HTML/CSS/JS",
+  "build_system": "Gradle (AGP 8.5.2, Kotlin 1.9.24, Gradle wrapper 8.7)",
+  "test_framework": "No automated tests - manual visual verification via APK",
+  "build_command": "./gradlew assembleDebug",
+  "test_command": "N/A (no test suite)",
+  "verification_instructions": "Build the APK with ./gradlew assembleDebug and verify no compilation errors. Visually verify HTML templates are well-formed.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "JDK 17 required. Run ./gradlew assembleDebug from project root.",
+  "environment_constraints": "No Android device available for runtime testing. Validate via successful build and AST/structural checks of HTML/JS.",
+  "contribution_requirements": "Each fix/feature on a separate branch -> PR. All layout keys must match <template id='layout-{key}'> pattern. SUPPORTED_LAYOUTS in clock.js must include keys. arrays.xml entries/values must be synced.",
+  "key_patterns": {
+    "layout_template_pattern": "<template id='layout-{name}'> containing <div class='layout-{name} app-screen flex-layout ...'>",
+    "prayer_card_pattern": "<div class='prayer ...' data-key='{prayer}'><span data-time>--:--</span></div>",
+    "required_ids": "id='digital', id='nextPill', id='nextLabel', id='nextCountdown', id='analogWrap', data-analog, id='greg-date', id='hij-date', id='masjidPrefix', id='masjidName', id='masjidAddress', id='logoBox'",
+    "slideshow_host": "<div class='slideshow-host absolute inset-0'></div> for photo backgrounds",
+    "prayer_highlight": ".prayer.next class added by renderTimes() in clock.js; styled via screen.css per-layout rules",
+    "slide_opacity_var": "--slide-opacity CSS variable set on :root by clock.js from cfg.slideshow_opacity (0-1 range)",
+    "adzan_overlay": "Shared #adzanOverlay div with #ovPrayer, #ovMsg, #ovImamBlock, #ovImamName, #ovKhatibLine, #ovCount, #ovSub, #ovContent"
+  },
+  "relevant_files": [
+    "app/src/main/assets/web/index.html",
+    "app/src/main/assets/web/js/clock.js",
+    "app/src/main/assets/web/css/screen.css",
+    "app/src/main/res/values/arrays.xml"
+  ],
+  "directory_structure": "app/src/main/assets/web/ contains the bundled web app (index.html with <template> elements for each layout, css/screen.css for styles, js/clock.js for all logic). app/src/main/res/values/arrays.xml contains dropdown options for the settings UI."
+}

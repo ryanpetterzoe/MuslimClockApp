@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-003",
+  "type": "chore",
+  "description": "Remove dome theme and 8 unused ornamental themes (mihrab, mosaic, crescent, persian, mecca, marrakesh, ottoman, jannah) from the codebase",
+  "status": "pending",
+  "steps": [
+    "1. Remove 'dome' from SUPPORTED_LAYOUTS array in clock.js (it's in the photo-frame section around line 141).",
+    "2. Remove the entire <template id='layout-dome'> block from index.html (starts at line ~2808, ends at next template or closing tag).",
+    "3. Remove the 'Dome (Foto Kubah + Arch Cards) ★ FOTO' entry from layout_entries in arrays.xml AND the corresponding 'dome' value from layout_values.",
+    "4. Remove the entire <template id='layout-mihrab'> block from index.html (starts at line ~1850).",
+    "5. Remove the entire <template id='layout-mosaic'> block from index.html (starts at line ~2011).",
+    "6. Remove the entire <template id='layout-crescent'> block from index.html (starts at line ~2082).",
+    "7. Remove the entire <template id='layout-persian'> block from index.html (starts at line ~2160).",
+    "8. Remove the entire <template id='layout-mecca'> block from index.html (starts at line ~2248).",
+    "9. Remove the entire <template id='layout-marrakesh'> block from index.html (starts at line ~2335).",
+    "10. Remove the entire <template id='layout-ottoman'> block from index.html (starts at line ~1197).",
+    "11. Remove the entire <template id='layout-jannah'> block from index.html (starts at line ~2409).",
+    "12. Also remove any CSS rules in screen.css that reference these removed layout names (.layout-dome, .layout-mihrab, .layout-mosaic, .layout-crescent, .layout-persian, .layout-mecca, .layout-marrakesh, .layout-ottoman, .layout-jannah).",
+    "13. Verify these themes are NOT in arrays.xml (they should not be since they were never in SUPPORTED_LAYOUTS, but double check)."
+  ],
+  "acceptance_criteria": [
+    "'dome' is not in SUPPORTED_LAYOUTS in clock.js",
+    "No <template id='layout-dome'> exists in index.html",
+    "No 'dome' entry/value exists in arrays.xml layout_entries/layout_values",
+    "No templates exist for mihrab, mosaic, crescent, persian, mecca, marrakesh, ottoman, jannah in index.html",
+    "./gradlew assembleDebug succeeds"
+  ],
+  "verification": [
+    "Run ./gradlew assembleDebug and confirm build success",
+    "grep 'layout-dome\\|layout-mihrab\\|layout-mosaic\\|layout-crescent\\|layout-persian\\|layout-mecca\\|layout-marrakesh\\|layout-ottoman\\|layout-jannah' index.html should return no results",
+    "grep 'dome' clock.js SUPPORTED_LAYOUTS section should return no results"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
