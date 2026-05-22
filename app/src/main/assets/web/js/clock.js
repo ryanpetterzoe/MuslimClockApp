@@ -138,7 +138,7 @@
         // Photo-frame + centered-logo themes
         'exhibit', 'pavilion', 'shrine', 'atrium', 'dome', 'minaret',
         'sanctuary', 'terrace',
-        'oasis', 'arch',
+        'oasis', 'arch', 'courtyard', 'panorama',
         // Full-background-photo layouts (slideshow as full BG)
         'fullphoto1', 'fullphoto2', 'fullphoto3',
         'fullphoto6', 'fullphoto7', 'fullphoto8', 'fullphoto9', 'fullphoto10',

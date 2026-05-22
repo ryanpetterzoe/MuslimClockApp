@@ -2108,6 +2108,16 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-arch .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-arch .prayer.next::before { display: none; }
 
+/* Courtyard */
+.layout-courtyard .prayer.next { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(34,197,94,0.12)) !important; border-color: var(--accent) !important; box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.06); }
+.layout-courtyard .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-courtyard .prayer.next::before { display: none; }
+
+/* Panorama */
+.layout-panorama .prayer.next { background: color-mix(in srgb, var(--accent) 20%, rgba(255,255,255,0.08)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.08); }
+.layout-panorama .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+.layout-panorama .prayer.next::before { display: none; }
+
 
 
 
