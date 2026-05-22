@@ -2073,6 +2073,31 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto10 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto10 .prayer.next::before { display: none; }
 
+/* Fullphoto 13 (Diagonal Ribbon) */
+.layout-fullphoto13 .prayer.next { transform: scale(1.08); border-left-color: var(--accent) !important; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), rgba(0,0,0,0.5)); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent), 0 4px 15px rgba(0,0,0,0.3); z-index: 10; }
+.layout-fullphoto13 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto13 .prayer.next::before { display: none; }
+
+/* Fullphoto 15 (Orbit Arc) */
+.layout-fullphoto15 .prayer.next { transform: scale(1.12); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(0,0,0,0.5)) !important; box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 0 2px var(--accent) !important; z-index: 10; }
+.layout-fullphoto15 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
+.layout-fullphoto15 .prayer.next::before { display: none; }
+
+/* Fullphoto 16 (Pil Jadwal) */
+.layout-fullphoto16 .prayer.next { transform: scale(1.08); background: color-mix(in srgb, var(--accent) 90%, black) !important; box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent), 0 4px 20px rgba(0,0,0,0.4); }
+.layout-fullphoto16 .prayer.next span { color: #000 !important; text-shadow: none; }
+.layout-fullphoto16 .prayer.next::before { display: none; }
+
+/* Fullphoto 17 (Cascade Tumpuk) */
+.layout-fullphoto17 .prayer.next { transform: scale(1.06) translateY(-2px); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, rgba(0,0,0,0.6)), rgba(0,0,0,0.6)) !important; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent), 0 8px 25px rgba(0,0,0,0.4); z-index: 20; }
+.layout-fullphoto17 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+.layout-fullphoto17 .prayer.next::before { display: none; }
+
+/* Fullphoto 19 (Bubble Melayang) */
+.layout-fullphoto19 .prayer.next { transform: scale(1.1); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.45)), rgba(0,0,0,0.45)) !important; border-color: var(--accent) !important; box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 0 1px var(--accent); z-index: 10; }
+.layout-fullphoto19 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
+.layout-fullphoto19 .prayer.next::before { display: none; }
+
 
 
 
