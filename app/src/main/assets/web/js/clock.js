@@ -1379,6 +1379,17 @@
         var arabFontSize = arabEl.style.fontSize || '';
         var transFontSize = transEl.style.fontSize || '';
 
+        // Lock element heights to prevent layout shift during typewriter.
+        // Measure at full-text size so the card stays static at its largest.
+        var arabHeight = arabEl.getBoundingClientRect().height;
+        var transHeight = transEl.getBoundingClientRect().height;
+        arabEl.style.minHeight = arabHeight + 'px';
+        transEl.style.minHeight = transHeight + 'px';
+
+        // Reserve quran space NOW while card is at full measured size,
+        // before clearing text for typewriter animation.
+        reserveQuranSpace(document.getElementById('quranBar'));
+
         // Clear and start typewriter with the pre-computed sizes
         arabEl.innerHTML = '<span class="quran-cursor">|</span>';
         if (arabFontSize) arabEl.style.fontSize = arabFontSize;
@@ -1415,8 +1426,6 @@
                 } else { phase = 3; clearInterval(quranTypingTimer); quranTypingTimer = null; }
             }
         }, charDelay);
-
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderCleanCard(ayat) {
