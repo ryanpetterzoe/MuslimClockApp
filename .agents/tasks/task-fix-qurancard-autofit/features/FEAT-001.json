@@ -1,0 +1,17 @@
+{
+  "id": "FEAT-001",
+  "title": "Fix accentcard and cleancard Quran display modes to auto-fit like fullcard",
+  "description": "Add autoFitToTwoLines pre-measurement to renderAccentCard so text is never clipped. Pre-compute font sizes using full text before starting typewriter animation, then apply those sizes during typing.",
+  "status": "completed",
+  "acceptance_criteria": [
+    "accentcard mode auto-shrinks font for long ayat (no text clipping)",
+    "cleancard mode auto-shrinks font for long ayat (no text clipping)", 
+    "typewriter animation still works with cursor",
+    "card size accommodates full text without overflow",
+    "reserveQuranSpace is called to properly allocate height"
+  ],
+  "files_to_modify": [
+    "app/src/main/assets/web/js/clock.js",
+    "app/src/main/assets/web/css/screen.css"
+  ]
+}
