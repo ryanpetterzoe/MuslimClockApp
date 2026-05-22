@@ -134,7 +134,7 @@
         // Ornament-rich themes (Islamic visual languages)
         'lantern',
         // Special themed layouts with custom assets
-        'special1', 'special3',
+        'special1', 'special3', 'special4',
         // Photo-frame + centered-logo themes
         'pavilion', 'atrium', 'minaret',
         'terrace',
