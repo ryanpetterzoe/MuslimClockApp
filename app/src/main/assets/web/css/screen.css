@@ -267,10 +267,16 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-cinema .prayer-col {
     background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
 }
+.layout-cinema .prayer.next::before { display: none; }
 .layout-cinema .prayer.next {
     background: linear-gradient(90deg,
-        rgba(255,255,255,0.15) 0%,
-        rgba(255,255,255,0.05) 100%);
+        color-mix(in srgb, var(--accent) 20%, transparent),
+        transparent) !important;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
+                inset 0 0 8px color-mix(in srgb, var(--accent) 10%, transparent);
+    border-radius: 8px;
+    transform: scale(1.04);
+    transition: all 0.3s ease;
 }
 .layout-cinema .prayer.next [data-time] { color: var(--accent) !important; }
 
@@ -1856,9 +1862,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto18 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
 .layout-fullphoto18 .prayer.next::before { display: none; }
 
-/* Fullphoto 6 (Lanskap) */
-.layout-fullphoto6 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
-.layout-fullphoto6 .prayer.next::before { display: none; }
 
 /* Fullphoto 7 (Jadwal Besar) */
 .layout-fullphoto7 .prayer.next { border-color: var(--accent) !important; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 5%, transparent)); box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 25%, transparent); }
@@ -1904,10 +1907,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-fullphoto19 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
 .layout-fullphoto19 .prayer.next::before { display: none; }
 
-/* Oasis */
-.layout-oasis .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), rgba(0,128,128,0.15)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.05); }
-.layout-oasis .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
-.layout-oasis .prayer.next::before { display: none; }
 
 /* Arch */
 .layout-arch .prayer.next { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)) !important; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent); transform: scale(1.06); }
@@ -1919,10 +1918,108 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-courtyard .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
 .layout-courtyard .prayer.next::before { display: none; }
 
-/* Panorama */
-.layout-panorama .prayer.next { background: color-mix(in srgb, var(--accent) 20%, rgba(255,255,255,0.08)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.08); }
-.layout-panorama .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
-.layout-panorama .prayer.next::before { display: none; }
+/* ---------- Prayer highlight glow overrides (10 themes) ---------- */
+
+/* Fullphoto 11 (Heksagonal / round badges) — circular glow */
+.layout-fullphoto11 .prayer.next::before { display: none; }
+.layout-fullphoto11 .prayer.next {
+    box-shadow: 0 0 20px var(--accent), 0 0 40px color-mix(in srgb, var(--accent) 50%, transparent);
+    transform: scale(1.15);
+    border-color: var(--accent) !important;
+    transition: all 0.3s ease;
+}
+.layout-fullphoto11 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 10px var(--accent); }
+
+/* Fullphoto 20 (Meter Vertikal) — right-border card glow */
+.layout-fullphoto20 .prayer.next::before { display: none; }
+.layout-fullphoto20 .prayer.next {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 40%, transparent);
+    transform: scale(1.05);
+    border-color: var(--accent) !important;
+    transition: all 0.3s ease;
+}
+.layout-fullphoto20 .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 8px var(--accent); }
+
+/* Heritage — already has ::before suppressed above; enhance glow */
+.layout-heritage .prayer.next {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
+                inset 0 0 8px color-mix(in srgb, var(--accent) 10%, transparent);
+    transform: scale(1.04);
+    transition: all 0.3s ease;
+}
+
+/* Exhibit — gradient background + subtle border */
+.layout-exhibit .prayer.next::before { display: none; }
+.layout-exhibit .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 20%, transparent);
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+}
+.layout-exhibit .prayer.next [data-time] { color: var(--accent) !important; }
+
+/* Pavilion — gradient background + border accent */
+.layout-pavilion .prayer.next::before { display: none; }
+.layout-pavilion .prayer.next {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 25%, transparent);
+    transform: scale(1.04);
+    transition: all 0.3s ease;
+}
+.layout-pavilion .prayer.next [data-time] { color: var(--accent) !important; }
+
+/* Shrine — glow + scale */
+.layout-shrine .prayer.next::before { display: none; }
+.layout-shrine .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent) !important;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent),
+                inset 0 0 8px color-mix(in srgb, var(--accent) 8%, transparent);
+    border-radius: 8px;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+.layout-shrine .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+
+/* Atrium — soft glow + scale */
+.layout-atrium .prayer.next::before { display: none; }
+.layout-atrium .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent) !important;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent),
+                inset 0 0 10px color-mix(in srgb, var(--accent) 10%, transparent);
+    border-radius: 8px;
+    transform: scale(1.04);
+    transition: all 0.3s ease;
+}
+.layout-atrium .prayer.next [data-time] { color: var(--accent) !important; }
+
+/* Sanctuary — accent shadow + scale */
+.layout-sanctuary .prayer.next::before { display: none; }
+.layout-sanctuary .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent) !important;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
+                0 4px 12px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+.layout-sanctuary .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
+
+/* Terrace — glow + subtle lift */
+.layout-terrace .prayer.next::before { display: none; }
+.layout-terrace .prayer.next {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent) !important;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 30%, transparent),
+                inset 0 0 6px color-mix(in srgb, var(--accent) 8%, transparent);
+    border-radius: 8px;
+    transform: scale(1.03);
+    transition: all 0.3s ease;
+}
+.layout-terrace .prayer.next [data-time] { color: var(--accent) !important; }
 
 
 /* ===================== LAYOUT FIX: Anti-kepotong + Spacing + Z-index =====================
