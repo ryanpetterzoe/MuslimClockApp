@@ -117,6 +117,11 @@
         <item>Folio (Flat + Bingkai Foto)</item>
         <item>Spire (Jadwal Vertikal Kanan)</item>
         <item>Gazette (Jadwal Vertikal Kiri)</item>
+        <item>Flat Blok (Primer) &#x2605; FLAT</item>
+        <item>Flat Split (Dua Warna) &#x2605; FLAT</item>
+        <item>Flat Grid (Kotak) &#x2605; FLAT</item>
+        <item>Flat Card (Kartu Datar) &#x2605; FLAT</item>
+        <item>Flat Minimal (Super Bersih) &#x2605; FLAT</item>
     </string-array>
 
     <string-array name="layout_values">
@@ -181,6 +186,11 @@
         <item>folio</item>
         <item>spire</item>
         <item>gazette</item>
+        <item>flat1</item>
+        <item>flat2</item>
+        <item>flat3</item>
+        <item>flat4</item>
+        <item>flat5</item>
     </string-array>
 
     <!-- Quran rotation card display modes. -->
@@ -256,6 +266,11 @@
         <item>Fade (Pudar Ganti)</item>
         <item>Neon (Glow Berjalan)</item>
         <item>Typewriter (Ketik Satu-Satu)</item>
+        <item>Slide (Geser Vertikal)</item>
+        <item>Glow (Bercahaya)</item>
+        <item>Karaoke (Highlight Progresif)</item>
+        <item>Gradient (Warna Bergerak)</item>
+        <item>Zoom (Besar-Kecil)</item>
     </string-array>
 
     <string-array name="ticker_style_values">
@@ -264,6 +279,11 @@
         <item>fade</item>
         <item>neon</item>
         <item>typewriter</item>
+        <item>slide</item>
+        <item>glow</item>
+        <item>karaoke</item>
+        <item>gradient_text</item>
+        <item>zoom</item>
     </string-array>
 
     <!-- Ticker / running text background variations -->
@@ -308,6 +328,11 @@
         <item>Binary (Desimal + Biner)</item>
         <item>Dots (Titik Pemisah)</item>
         <item>Wave (Gelombang Animasi)</item>
+        <item>Stencil (Potongan Huruf)</item>
+        <item>Glitch (Efek Rusak)</item>
+        <item>Emboss (Timbul 3D)</item>
+        <item>Pixel (Kotak 8-bit)</item>
+        <item>Brush (Kuas Tangan)</item>
     </string-array>
 
     <string-array name="digital_style_values">
@@ -326,6 +351,11 @@
         <item>binary</item>
         <item>dots</item>
         <item>wave</item>
+        <item>stencil</item>
+        <item>glitch</item>
+        <item>emboss</item>
+        <item>pixel</item>
+        <item>brush</item>
     </string-array>
 
     <!-- Analog clock display styles -->

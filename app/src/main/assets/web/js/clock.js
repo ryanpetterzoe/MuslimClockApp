@@ -39,7 +39,7 @@
         show_analog: true,
         show_countdown: true,
         layout: 'cinema',
-        digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave
+        digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave | stencil | glitch | emboss | pixel | brush
         hide_seconds: false,        // hide seconds display on digital clock
         analog_style: 'classic',    // classic | modern | minimal | roman | arabic | dots | skeleton | luxury | sport | radar
         slideshow_urls: '',     // newline / comma separated. Empty = default bg.
@@ -48,7 +48,7 @@
         show_ticker: true,
         ticker_text: 'Selamat Datang di Masjid Muslim Clock | Jadwal Sholat Hari Ini',
         ticker_speed: 30,       // seconds for one full scroll cycle
-        ticker_style: 'classic', // classic | bounce | fade | neon | typewriter
+        ticker_style: 'classic', // classic | bounce | fade | neon | typewriter | slide | glow | karaoke | gradient_text | zoom
         ticker_bg: 'solid_dark', // solid_dark | transparent | glass | accent | gradient_sunset | gradient_ocean | gradient_purple | green_islamic | red_dark
         show_quran: true,
         quran_interval: 30,     // seconds between ayat rotation
@@ -145,7 +145,9 @@
         'fullphoto11', 'fullphoto12', 'fullphoto13', 'fullphoto15',
         'fullphoto16', 'fullphoto17', 'fullphoto18', 'fullphoto19', 'fullphoto20',
         // Glass/modern themes
-        'lumina', 'prism', 'folio', 'spire', 'gazette'
+        'lumina', 'prism', 'folio', 'spire', 'gazette',
+        // Flat design themes (solid colors, no gradients/shadows/blur)
+        'flat1', 'flat2', 'flat3', 'flat4', 'flat5'
     ];
 
     /* ===== State (mutable) ===== */
@@ -270,6 +272,13 @@
             document.documentElement.style.setProperty('--accent', cfg.theme_accent);
             document.documentElement.style.setProperty(
                 '--accent-shadow', `color-mix(in srgb, ${cfg.theme_accent} 40%, transparent)`);
+            // Compute accent contrast color based on luminance
+            const accentHex = cfg.theme_accent || '#F5B301';
+            const rr = parseInt(accentHex.slice(1,3), 16) || 0;
+            const gg = parseInt(accentHex.slice(3,5), 16) || 0;
+            const bb = parseInt(accentHex.slice(5,7), 16) || 0;
+            const lum = (0.299 * rr + 0.587 * gg + 0.114 * bb) / 255;
+            document.documentElement.style.setProperty('--accent-contrast', lum > 0.6 ? '#101820' : '#ffffff');
         }
 
         // Slideshow visual intensity. The user picks 0..100% in Settings;
@@ -953,6 +962,31 @@
                 default:
                     content.style.animationName = 'ticker';
                     content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'slide':
+                    content.style.animationName = 'tickerSlide';
+                    content.style.animationTimingFunction = 'ease';
+                    content.style.paddingLeft = '0';
+                    break;
+                case 'glow':
+                    content.classList.add('ticker-glow');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'karaoke':
+                    content.classList.add('ticker-karaoke');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'gradient_text':
+                    content.classList.add('ticker-gradient');
+                    content.style.animationName = 'ticker';
+                    content.style.animationTimingFunction = 'linear';
+                    break;
+                case 'zoom':
+                    content.style.animationName = 'tickerZoom';
+                    content.style.animationTimingFunction = 'ease-in-out';
+                    content.style.paddingLeft = '0';
                     break;
             }
         }
@@ -2321,7 +2355,7 @@
 
     /* ===== Digital clock + date ===== */
 
-    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone', 'matrix', 'retro', 'minimal', 'gradient', 'outline', 'shadow', 'lcd', 'binary', 'dots', 'wave'];
+    const DIGITAL_STYLES = ['classic', 'split', 'neon', 'flip', 'dualtone', 'matrix', 'retro', 'minimal', 'gradient', 'outline', 'shadow', 'lcd', 'binary', 'dots', 'wave', 'stencil', 'glitch', 'emboss', 'pixel', 'brush'];
 
     function tickDigital() {
         const now = new Date();
@@ -2454,6 +2488,40 @@
                 }
                 waveHtml += '</span>';
                 return waveHtml;
+
+            case 'stencil':
+                // Stencil/cutout style with inner gaps
+                return `<span class="digi-stencil">${pad(h)}</span>` +
+                    `<span class="digi-stencil-sep">:</span>` +
+                    `<span class="digi-stencil">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-stencil-sep">:</span><span class="digi-stencil" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'glitch':
+                // Glitch/distortion effect
+                return `<span class="digi-glitch" data-text="${pad(h)}:${pad(m)}${hideSeconds ? '' : ':' + pad(s)}">${pad(h)}<span class="digi-glitch-sep">:</span>${pad(m)}${hideSeconds ? '' : `<span class="digi-glitch-sep">:</span><span style="font-size:0.6em;">${pad(s)}</span>`}</span>`;
+
+            case 'emboss':
+                // Embossed/raised 3D effect
+                return `<span class="digi-emboss">${pad(h)}</span>` +
+                    `<span class="digi-emboss-sep">:</span>` +
+                    `<span class="digi-emboss">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-emboss-sep">:</span><span class="digi-emboss" style="font-size:0.6em;">${pad(s)}</span>`);
+
+            case 'pixel':
+                // Pixel/8-bit style
+                return `<span class="digi-pixel-wrap">` +
+                    `<span class="digi-pixel">${pad(h)}</span>` +
+                    `<span class="digi-pixel-sep">:</span>` +
+                    `<span class="digi-pixel">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-pixel-sep">:</span><span class="digi-pixel" style="font-size:0.65em;">${pad(s)}</span>`) +
+                    `</span>`;
+
+            case 'brush':
+                // Brush/handwritten style
+                return `<span class="digi-brush">${pad(h)}</span>` +
+                    `<span class="digi-brush-sep">:</span>` +
+                    `<span class="digi-brush">${pad(m)}</span>` +
+                    (hideSeconds ? '' : `<span class="digi-brush-sep">:</span><span class="digi-brush" style="font-size:0.6em;">${pad(s)}</span>`);
 
             case 'classic':
             default:
