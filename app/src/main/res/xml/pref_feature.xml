@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_ticker">
+
+        <SwitchPreferenceCompat
+            app:key="show_ticker"
+            app:title="@string/pref_show_ticker"
+            app:defaultValue="true" />
+
+        <ListPreference
+            app:key="ticker_style"
+            app:title="Gaya Running Text"
+            app:summary="Pilih gaya tampilan running text"
+            app:entries="@array/ticker_style_entries"
+            app:entryValues="@array/ticker_style_values"
+            app:defaultValue="classic"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="ticker_bg"
+            app:title="Background Running Text"
+            app:summary="Pilih jenis background running text"
+            app:entries="@array/ticker_bg_entries"
+            app:entryValues="@array/ticker_bg_values"
+            app:defaultValue="solid_dark"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="ticker_text"
+            app:title="@string/pref_ticker_text"
+            app:summary="@string/pref_ticker_text_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="ticker_speed"
+            app:title="@string/pref_ticker_speed"
+            app:summary="@string/pref_ticker_speed_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_quran">
+
+        <SwitchPreferenceCompat
+            app:key="show_quran"
+            app:title="@string/pref_show_quran"
+            app:defaultValue="true" />
+
+        <ListPreference
+            app:key="quran_mode"
+            app:title="@string/pref_quran_mode"
+            app:summary="@string/pref_quran_mode_sum"
+            app:entries="@array/quran_mode_entries"
+            app:entryValues="@array/quran_mode_values"
+            app:defaultValue="fullcard"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="quran_interval"
+            app:title="@string/pref_quran_interval"
+            app:summary="@string/pref_quran_interval_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            app:key="quran_marquee_speed"
+            app:title="@string/pref_quran_marquee_speed"
+            app:summary="@string/pref_quran_marquee_speed_sum"
+            android:max="300"
+            app:min="10"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="50" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -15,7 +15,7 @@ import org.json.JSONObject
  */
 object Settings {
 
-    // Keep these in sync with res/xml/preferences.xml
+    // Keep these in sync with res/xml/pref_*.xml
     const val K_MASJID_NAME    = "masjid_name"
     const val K_MASJID_ADDRESS = "masjid_address"
     const val K_MASJID_LOGO    = "masjid_logo"

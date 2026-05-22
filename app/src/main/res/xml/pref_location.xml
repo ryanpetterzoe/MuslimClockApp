@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_location">
+
+        <id.muslimclock.app.LocationSearchPreference
+            app:key="location_picker"
+            app:icon="@android:drawable/ic_menu_mylocation"
+            app:title="@string/pref_location_search"
+            app:summary="@string/pref_location_search_sum" />
+
+        <EditTextPreference
+            app:key="location_lat"
+            app:title="@string/pref_lat"
+            app:summary="@string/pref_lat_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="location_lng"
+            app:title="@string/pref_lng"
+            app:summary="@string/pref_lng_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="timezone"
+            app:title="@string/pref_timezone"
+            app:entries="@array/timezone_entries"
+            app:entryValues="@array/timezone_values"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="calc_method"
+            app:title="@string/pref_calc_method"
+            app:entries="@array/calc_method_entries"
+            app:entryValues="@array/calc_method_values"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

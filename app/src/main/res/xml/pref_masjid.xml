@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_masjid">
+
+        <EditTextPreference
+            app:key="masjid_name"
+            app:title="@string/pref_masjid_name"
+            app:summary="@string/pref_masjid_name_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="masjid_address"
+            app:title="@string/pref_masjid_address"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:key="pick_logo"
+            app:title="@string/pref_pick_logo"
+            app:summary="@string/pref_pick_logo_sum_empty"
+            app:icon="@android:drawable/ic_menu_gallery" />
+
+        <Preference
+            app:key="clear_logo"
+            app:title="@string/pref_clear_logo"
+            app:summary="@string/pref_clear_logo_sum" />
+
+        <EditTextPreference
+            app:key="masjid_logo"
+            app:title="@string/pref_masjid_logo"
+            app:summary="@string/pref_masjid_logo_sum"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

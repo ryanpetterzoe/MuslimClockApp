@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -34,6 +35,7 @@ class LayoutEditorActivity : AppCompatActivity() {
 
     private lateinit var previewWebView: WebView
     private lateinit var assetLoader: WebViewAssetLoader
+    private lateinit var controlPanel: LinearLayout
     private lateinit var elementTabs: LinearLayout
     private lateinit var sliderContainer: LinearLayout
 
@@ -72,13 +74,11 @@ class LayoutEditorActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide action bar — we use a fullscreen overlay approach
+        supportActionBar?.hide()
         setContentView(R.layout.activity_layout_editor)
 
-        supportActionBar?.apply {
-            title = getString(R.string.layout_editor_title)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
+        controlPanel = findViewById(R.id.control_panel)
         elementTabs = findViewById(R.id.element_tabs)
         sliderContainer = findViewById(R.id.slider_container)
 
@@ -95,8 +95,38 @@ class LayoutEditorActivity : AppCompatActivity() {
         showSlidersForElement(0)
 
         // Buttons
-        findViewById<Button>(R.id.btn_reset).setOnClickListener { confirmReset() }
-        findViewById<Button>(R.id.btn_done).setOnClickListener { saveAndFinish() }
+        val btnReset = findViewById<Button>(R.id.btn_reset)
+        val btnDone = findViewById<Button>(R.id.btn_done)
+        btnReset.setOnClickListener { confirmReset() }
+        btnDone.setOnClickListener { saveAndFinish() }
+
+        // Focus highlight for remote navigation on action buttons
+        val focusHighlight = View.OnFocusChangeListener { v, hasFocus ->
+            val btn = v as Button
+            if (hasFocus) {
+                btn.scaleX = 1.1f
+                btn.scaleY = 1.1f
+                btn.alpha = 1.0f
+            } else {
+                btn.scaleX = 1.0f
+                btn.scaleY = 1.0f
+                btn.alpha = 0.85f
+            }
+        }
+        btnReset.onFocusChangeListener = focusHighlight
+        btnDone.onFocusChangeListener = focusHighlight
+
+        // Tap the preview area (outside panel) to toggle panel visibility
+        previewWebView.setOnTouchListener { _, event ->
+            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                // Only toggle if tap is outside the panel area
+                val panelLeft = controlPanel.left
+                if (event.x < panelLeft) {
+                    togglePanel()
+                }
+            }
+            false // let WebView handle the touch normally
+        }
     }
 
     private fun loadWorkingValues() {
@@ -210,8 +240,17 @@ class LayoutEditorActivity : AppCompatActivity() {
                 textSize = 12f
                 isAllCaps = false
                 setPadding(24, 12, 24, 12)
+                // D-pad / remote navigation support
+                isFocusable = true
+                isFocusableInTouchMode = true
                 setOnClickListener {
                     selectTab(idx)
+                }
+                // Highlight on focus (for remote/D-pad navigation)
+                setOnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
+                        selectTab(idx)
+                    }
                 }
             }
             val lp = LinearLayout.LayoutParams(
@@ -224,6 +263,8 @@ class LayoutEditorActivity : AppCompatActivity() {
             tabButtons.add(btn)
         }
         highlightTab(0)
+        // Request focus on the first tab so remote can navigate immediately
+        tabButtons.firstOrNull()?.requestFocus()
     }
 
     private fun selectTab(idx: Int) {
@@ -320,6 +361,10 @@ class LayoutEditorActivity : AppCompatActivity() {
             this.max = (max - min) / step
             progress = (currentValue - min) / step
             setPadding(0, 16, 0, 16)
+            // D-pad / remote navigation support
+            isFocusable = true
+            isFocusableInTouchMode = true
+            keyProgressIncrement = 1
 
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -376,9 +421,27 @@ class LayoutEditorActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun togglePanel() {
+        if (controlPanel.visibility == View.VISIBLE) {
+            controlPanel.visibility = View.GONE
+        } else {
+            controlPanel.visibility = View.VISIBLE
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        // If panel is hidden, show it back first
+        if (controlPanel.visibility == View.GONE) {
+            controlPanel.visibility = View.VISIBLE
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onDestroy() {
