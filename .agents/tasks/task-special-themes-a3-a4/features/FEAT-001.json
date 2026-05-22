@@ -36,5 +36,5 @@
     "Run grep to verify distinct styles: a3 files should have border-radius (rounded), a4 files should not or have minimal radius"
   ],
   "blocked_reason": null,
-  "findings": "All 4 files created and verified. A3 uses rounded glass cards with backdrop-filter blur. A4 uses sharp geometric table layout with solid borders. Assets reference img/temaspesial/background.png and img/temaspesial/frame.png directly (no subfolders). Did not reference A1 theme at all as per user instruction."
+  "findings": "All 4 files created and verified. A3 uses rounded glass cards with backdrop-filter blur. A4 uses sharp geometric table layout with solid borders. Assets reference img/temaspesial/background.png and img/temaspesial/frame.png directly (no subfolders). Did not reference A1 theme at all as per user instruction. Post-review fixes applied: (1) XSS vulnerability in masjid_logo innerHTML replaced with safe DOM creation using createElement/appendChild, (2) Post-Isha countdown gap fixed to compute time until next Fajr instead of showing --:--:--."
 }
