@@ -1,7 +1,13 @@
 {
   "task_id": "task-fix-qurancard-autofit",
   "task_description": "Fix accentcard and cleancard Quran display modes to auto-fit text like fullcard mode, keeping typewriter animation. Card size should follow the longest surah so text never gets cut off.",
-  "status": "in_progress",
+  "status": "completed",
   "feature_order": ["FEAT-001"],
-  "blocked_reason": null
+  "blocked_reason": null,
+  "verification": {
+    "build": "skipped - no JS build step, static asset",
+    "tests": "skipped - no unit tests for web assets",
+    "syntax": "pass - brace/bracket count delta matches pre-existing state",
+    "summary": "Added autoFitToTwoLines pre-measurement to renderAccentCard. The function now sets full text, calls autoFit to shrink font to fit 2 lines, saves computed font sizes, clears elements, and types with saved sizes. cleancard inherits fix via renderAccentCard delegation."
+  }
 }
