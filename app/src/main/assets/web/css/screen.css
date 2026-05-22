@@ -606,7 +606,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 #quranBar .q-arab, #quranBar .q-trans { overflow-wrap: anywhere; }
 
 
-
 /* ===================== SLIDESHOW-CENTRIC LAYOUTS NEXT-STATE ===================== */
 
 /* Theater */
@@ -759,7 +758,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== NEW LAYOUTS (set 2): GLASS / NEWSPAPER / BRUTALIST / HERITAGE / MONO / SUNRISE ===================== */
 
 /* Glass — frosted card highlight on next prayer. */
@@ -838,7 +836,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-sunrise .prayer.next::before {
     display: none;
 }
-
 
 
 /* ===================== PHOTO-FRAME LAYOUTS (gallery / journal / studio / canvas / memory) ===================== */
@@ -1022,7 +1019,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== PRAYER-CARD CROSS-FONT SAFETY =====================
  *
  * Fonts vary wildly in glyph width and ascender height. Wide-glyph picks
@@ -1066,7 +1062,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .prayer-col .prayer > * {
     min-width: 0;
 }
-
 
 
 /* ===================== VERTICAL PRAYER-CARD LAYOUTS =====================
@@ -1204,7 +1199,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== ORNAMENT-RICH LAYOUTS (set v2) =====================
  *
  * Card / next-state styling for the 10 ornament-heavy layouts in
@@ -1216,7 +1210,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
  * The universal `.prayer.next::before` left-bar is suppressed for
  * every layout in this set because each owns a richer highlight.
  */
-
 
 
 /* ----- LANTERN (warm bronze + cream) ----- */
@@ -1237,63 +1230,11 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
-
-
-/* ----- DAMASCUS (brass + bronze) ----- */
-.layout-damascus .dm-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(58, 38, 20, 0.55);
-    border: 1px solid #d4a36a;
-    border-radius: 4px;
-    box-shadow: inset 0 0 8px rgba(184, 144, 96, 0.25);
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-}
-.layout-damascus .prayer.next .dm-card,
-.layout-damascus .dm-card.next {
-    background: linear-gradient(180deg, rgba(212, 163, 106, 0.30), rgba(58, 38, 20, 0.65));
-    border-color: #fde68a;
-    box-shadow: 0 0 0 1px #fde68a, 0 12px 32px -10px #d4a36a, inset 0 0 14px rgba(253, 230, 138, 0.18);
-}
-
-
-
-
-
-
-
-/* ----- IMPERIAL (deep red + gold) ----- */
-.layout-imperial .im-card {
-    padding: 12px;
-    text-align: center;
-    background: rgba(91, 14, 14, 0.55);
-    border: 1px solid #daa520;
-    border-top: 2px solid #fde68a;
-    border-bottom: 2px solid #fde68a;
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-}
-.layout-imperial .prayer.next .im-card,
-.layout-imperial .im-card.next {
-    background: linear-gradient(180deg, rgba(218, 165, 32, 0.30), rgba(91, 14, 14, 0.7));
-    border-color: #fde68a;
-    box-shadow: 0 0 0 1px #fde68a, 0 12px 36px -10px #daa520, inset 0 0 18px rgba(218, 165, 32, 0.20);
-}
-.layout-imperial .prayer.next .im-card [data-time] {
-    color: #fde68a;
-    text-shadow: 0 0 10px #daa520;
-}
-
-
-
 /* Suppress the universal `.prayer.next::before` left-bar for every
  * ornament-rich theme — each one supplies its own next-state. */
-.layout-lantern   .prayer.next::before,
-.layout-damascus  .prayer.next::before,
-.layout-imperial  .prayer.next::before {
+.layout-lantern .prayer.next::before {
     display: none;
 }
-
 
 
 /* ===================== NEW DIGITAL CLOCK STYLES ===================== */
@@ -1570,7 +1511,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 }
 
 
-
 /* ===================== DIGITAL CLOCK AUTOFIT =====================
  * Ensure #digital never overflows its parent container when switching
  * between styles that produce wider output (Binary, Dots, LCD, etc.).
@@ -1582,7 +1522,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     word-break: keep-all;
     white-space: nowrap;
 }
-
 
 
 /* ===================== TICKER STYLES ===================== */
@@ -1984,8 +1923,6 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
 .layout-panorama .prayer.next { background: color-mix(in srgb, var(--accent) 20%, rgba(255,255,255,0.08)) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent); transform: scale(1.08); }
 .layout-panorama .prayer.next [data-time] { color: var(--accent) !important; text-shadow: 0 0 6px var(--accent); }
 .layout-panorama .prayer.next::before { display: none; }
-
-
 
 
 /* ===================== LAYOUT FIX: Anti-kepotong + Spacing + Z-index =====================
