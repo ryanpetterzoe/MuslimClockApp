@@ -10,7 +10,7 @@
             app:summary="@string/pref_layout_sum"
             app:entries="@array/layout_entries"
             app:entryValues="@array/layout_values"
-            app:defaultValue="minimal"
+            app:defaultValue="cinema"
             app:useSimpleSummaryProvider="true" />
 
         <id.muslimclock.app.ColorPickerPreference

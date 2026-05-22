@@ -18,6 +18,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.Spinner
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -73,6 +74,8 @@ class LayoutEditorActivity : AppCompatActivity() {
     private val workingValues = mutableMapOf<String, Int>()
     // Local working copy of string-type settings (dropdowns)
     private val workingStrings = mutableMapOf<String, String>()
+    // Local working copy of boolean-type settings (toggles/switches)
+    private val workingBooleans = mutableMapOf<String, Boolean>()
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -150,6 +153,9 @@ class LayoutEditorActivity : AppCompatActivity() {
         workingStrings[Settings.K_DIGITAL_STYLE] = p.getString(Settings.K_DIGITAL_STYLE, "classic") ?: "classic"
         workingStrings[Settings.K_IDENTITY_POSITION] = p.getString(Settings.K_IDENTITY_POSITION, "left") ?: "left"
         workingStrings[Settings.K_LOGO_POSITION] = p.getString(Settings.K_LOGO_POSITION, "right") ?: "right"
+        workingStrings[Settings.K_QURAN_MODE] = p.getString(Settings.K_QURAN_MODE, "fullcard") ?: "fullcard"
+        // Load boolean-type settings
+        workingBooleans[Settings.K_HIDE_SECONDS] = p.getBoolean(Settings.K_HIDE_SECONDS, false)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -227,6 +233,10 @@ class LayoutEditorActivity : AppCompatActivity() {
         }
         // Override layout keys with working string values
         for ((key, value) in workingStrings) {
+            json.put(key, value)
+        }
+        // Override layout keys with working boolean values
+        for ((key, value) in workingBooleans) {
             json.put(key, value)
         }
         return json.toString()
@@ -313,6 +323,22 @@ class LayoutEditorActivity : AppCompatActivity() {
                 addDropdown(
                     label = getString(R.string.layout_editor_dropdown_digital_style),
                     key = Settings.K_DIGITAL_STYLE,
+                    entries = entries,
+                    values = values
+                )
+                // Hide seconds toggle
+                addToggle(
+                    label = getString(R.string.layout_editor_hide_seconds),
+                    key = Settings.K_HIDE_SECONDS
+                )
+            }
+            "Qur'an" -> {
+                // Quran mode dropdown at the top
+                val entries = resources.getStringArray(R.array.quran_mode_entries)
+                val values = resources.getStringArray(R.array.quran_mode_values)
+                addDropdown(
+                    label = getString(R.string.layout_editor_dropdown_quran_mode),
+                    key = Settings.K_QURAN_MODE,
                     entries = entries,
                     values = values
                 )
@@ -431,6 +457,41 @@ class LayoutEditorActivity : AppCompatActivity() {
         sliderContainer.addView(container)
     }
 
+    @Suppress("UseSwitchCompatOrMaterialCode")
+    private fun addToggle(label: String, key: String) {
+        val currentValue = workingBooleans[key] ?: false
+
+        // Container
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 8, 0, 16)
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        // Label
+        val labelText = TextView(this).apply {
+            text = label
+            textSize = 14f
+            setTextColor(Color.parseColor("#ecf0f1"))
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+
+        // Switch
+        val switch = Switch(this).apply {
+            isChecked = currentValue
+            isFocusable = true
+            isFocusableInTouchMode = true
+            setOnCheckedChangeListener { _, isChecked ->
+                workingBooleans[key] = isChecked
+                pushConfigToPreview()
+            }
+        }
+
+        container.addView(labelText)
+        container.addView(switch)
+        sliderContainer.addView(container)
+    }
+
     private fun addSlider(label: String, key: String, min: Int, max: Int, step: Int, suffix: String) {
         val currentValue = workingValues[key] ?: if (key.endsWith("_size")) 100 else 0
 
@@ -509,6 +570,9 @@ class LayoutEditorActivity : AppCompatActivity() {
                 workingStrings[Settings.K_IDENTITY_POSITION] = "left"
                 workingStrings[Settings.K_LOGO_POSITION] = "right"
                 workingStrings[Settings.K_DIGITAL_STYLE] = "classic"
+                workingStrings[Settings.K_QURAN_MODE] = "fullcard"
+                // Reset boolean settings to defaults
+                workingBooleans[Settings.K_HIDE_SECONDS] = false
                 // Refresh sliders and preview
                 showSlidersForElement(selectedElementIdx)
                 pushConfigToPreview()
@@ -527,6 +591,10 @@ class LayoutEditorActivity : AppCompatActivity() {
         // Save string-type settings
         for ((key, value) in workingStrings) {
             editor.putString(key, value)
+        }
+        // Save boolean-type settings
+        for ((key, value) in workingBooleans) {
+            editor.putBoolean(key, value)
         }
         editor.apply()
         Toast.makeText(this, R.string.layout_editor_saved, Toast.LENGTH_SHORT).show()

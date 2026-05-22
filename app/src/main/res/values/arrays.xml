@@ -56,52 +56,29 @@
       selections by index/key keep working).
     -->
     <string-array name="layout_entries">
-        <item>Minimal</item>
-        <item>Mosque (Kubah)</item>
         <item>Cinema (3 kolom)</item>
-        <item>Neon (Cyber)</item>
         <item>Classic (Ornamen)</item>
-        <item>Aurora (Gradient)</item>
-        <item>Frame (Bingkai)</item>
-        <item>Stadium (Scoreboard)</item>
-        <item>Magazine (Editorial)</item>
         <item>Theater (Slideshow)</item>
         <item>Showcase (Galeri)</item>
-        <item>Split (Dua Sisi)</item>
         <item>Polaroid (Foto)</item>
         <item>Window (Jendela)</item>
         <item>Festival (Pearl)</item>
-        <item>Portrait (Potret)</item>
         <item>Galaxy (Angkasa)</item>
         <item>Geometric (Pola)</item>
-        <item>Kinetic (Dinamis)</item>
         <item>Marble (Marmer)</item>
-        <item>Terminal (Hacker)</item>
         <item>Sunset (Senja)</item>
         <item>Glass (Glassmorphism)</item>
         <item>Newspaper (Koran)</item>
-        <item>Brutalist (Berani)</item>
         <item>Heritage (Pola Klasik)</item>
         <item>Mono (Hitam Putih)</item>
-        <item>Sunrise (Fajar)</item>
         <item>Arabesque (Islam Klasik)</item>
         <item>Royal (Kerajaan)</item>
-        <item>Calligraphy (Kaligrafi)</item>
         <item>Jade (Giok)</item>
-        <item>Ottoman (Turki Usmani)</item>
-        <item>Celestial (Langit)</item>
-        <item>Rumi (Persia)</item>
-        <item>Andalusia (Moor)</item>
-        <item>Medina (Madinah)</item>
-        <item>Batik (Jawa)</item>
         <item>Gallery (Foto + Jam Besar) ★ BARU</item>
-        <item>Journal (Album Vintage) ★ BARU</item>
         <item>Studio (Foto Premium) ★ BARU</item>
-        <item>Canvas (Editorial Putih) ★ BARU</item>
         <item>Memory (Album Hangat) ★ BARU</item>
         <item>Bigboard (Jam Sholat Besar) ★ BARU</item>
         <item>Pulpit (Mimbar Hijau Emas) ★ BARU</item>
-        <item>Bulletin (Newsroom) ★ BARU</item>
         <item>Tower (Indigo Besar) ★ BARU</item>
         <item>Beacon (Aksen Glow) ★ BARU</item>
         <item>Vertical (Daftar Tegak) ★ VERTIKAL</item>
@@ -109,18 +86,8 @@
         <item>Stack (Tumpukan Tengah) ★ VERTIKAL</item>
         <item>Rack (Rak Kayu Sholat) ★ VERTIKAL</item>
         <item>Column (Kolom Klasik Ornamen) ★ VERTIKAL</item>
-        <item>Mihrab (Lengkung Mihrab) ★ ORNAMEN</item>
         <item>Lantern (Lentera Maroko) ★ ORNAMEN</item>
-        <item>Mosaic (Zellige Cobalt) ★ ORNAMEN</item>
-        <item>Crescent (Hilal Konstelasi) ★ ORNAMEN</item>
-        <item>Damascus (Logam Damaskus) ★ ORNAMEN</item>
-        <item>Persian (Karpet Medallion) ★ ORNAMEN</item>
-        <item>Mecca (Cahaya Haram) ★ ORNAMEN</item>
-        <item>Marrakesh (Tile Multi-Warna) ★ ORNAMEN</item>
-        <item>Imperial (Tugra Utsmani) ★ ORNAMEN</item>
-        <item>Jannah (Kebun Surga) ★ ORNAMEN</item>
         <item>Spesial A1 (Custom Background)</item>
-        <item>Spesial A2 (Jadwal Vertikal Kanan)</item>
         <item>Spesial A3 (Jadwal Vertikal Kiri)</item>
         <item>Exhibit (Foto + Ribbon) ★ FOTO</item>
         <item>Pavilion (3 Kolom Foto) ★ FOTO</item>
@@ -157,52 +124,29 @@
     </string-array>
 
     <string-array name="layout_values">
-        <item>minimal</item>
-        <item>mosque</item>
         <item>cinema</item>
-        <item>neon</item>
         <item>classic</item>
-        <item>aurora</item>
-        <item>frame</item>
-        <item>stadium</item>
-        <item>magazine</item>
         <item>theater</item>
         <item>showcase</item>
-        <item>split</item>
         <item>polaroid</item>
         <item>window</item>
         <item>festival</item>
-        <item>portrait</item>
         <item>galaxy</item>
         <item>geometric</item>
-        <item>kinetic</item>
         <item>marble</item>
-        <item>terminal</item>
         <item>sunset</item>
         <item>glass</item>
         <item>newspaper</item>
-        <item>brutalist</item>
         <item>heritage</item>
         <item>mono</item>
-        <item>sunrise</item>
         <item>arabesque</item>
         <item>royal</item>
-        <item>calligraphy</item>
         <item>jade</item>
-        <item>ottoman</item>
-        <item>celestial</item>
-        <item>rumi</item>
-        <item>andalusia</item>
-        <item>medina</item>
-        <item>batik</item>
         <item>gallery</item>
-        <item>journal</item>
         <item>studio</item>
-        <item>canvas</item>
         <item>memory</item>
         <item>bigboard</item>
         <item>pulpit</item>
-        <item>bulletin</item>
         <item>tower</item>
         <item>beacon</item>
         <item>vertical</item>
@@ -210,18 +154,8 @@
         <item>stack</item>
         <item>rack</item>
         <item>column</item>
-        <item>mihrab</item>
         <item>lantern</item>
-        <item>mosaic</item>
-        <item>crescent</item>
-        <item>damascus</item>
-        <item>persian</item>
-        <item>mecca</item>
-        <item>marrakesh</item>
-        <item>imperial</item>
-        <item>jannah</item>
         <item>special1</item>
-        <item>special2</item>
         <item>special3</item>
         <item>exhibit</item>
         <item>pavilion</item>
