@@ -38,7 +38,7 @@
         adzan_audio_loops: 1,
         show_analog: true,
         show_countdown: true,
-        layout: 'minimal',
+        layout: 'cinema',
         digital_style: 'classic',   // classic | split | neon | flip | dualtone | matrix | retro | minimal | gradient | outline | shadow | lcd | binary | dots | wave
         hide_seconds: false,        // hide seconds display on digital clock
         analog_style: 'classic',    // classic | modern | minimal | roman | arabic | dots | skeleton | luxury | sport | radar
@@ -88,6 +88,9 @@
         logo_size: 100,
         identity_size: 100,
         identity_position: 'left',
+        identity_x_pct: 0,
+        identity_y_pct: 0,
+        logo_position: 'right',
         date_position: 'auto',
     };
 
@@ -116,23 +119,20 @@
     };
 
     const SUPPORTED_LAYOUTS = [
-        'minimal', 'mosque', 'cinema', 'neon', 'classic',
-        'aurora', 'frame',
+        'cinema', 'classic',
         'theater', 'showcase', 'polaroid',
         'window', 'festival',
         'galaxy', 'geometric', 'marble', 'sunset',
-        'glass', 'newspaper', 'brutalist', 'heritage', 'mono', 'sunrise',
-        'arabesque', 'royal', 'calligraphy', 'jade', 'ottoman',
-        'celestial', 'rumi', 'andalusia', 'medina', 'batik',
+        'glass', 'newspaper', 'heritage', 'mono',
+        'arabesque', 'royal', 'jade',
         // Photo-frame themes (foto + jam besar + jadwal horizontal)
-        'gallery', 'journal', 'studio', 'memory',
+        'gallery', 'studio', 'memory',
         // Big-schedule themes (kartu jadwal sholat besar/jelas)
-        'bigboard', 'pulpit', 'bulletin', 'tower', 'beacon',
+        'bigboard', 'pulpit', 'tower', 'beacon',
         // Vertical prayer-card themes (jadwal sholat tersusun tegak)
         'vertical', 'pillar', 'stack', 'rack', 'column',
         // Ornament-rich themes (Islamic visual languages)
-        'mihrab', 'lantern', 'mosaic', 'crescent',
-        'persian', 'mecca', 'marrakesh', 'jannah',
+        'lantern',
         // Special themed layouts with custom assets
         'special1', 'special3',
         // Photo-frame + centered-logo themes
@@ -177,7 +177,7 @@
     function mountLayout(name) {
         const host = $('#layoutHost');
         if (!host) return false;
-        const safe = SUPPORTED_LAYOUTS.includes(name) ? name : 'minimal';
+        const safe = SUPPORTED_LAYOUTS.includes(name) ? name : 'cinema';
         const tmpl = document.getElementById('layout-' + safe);
         if (!tmpl) {
             console.warn('Layout template missing:', safe);
@@ -361,6 +361,28 @@
             const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
             box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
             box.style.transformOrigin = 'center center';
+        }
+
+        // Logo position — controls whether the logo appears to the right
+        // of the identity text ("right", default) or above it ("top").
+        // We achieve this by setting flex-direction on the logo's parent
+        // container (which typically holds logo + name/address as siblings).
+        if (box) {
+            const logoPos = cfg.logo_position || 'right';
+            const identParent = box.parentElement;
+            if (identParent && identParent.tagName !== 'HEADER') {
+                if (logoPos === 'top') {
+                    identParent.style.flexDirection = 'column';
+                    identParent.style.alignItems = identParent.style.alignItems || 'flex-start';
+                    // Move logo before text siblings by reinserting as first child
+                    if (box !== identParent.firstElementChild) {
+                        identParent.insertBefore(box, identParent.firstElementChild);
+                    }
+                } else {
+                    // "right" — default row layout, logo after text
+                    identParent.style.flexDirection = '';
+                }
+            }
         }
 
         // Identity text size — scale #masjidName and #masjidAddress font-size.
@@ -1388,6 +1410,22 @@
             apply(uniqueDateSelector(dateWrap),
                   cfg.date_size, cfg.date_x_pct, cfg.date_y_pct,
                   'top right');
+        }
+
+        // Identity header block — translate the entire header (logo +
+        // name + address) using identity_x_pct / identity_y_pct. The
+        // identity_size scaling is handled separately in applyConfigToDom
+        // (per-text element), so here we only apply the translate offset.
+        const identityHeader = (function () {
+            const el = document.getElementById('logoBox') || document.getElementById('masjidName');
+            return el ? el.closest('header') : null;
+        })();
+        if (identityHeader) {
+            const ix = Math.max(-50, Math.min(50, parseInt(cfg.identity_x_pct, 10) || 0));
+            const iy = Math.max(-50, Math.min(50, parseInt(cfg.identity_y_pct, 10) || 0));
+            const isDefault = ix === 0 && iy === 0;
+            identityHeader.style.transform = isDefault ? '' : `translate(${ix}vw, ${iy}vh)`;
+            identityHeader.style.willChange = isDefault ? '' : 'transform';
         }
 
         // After all transforms are applied, schedule a collision check
