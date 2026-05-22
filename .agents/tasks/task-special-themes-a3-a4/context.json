@@ -1,0 +1,24 @@
+{
+  "project_type": "Android WebView prayer clock app with HTML/CSS/JS frontend",
+  "language": "HTML/CSS/JavaScript (frontend), Kotlin (Android)",
+  "build_system": "Gradle (Android), no build step for web assets",
+  "test_framework": "No automated tests for web assets. Manual verification via file existence and HTML validity.",
+  "build_command": "N/A for web assets (static HTML files)",
+  "test_command": "N/A (verify files exist and are well-formed HTML)",
+  "verification_instructions": "1. Verify the 4 HTML files exist at app/src/main/assets/web/. 2. Check that each file references img/temaspesial/background.png and img/temaspesial/frame.png. 3. Verify HTML is well-formed. 4. Check that MCAndroid bridge interface is present (getConfig, applyConfig). 5. Check all required sections exist: identity, prayer table, digital clock, slideshow, running text, iqamah overlay.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup needed. Files are static HTML assets.",
+  "environment_constraints": "No build tools needed. Just create static HTML files in the assets directory.",
+  "contribution_requirements": "Files must follow the existing pattern of the app: use MCAndroid bridge for config, support live config updates via window.applyConfig(), include adzan/iqamah overlay, ticker, and prayer time display.",
+  "key_patterns": "1. MCAndroid.getConfig() returns JSON config (masjid_name, prayer times location, theme colors, etc.). 2. window.applyConfig(json) is called by Android when settings change. 3. Prayer times fetched from aladhan.com API. 4. Adzan overlay triggers at prayer time with countdown. 5. Ticker bar at bottom with marquee animation. 6. Tailwind CSS via local js/tailwind.js. 7. CSS custom properties: --primary, --accent, --font-display, --font-digital. 8. Layouts use position:fixed inset:0 with flex column structure (row-fixed/row-fill). 9. Prayer cards use data-key attribute (fajr, sunrise, dhuhr, asr, maghrib, isha) and data-time for time display. 10. Identity: #logoBox, #masjidPrefix, #masjidName, #masjidAddress. 11. Clock: #digital element. 12. Countdown: #nextPill, #nextLabel, #nextCountdown. 13. Dates: #greg-date, #hij-date.",
+  "relevant_files": [
+    "app/src/main/assets/web/index.html",
+    "app/src/main/assets/web/js/clock.js",
+    "app/src/main/assets/web/css/screen.css",
+    "app/src/main/assets/web/img/temaspesial/background.png",
+    "app/src/main/assets/web/img/temaspesial/frame.png",
+    "app/src/main/java/id/muslimclock/app/WebAppBridge.kt",
+    "app/src/main/java/id/muslimclock/app/MainActivity.kt"
+  ],
+  "directory_structure": "app/src/main/assets/web/ - root of web assets; index.html is main app page; js/ has clock.js (3550 lines, all app logic) and tailwind.js; css/ has screen.css; img/ has images including img/temaspesial/ for special theme assets"
+}

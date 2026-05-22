@@ -1,0 +1,40 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Create 4 standalone special theme HTML files for A3 and A4 themes (vertical and horizontal variants). Each file is a self-contained page with full prayer clock functionality, using img/temaspesial/background.png as full-page background and img/temaspesial/frame.png as slideshow decorative border. A3 and A4 have distinct visual styles. Vertical = portrait single-column layout. Horizontal = landscape multi-panel layout.",
+  "status": "in_progress",
+  "steps": [
+    "Create app/src/main/assets/web/jadwal_sholat_spesial_a3_vertikal.html - A3 vertical/portrait layout with: (1) Full-page background using img/temaspesial/background.png, (2) Identity section CENTERED with mosque logo on LEFT side of identity text, (3) Large digital clock display, (4) Prayer schedule table showing 6 rows (Subuh, Syuruq, Dzuhur, Ashar, Maghrib, Isya) in a vertical single-column card layout, (5) Slideshow area with img/temaspesial/frame.png as decorative border around it, (6) Running text ticker at bottom (marquee animation), (7) Adzan/Iqamah countdown overlay (full-screen, same as index.html), (8) MCAndroid bridge integration (getConfig, applyConfig), (9) Prayer time fetching from aladhan.com API, (10) Hijri date display. A3 visual style: elegant/clean with rounded cards, semi-transparent dark glass backgrounds for cards, gold accent borders.",
+    "Create app/src/main/assets/web/jadwal_sholat_spesial_a3_horizontal.html - A3 horizontal/landscape layout with multi-panel design: (1) Full-page background using img/temaspesial/background.png, (2) Left panel: slideshow area with img/temaspesial/frame.png as decorative border, (3) Right panel split into: top-right identity (centered, logo LEFT of text), middle-right large digital clock + date, bottom-right prayer schedule table in a 2x3 or 3x2 grid. (4) Running text ticker at bottom, (5) Adzan/Iqamah overlay, (6) MCAndroid bridge, (7) Prayer time fetching. Same A3 visual style: rounded cards, glass backgrounds, gold accents.",
+    "Create app/src/main/assets/web/jadwal_sholat_spesial_a4_vertikal.html - A4 vertical/portrait layout with a DIFFERENT visual style from A3: (1) Full-page background using img/temaspesial/background.png, (2) Identity section CENTERED with logo on LEFT of text, (3) Digital clock display with bold geometric styling, (4) Prayer schedule as a structured table (not cards) with alternating row colors, (5) Slideshow with frame.png border, (6) Running text ticker, (7) Adzan/Iqamah overlay, (8) MCAndroid bridge. A4 visual style: bold/geometric with sharp corners, stronger contrast, table-style prayer schedule with header row, more structured/formal appearance.",
+    "Create app/src/main/assets/web/jadwal_sholat_spesial_a4_horizontal.html - A4 horizontal/landscape layout: (1) Full-page background, (2) Multi-panel: Left panel has identity (centered, logo LEFT) + digital clock + countdown, (3) Center panel: prayer schedule as a formal table with headers, (4) Right panel: slideshow with frame.png border, (5) Running text ticker, (6) Adzan/Iqamah overlay, (7) MCAndroid bridge. Same A4 visual style: geometric, sharp, table-based.",
+    "Each file MUST include these essential elements with correct IDs for the MCAndroid bridge to work: #layoutHost is NOT used (these are standalone, not template-based), but the following IDs must exist: #digital (clock), #masjidName, #masjidPrefix, #masjidAddress, #logoBox (identity), #greg-date, #hij-date (dates), #nextPill, #nextLabel, #nextCountdown (countdown), #tickerBar, #tickerContent (running text), #adzanOverlay with #ovPrayer, #ovMsg, #ovCount, #ovSub, #ovImamBlock, #ovImamName, #ovKhatibLine, #ovKhatibName, #ovContent, #ovQuranCard, #ovQuranArab, #ovQuranTrans, #ovQuranRef, #ovCustomText (adzan overlay). Prayer cards use class='prayer' with data-key='fajr|sunrise|dhuhr|asr|maghrib|isha' and child [data-time] element.",
+    "Each file must include inline JavaScript that: (1) Loads config from MCAndroid.getConfig() on init, (2) Exposes window.applyConfig(cfg) for live updates, (3) Fetches prayer times from aladhan.com monthly calendar API, (4) Updates digital clock every second, (5) Triggers adzan overlay at prayer time, (6) Manages iqamah countdown after adzan, (7) Computes next prayer countdown, (8) Loads Hijri date from API response, (9) Manages slideshow if URLs are configured, (10) Manages ticker text and animation. Reference the logic patterns in clock.js but implement as self-contained inline script.",
+    "Each file must load Tailwind CSS from js/tailwind.js (relative path) and Google Fonts (Inter, Orbitron at minimum). Include inline <style> for custom CSS needed by the special layout. Use CSS custom properties --primary, --accent, --font-display, --font-digital consistent with the main app."
+  ],
+  "acceptance_criteria": [
+    "4 HTML files exist at app/src/main/assets/web/ with correct filenames",
+    "Each file uses img/temaspesial/background.png as full-page background (via CSS background or img tag)",
+    "Each file uses img/temaspesial/frame.png as decorative border around the slideshow area",
+    "Identity section shows logo on LEFT side of text, centered on page",
+    "Prayer schedule displays 6 prayer times (Subuh, Syuruq, Dzuhur, Ashar, Maghrib, Isya) with data-key attributes",
+    "Digital clock (#digital) is present and would update every second via JS",
+    "Running text ticker (#tickerBar) with marquee animation is present at bottom",
+    "Adzan/Iqamah overlay (#adzanOverlay) is present with all required child elements",
+    "MCAndroid bridge code is present: MCAndroid.getConfig() call and window.applyConfig function",
+    "Prayer time fetch logic (aladhan.com API) is present",
+    "A3 files have distinct visual style (rounded, glass, elegant) from A4 files (geometric, sharp, table-based)",
+    "Vertical variants use single-column portrait layout",
+    "Horizontal variants use multi-panel landscape layout",
+    "All files reference js/tailwind.js for Tailwind CSS",
+    "Hijri date display (#hij-date) and Gregorian date (#greg-date) elements are present"
+  ],
+  "verification": [
+    "Run: ls -la /projects/sandbox/MuslimClockApp/app/src/main/assets/web/jadwal_sholat_spesial_a3_vertikal.html /projects/sandbox/MuslimClockApp/app/src/main/assets/web/jadwal_sholat_spesial_a3_horizontal.html /projects/sandbox/MuslimClockApp/app/src/main/assets/web/jadwal_sholat_spesial_a4_vertikal.html /projects/sandbox/MuslimClockApp/app/src/main/assets/web/jadwal_sholat_spesial_a4_horizontal.html",
+    "Run grep to verify each file contains: MCAndroid.getConfig, window.applyConfig, adzanOverlay, tickerBar, data-key, img/temaspesial/background.png, img/temaspesial/frame.png",
+    "Run grep to verify identity elements: logoBox, masjidName, masjidPrefix, masjidAddress in each file",
+    "Run grep to verify distinct styles: a3 files should have border-radius (rounded), a4 files should not or have minimal radius"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

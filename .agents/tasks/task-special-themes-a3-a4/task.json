@@ -1,0 +1,7 @@
+{
+  "task_id": "task-special-themes-a3-a4",
+  "task_description": "Create 4 standalone special theme HTML files for the Muslim Clock app: jadwal_sholat_spesial_a3_vertikal.html, jadwal_sholat_spesial_a3_horizontal.html, jadwal_sholat_spesial_a4_vertikal.html, jadwal_sholat_spesial_a4_horizontal.html. Each is a self-contained prayer schedule display page with full-page background (img/temaspesial/background.png), slideshow with frame (img/temaspesial/frame.png), identity section, prayer table, digital clock, running text, and iqamah overlay. A3 has elegant/rounded style, A4 has bold/geometric style.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001"],
+  "blocked_reason": null
+}
