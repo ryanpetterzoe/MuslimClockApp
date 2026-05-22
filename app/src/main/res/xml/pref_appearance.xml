@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_appearance">
+
+        <ListPreference
+            app:key="layout"
+            app:title="@string/pref_layout"
+            app:summary="@string/pref_layout_sum"
+            app:entries="@array/layout_entries"
+            app:entryValues="@array/layout_values"
+            app:defaultValue="minimal"
+            app:useSimpleSummaryProvider="true" />
+
+        <id.muslimclock.app.ColorPickerPreference
+            app:key="theme_primary"
+            app:title="@string/pref_theme_primary"
+            app:summary="@string/pref_theme_primary_sum"
+            app:defaultValue="#0A4EA3" />
+
+        <id.muslimclock.app.ColorPickerPreference
+            app:key="theme_accent"
+            app:title="@string/pref_theme_accent"
+            app:summary="@string/pref_theme_accent_sum"
+            app:defaultValue="#F5B301" />
+
+        <ListPreference
+            app:key="font_display"
+            app:title="@string/pref_font_display"
+            app:summary="@string/pref_font_display_sum"
+            app:entries="@array/font_display_entries"
+            app:entryValues="@array/font_display_values"
+            app:defaultValue="Inter"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="font_digital"
+            app:title="@string/pref_font_digital"
+            app:summary="@string/pref_font_digital_sum"
+            app:entries="@array/font_digital_entries"
+            app:entryValues="@array/font_digital_values"
+            app:defaultValue="Orbitron"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="digital_style"
+            app:title="@string/pref_digital_style"
+            app:summary="@string/pref_digital_style_sum"
+            app:entries="@array/digital_style_entries"
+            app:entryValues="@array/digital_style_values"
+            app:defaultValue="classic"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="hide_seconds"
+            app:title="@string/pref_hide_seconds"
+            app:summary="@string/pref_hide_seconds_sum"
+            app:defaultValue="false" />
+
+        <ListPreference
+            app:key="analog_style"
+            app:title="@string/pref_analog_style"
+            app:summary="@string/pref_analog_style_sum"
+            app:entries="@array/analog_style_entries"
+            app:entryValues="@array/analog_style_values"
+            app:defaultValue="classic"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="show_analog"
+            app:title="@string/pref_show_analog"
+            app:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            app:key="show_countdown"
+            app:title="@string/pref_show_countdown"
+            app:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/cat_identity_settings">
+
+        <SeekBarPreference
+            app:key="logo_size"
+            app:title="@string/pref_logo_size"
+            app:summary="@string/pref_logo_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <SeekBarPreference
+            app:key="identity_size"
+            app:title="@string/pref_identity_size"
+            app:summary="@string/pref_identity_size_sum"
+            android:max="200"
+            app:min="50"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+
+        <ListPreference
+            app:key="identity_position"
+            app:title="@string/pref_identity_position"
+            app:summary="@string/pref_identity_position_sum"
+            app:entries="@array/identity_position_entries"
+            app:entryValues="@array/identity_position_values"
+            app:defaultValue="left"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="date_position"
+            app:title="@string/pref_date_position"
+            app:summary="@string/pref_date_position_sum"
+            app:entries="@array/date_position_entries"
+            app:entryValues="@array/date_position_values"
+            app:defaultValue="auto"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

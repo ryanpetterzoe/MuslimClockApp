@@ -8,8 +8,20 @@
     <string name="cat_appearance">Tampilan</string>
     <string name="cat_adzan">Adzan &amp; Iqomah</string>
 
+    <!-- Grid card titles -->
+    <string name="grid_masjid">Masjid</string>
+    <string name="grid_location">Lokasi Dan Hisab</string>
+    <string name="grid_appearance">Tampilan</string>
+    <string name="grid_feature">Pengaturan Fitur</string>
+    <string name="grid_slideshow">Slideshow</string>
+    <string name="grid_imam">Jadwal Imam</string>
+    <string name="grid_editor">Editor Tata Letak</string>
+    <string name="grid_adzan">Adzan dan Iqomah</string>
+    <string name="grid_system">Sistem dan Aktivasi</string>
+    <string name="settings_copyright">Khusyu\' Time Oleh Ryan Apps</string>
+
     <!-- System category (paling atas Settings) -->
-    <string name="cat_system">Sistem</string>
+    <string name="cat_system">Sistem dan Aktivasi</string>
     <string name="pref_start_on_boot">Mulai Otomatis Saat Hidupkan TV</string>
     <string name="pref_start_on_boot_sum">Buka aplikasi otomatis saat TV/perangkat dinyalakan setelah mati listrik. Catatan: di sebagian TV (Xiaomi/Realme/Oppo) Anda perlu mengaktifkan \"Autostart\" di pengaturan sistem juga.</string>
     <string name="pref_longpress_theme">Tahan OK untuk Ganti Tema</string>

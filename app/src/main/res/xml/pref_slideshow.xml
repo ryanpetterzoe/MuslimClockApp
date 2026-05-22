@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/cat_slideshow">
+
+        <Preference
+            app:key="pick_slides"
+            app:title="@string/pref_pick_slides"
+            app:summary="@string/pref_pick_slides_sum"
+            app:icon="@android:drawable/ic_menu_gallery" />
+
+        <Preference
+            app:key="clear_slides"
+            app:title="@string/pref_clear_slides" />
+
+        <EditTextPreference
+            app:key="slideshow_urls"
+            app:title="@string/pref_slideshow_urls"
+            app:summary="@string/pref_slideshow_urls_sum"
+            app:dialogMessage="@string/pref_slideshow_urls_sum" />
+
+        <EditTextPreference
+            app:key="slide_duration"
+            app:title="@string/pref_slide_duration"
+            app:summary="@string/pref_slide_duration_sum"
+            app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            app:key="slideshow_opacity"
+            app:title="@string/pref_slideshow_opacity"
+            app:summary="@string/pref_slideshow_opacity_sum"
+            android:max="100"
+            app:min="0"
+            app:seekBarIncrement="5"
+            app:showSeekBarValue="true"
+            app:defaultValue="100" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

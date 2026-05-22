@@ -1,14 +1,21 @@
 package id.muslimclock.app
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.GridLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -23,52 +30,255 @@ class SettingsActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.settings_container, SettingsFragment())
+                .replace(R.id.settings_container, SettingsGridFragment())
                 .commit()
+        }
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                title = getString(R.string.settings_title)
+            }
         }
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+            return true
+        }
         finish()
         return true
     }
 
-    /**
-     * Hosts the XML-defined preferences plus two click-only Preferences
-     * that drive the slideshow file picker. We register the picker contract
-     * once at fragment creation so it survives config changes.
-     */
-    class SettingsFragment : PreferenceFragmentCompat() {
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
+        }
+    }
 
-        private lateinit var pickImagesLauncher: ActivityResultLauncher<Array<String>>
+    private fun navigateTo(fragment: Fragment, titleRes: Int) {
+        title = getString(titleRes)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.settings_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    // =========================================================================
+    // Grid Fragment
+    // =========================================================================
+
+    class SettingsGridFragment : Fragment() {
+
+        private data class CardItem(
+            val titleRes: Int,
+            val iconRes: Int,
+            val action: () -> Unit
+        )
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            return inflater.inflate(R.layout.fragment_settings_grid, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val activity = requireActivity() as SettingsActivity
+            val grid = view.findViewById<GridLayout>(R.id.settings_grid)
+
+            val items = listOf(
+                CardItem(R.string.grid_masjid, R.drawable.ic_settings_masjid) {
+                    activity.navigateTo(MasjidSettingsFragment(), R.string.grid_masjid)
+                },
+                CardItem(R.string.grid_location, R.drawable.ic_settings_location) {
+                    activity.navigateTo(LocationSettingsFragment(), R.string.grid_location)
+                },
+                CardItem(R.string.grid_appearance, R.drawable.ic_settings_appearance) {
+                    activity.navigateTo(AppearanceSettingsFragment(), R.string.grid_appearance)
+                },
+                CardItem(R.string.grid_feature, R.drawable.ic_settings_feature) {
+                    activity.navigateTo(FeatureSettingsFragment(), R.string.grid_feature)
+                },
+                CardItem(R.string.grid_slideshow, R.drawable.ic_settings_slideshow) {
+                    activity.navigateTo(SlideshowSettingsFragment(), R.string.grid_slideshow)
+                },
+                CardItem(R.string.grid_imam, R.drawable.ic_settings_imam) {
+                    activity.navigateTo(ImamSettingsFragment(), R.string.grid_imam)
+                },
+                CardItem(R.string.grid_editor, R.drawable.ic_settings_editor) {
+                    startActivity(Intent(requireContext(), LayoutEditorActivity::class.java))
+                },
+                CardItem(R.string.grid_adzan, R.drawable.ic_settings_adzan) {
+                    activity.navigateTo(AdzanSettingsFragment(), R.string.grid_adzan)
+                },
+                CardItem(R.string.grid_system, R.drawable.ic_settings_system) {
+                    activity.navigateTo(SystemSettingsFragment(), R.string.grid_system)
+                }
+            )
+
+            val inflater = LayoutInflater.from(requireContext())
+            for ((index, item) in items.withIndex()) {
+                val card = inflater.inflate(R.layout.item_settings_card, grid, false) as LinearLayout
+                card.findViewById<ImageView>(R.id.card_icon).setImageResource(item.iconRes)
+                card.findViewById<TextView>(R.id.card_title).text = getString(item.titleRes)
+                card.setOnClickListener { item.action() }
+
+                val params = GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = GridLayout.LayoutParams.WRAP_CONTENT
+                    columnSpec = GridLayout.spec(index % 3, 1f)
+                    rowSpec = GridLayout.spec(index / 3)
+                    setMargins(8, 8, 8, 8)
+                }
+                grid.addView(card, params)
+            }
+        }
+    }
+
+    // =========================================================================
+    // Masjid Settings
+    // =========================================================================
+
+    class MasjidSettingsFragment : PreferenceFragmentCompat() {
+
         private lateinit var pickLogoLauncher: ActivityResultLauncher<Array<String>>
-        private lateinit var pickAdzanAudioLauncher: ActivityResultLauncher<Array<String>>
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            // Multi-select picker for both images and videos. We pass two
-            // MIME prefixes; ACTION_OPEN_DOCUMENT uses the union, which is
-            // what every Android gallery picker supports.
-            pickImagesLauncher = registerForActivityResult(
-                ActivityResultContracts.OpenMultipleDocuments()
-            ) { uris -> if (!uris.isNullOrEmpty()) onImagesPicked(uris) }
-
-            // Single-select picker for the masjid logo. Different contract
-            // (OpenDocument, not OpenMultipleDocuments) so users can't
-            // accidentally pick five logos at once.
             pickLogoLauncher = registerForActivityResult(
                 ActivityResultContracts.OpenDocument()
             ) { uri -> if (uri != null) onLogoPicked(uri) }
-
-            // Single-select picker for the adzan alarm sound. Same contract
-            // as the logo picker; only one audio file is active at a time.
-            pickAdzanAudioLauncher = registerForActivityResult(
-                ActivityResultContracts.OpenDocument()
-            ) { uri -> if (uri != null) onAdzanAudioPicked(uri) }
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            setPreferencesFromResource(R.xml.preferences, rootKey)
+            setPreferencesFromResource(R.xml.pref_masjid, rootKey)
+
+            findPreference<Preference>("pick_logo")?.setOnPreferenceClickListener {
+                pickLogoLauncher.launch(arrayOf("image/*"))
+                true
+            }
+            findPreference<Preference>("clear_logo")?.setOnPreferenceClickListener {
+                confirmClearLogo()
+                true
+            }
+            updateLogoSummary()
+        }
+
+        private fun onLogoPicked(uri: Uri) {
+            val ctx = requireContext()
+            val url = LogoStorage.importLogo(ctx, uri)
+            if (url == null) {
+                Toast.makeText(ctx, R.string.logo_import_failed, Toast.LENGTH_LONG).show()
+                return
+            }
+            findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)?.text = url
+            Toast.makeText(ctx, R.string.logo_imported, Toast.LENGTH_SHORT).show()
+            updateLogoSummary()
+        }
+
+        private fun confirmClearLogo() {
+            val ctx = requireContext()
+            AlertDialog.Builder(ctx)
+                .setTitle(R.string.clear_logo_title)
+                .setMessage(R.string.clear_logo_message)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    LogoStorage.clear(ctx)
+                    val pref = findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)
+                    if (pref != null && LogoStorage.isLocalLogoUrl(pref.text)) {
+                        pref.text = ""
+                    }
+                    Toast.makeText(
+                        ctx,
+                        if (LogoStorage.clear(ctx)) R.string.logo_cleared
+                        else R.string.logo_nothing_to_clear,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateLogoSummary()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        private fun updateLogoSummary() {
+            val ctx = context ?: return
+            val current = Settings.prefs(ctx).getString(Settings.K_MASJID_LOGO, "").orEmpty()
+            findPreference<Preference>("pick_logo")?.summary = when {
+                current.isBlank() ->
+                    ctx.getString(R.string.pref_pick_logo_sum_empty)
+                LogoStorage.isLocalLogoUrl(current) ->
+                    ctx.getString(R.string.pref_pick_logo_sum_local)
+                else ->
+                    ctx.getString(R.string.pref_pick_logo_sum_url)
+            }
+        }
+    }
+
+    // =========================================================================
+    // Location Settings
+    // =========================================================================
+
+    class LocationSettingsFragment : PreferenceFragmentCompat() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_location, rootKey)
+        }
+
+        override fun onPreferenceTreeClick(preference: Preference): Boolean {
+            if (maybeShowLocationSearch(preference)) return true
+            return super.onPreferenceTreeClick(preference)
+        }
+    }
+
+    // =========================================================================
+    // Appearance Settings
+    // =========================================================================
+
+    class AppearanceSettingsFragment : PreferenceFragmentCompat() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_appearance, rootKey)
+        }
+
+        override fun onDisplayPreferenceDialog(preference: Preference) {
+            if (maybeShowColorPicker(preference)) return
+            super.onDisplayPreferenceDialog(preference)
+        }
+    }
+
+    // =========================================================================
+    // Feature Settings (Running Text + Quran)
+    // =========================================================================
+
+    class FeatureSettingsFragment : PreferenceFragmentCompat() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_feature, rootKey)
+        }
+    }
+
+    // =========================================================================
+    // Slideshow Settings
+    // =========================================================================
+
+    class SlideshowSettingsFragment : PreferenceFragmentCompat() {
+
+        private lateinit var pickImagesLauncher: ActivityResultLauncher<Array<String>>
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            pickImagesLauncher = registerForActivityResult(
+                ActivityResultContracts.OpenMultipleDocuments()
+            ) { uris -> if (!uris.isNullOrEmpty()) onImagesPicked(uris) }
+        }
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_slideshow, rootKey)
 
             findPreference<Preference>("pick_slides")?.setOnPreferenceClickListener {
                 pickImagesLauncher.launch(arrayOf("image/*", "video/*"))
@@ -78,76 +288,11 @@ class SettingsActivity : AppCompatActivity() {
                 confirmClearSlides()
                 true
             }
-            findPreference<Preference>("pick_logo")?.setOnPreferenceClickListener {
-                // Accept all common image MIME types incl. SVG. We *don't*
-                // include svg+xml in the array directly because some
-                // pickers misfile it; "image/*" covers it on every device
-                // we tested.
-                pickLogoLauncher.launch(arrayOf("image/*"))
-                true
-            }
-            findPreference<Preference>("clear_logo")?.setOnPreferenceClickListener {
-                confirmClearLogo()
-                true
-            }
-            findPreference<Preference>("pick_adzan_audio")?.setOnPreferenceClickListener {
-                // "audio/*" alone is enough on every modern Android — it
-                // catches MP3 / M4A / OGG / WAV / FLAC. We don't pass an
-                // explicit MIME list because some pickers misfile less
-                // common types (e.g. WhatsApp voice notes) and would hide
-                // them from the list otherwise.
-                pickAdzanAudioLauncher.launch(arrayOf("audio/*"))
-                true
-            }
-            findPreference<Preference>("clear_adzan_audio")?.setOnPreferenceClickListener {
-                confirmClearAdzanAudio()
-                true
-            }
-            findPreference<Preference>("reset_layout")?.setOnPreferenceClickListener {
-                confirmResetLayout()
-                true
-            }
-            findPreference<Preference>("open_layout_editor")?.setOnPreferenceClickListener {
-                startActivity(android.content.Intent(requireContext(), LayoutEditorActivity::class.java))
-                true
-            }
-            findPreference<Preference>("activate_license")?.setOnPreferenceClickListener {
-                showLicenseInputDialog()
-                true
-            }
             updateClearSummary()
-            updateLogoSummary()
-            updateAdzanAudioSummary()
-            updateLicenseSummary()
-        }
-
-        /**
-         * Route custom DialogPreference subclasses (color picker) through
-         * their own dialog fragments. The default PreferenceFragmentCompat
-         * doesn't know how to inflate them, so we intercept here.
-         */
-        override fun onDisplayPreferenceDialog(preference: Preference) {
-            if (maybeShowColorPicker(preference)) return
-            super.onDisplayPreferenceDialog(preference)
-        }
-
-        /**
-         * Plain Preference (non-DialogPreference) clicks come through here.
-         * Location search lives on a regular Preference because a
-         * DialogPreference forces an AlertDialog with a scrollable container
-         * that breaks our inner ListView item-clicks (the original symptom:
-         * tapping a city closed the whole SettingsActivity).
-         */
-        override fun onPreferenceTreeClick(preference: Preference): Boolean {
-            if (maybeShowLocationSearch(preference)) return true
-            return super.onPreferenceTreeClick(preference)
         }
 
         private fun onImagesPicked(uris: List<Uri>) {
             val ctx = requireContext()
-            // For ACTION_OPEN_DOCUMENT URIs we get a long-lived permission
-            // by default, but importing now and persisting our own copy
-            // means we don't depend on the source app surviving.
             val imported = mutableListOf<String>()
             val rejected = mutableListOf<Uri>()
             for (uri in uris) {
@@ -173,17 +318,12 @@ class SettingsActivity : AppCompatActivity() {
             updateClearSummary()
         }
 
-        /** Append new URLs to the existing `slideshow_urls` text pref. */
         private fun appendSlides(urls: List<String>) {
             val pref = findPreference<EditTextPreference>(Settings.K_SLIDESHOW_URLS) ?: return
             val existing = pref.text.orEmpty()
-            // One URL per line: append after a newline if the field already
-            // has content, otherwise just join straight.
             val joined = if (existing.isBlank()) urls.joinToString("\n")
                          else existing.trimEnd() + "\n" + urls.joinToString("\n")
             pref.text = joined
-            // Triggering the change listener via setText updates summary +
-            // SharedPreferences for us.
         }
 
         private fun confirmClearSlides() {
@@ -193,8 +333,6 @@ class SettingsActivity : AppCompatActivity() {
                 .setMessage(R.string.clear_slides_message)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     val n = SlideStorage.clearAll(ctx)
-                    // Strip any appassets URLs from the text pref since the
-                    // backing files are gone; leave external http(s) URLs.
                     findPreference<EditTextPreference>(Settings.K_SLIDESHOW_URLS)?.let { p ->
                         val keep = (p.text ?: "")
                             .lineSequence()
@@ -220,84 +358,48 @@ class SettingsActivity : AppCompatActivity() {
             findPreference<Preference>("clear_slides")?.summary =
                 resources.getQuantityString(R.plurals.stored_slides_count, files, files)
         }
+    }
 
-        /**
-         * Logo picker callback. Copies the picked image into private
-         * storage and writes the resulting `appassets://.../logo/<uuid>`
-         * URL straight into the [Settings.K_MASJID_LOGO] EditText pref so
-         * the existing JSON config flow picks it up — no extra plumbing.
-         *
-         * We replace any previous logo (handled inside [LogoStorage]) so
-         * uploading a new file always supersedes the old one cleanly.
-         */
-        private fun onLogoPicked(uri: Uri) {
-            val ctx = requireContext()
-            val url = LogoStorage.importLogo(ctx, uri)
-            if (url == null) {
-                Toast.makeText(ctx, R.string.logo_import_failed, Toast.LENGTH_LONG).show()
-                return
+    // =========================================================================
+    // Imam Settings
+    // =========================================================================
+
+    class ImamSettingsFragment : PreferenceFragmentCompat() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_imam, rootKey)
+        }
+    }
+
+    // =========================================================================
+    // Adzan Settings
+    // =========================================================================
+
+    class AdzanSettingsFragment : PreferenceFragmentCompat() {
+
+        private lateinit var pickAdzanAudioLauncher: ActivityResultLauncher<Array<String>>
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            pickAdzanAudioLauncher = registerForActivityResult(
+                ActivityResultContracts.OpenDocument()
+            ) { uri -> if (uri != null) onAdzanAudioPicked(uri) }
+        }
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_adzan, rootKey)
+
+            findPreference<Preference>("pick_adzan_audio")?.setOnPreferenceClickListener {
+                pickAdzanAudioLauncher.launch(arrayOf("audio/*"))
+                true
             }
-            findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)?.text = url
-            Toast.makeText(ctx, R.string.logo_imported, Toast.LENGTH_SHORT).show()
-            updateLogoSummary()
-        }
-
-        /**
-         * Confirm + wipe the locally stored logo. Also clears the
-         * `masjid_logo` preference *iff* it was pointing at our local
-         * URL — external http(s) URLs typed in by the user are left
-         * alone so we don't surprise them.
-         */
-        private fun confirmClearLogo() {
-            val ctx = requireContext()
-            AlertDialog.Builder(ctx)
-                .setTitle(R.string.clear_logo_title)
-                .setMessage(R.string.clear_logo_message)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val removed = LogoStorage.clear(ctx)
-                    val pref = findPreference<EditTextPreference>(Settings.K_MASJID_LOGO)
-                    if (pref != null && LogoStorage.isLocalLogoUrl(pref.text)) {
-                        pref.text = ""
-                    }
-                    Toast.makeText(
-                        ctx,
-                        if (removed) R.string.logo_cleared else R.string.logo_nothing_to_clear,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateLogoSummary()
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
-        }
-
-        /**
-         * Show a friendly hint under the "Upload Logo" button so users
-         * can tell whether a logo is currently set without diving into
-         * the URL field.
-         */
-        private fun updateLogoSummary() {
-            val ctx = context ?: return
-            val current = Settings.prefs(ctx).getString(Settings.K_MASJID_LOGO, "").orEmpty()
-            findPreference<Preference>("pick_logo")?.summary = when {
-                current.isBlank() ->
-                    ctx.getString(R.string.pref_pick_logo_sum_empty)
-                LogoStorage.isLocalLogoUrl(current) ->
-                    ctx.getString(R.string.pref_pick_logo_sum_local)
-                else ->
-                    ctx.getString(R.string.pref_pick_logo_sum_url)
+            findPreference<Preference>("clear_adzan_audio")?.setOnPreferenceClickListener {
+                confirmClearAdzanAudio()
+                true
             }
+            updateAdzanAudioSummary()
         }
 
-        /**
-         * Adzan audio picker callback. Copies the picked audio into
-         * private storage and writes the resulting `appassets://.../audio/<uuid>`
-         * URL straight into the [Settings.K_ADZAN_AUDIO_URL] EditText pref so
-         * the existing JSON config flow picks it up — the WebView's
-         * <audio> element then plays it when adzan triggers.
-         *
-         * Replaces any previous file (handled inside [AudioStorage]) so
-         * uploading a new clip cleanly supersedes the old one.
-         */
         private fun onAdzanAudioPicked(uri: Uri) {
             val ctx = requireContext()
             val url = AudioStorage.importAudio(ctx, uri)
@@ -310,12 +412,6 @@ class SettingsActivity : AppCompatActivity() {
             updateAdzanAudioSummary()
         }
 
-        /**
-         * Confirm + wipe the locally stored adzan audio. Also clears the
-         * `adzan_audio_url` preference *iff* it was pointing at our local
-         * URL — external http(s) URLs typed in by the user are left
-         * alone so we don't surprise them.
-         */
         private fun confirmClearAdzanAudio() {
             val ctx = requireContext()
             AlertDialog.Builder(ctx)
@@ -339,11 +435,6 @@ class SettingsActivity : AppCompatActivity() {
                 .show()
         }
 
-        /**
-         * Show a friendly hint under the "Upload Suara Adzan" button so
-         * users can tell at a glance whether an alarm sound is currently
-         * configured without scrolling down to the URL field.
-         */
         private fun updateAdzanAudioSummary() {
             val ctx = context ?: return
             val current = Settings.prefs(ctx).getString(Settings.K_ADZAN_AUDIO_URL, "").orEmpty()
@@ -356,61 +447,24 @@ class SettingsActivity : AppCompatActivity() {
                     ctx.getString(R.string.pref_pick_adzan_audio_sum_url)
             }
         }
+    }
 
-        /**
-         * Push every layout-editor key back to its default. Resetting via
-         * the hosted [androidx.preference.SeekBarPreference] objects fires
-         * each preference's change listener (if any) and refreshes the
-         * displayed value, which is what we want — otherwise the slider
-         * UI would still show the old number until the user scrolled.
-         */
-        private fun confirmResetLayout() {
-            val ctx = requireContext()
-            AlertDialog.Builder(ctx)
-                .setTitle(R.string.pref_reset_layout)
-                .setMessage(R.string.pref_reset_layout_sum)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    // Pairs of (pref key, default value). Sizes default to
-                    // 100 (%); offsets to 0 (centred / unchanged).
-                    val resets = listOf(
-                        Settings.K_ANALOG_SIZE   to 100,
-                        Settings.K_ANALOG_X_PCT  to 0,
-                        Settings.K_ANALOG_Y_PCT  to 0,
-                        Settings.K_DIGITAL_SIZE  to 100,
-                        Settings.K_DIGITAL_X_PCT to 0,
-                        Settings.K_DIGITAL_Y_PCT to 0,
-                        Settings.K_PRAYERS_SIZE  to 100,
-                        Settings.K_PRAYERS_X_PCT to 0,
-                        Settings.K_PRAYERS_Y_PCT to 0,
-                        Settings.K_QURAN_SIZE    to 100,
-                        Settings.K_QURAN_X_PCT   to 0,
-                        Settings.K_QURAN_Y_PCT   to 0,
-                        Settings.K_DATE_SIZE     to 100,
-                        Settings.K_DATE_X_PCT    to 0,
-                        Settings.K_DATE_Y_PCT    to 0,
-                        Settings.K_NEXT_SIZE     to 100,
-                        Settings.K_NEXT_X_PCT    to 0,
-                        Settings.K_NEXT_Y_PCT    to 0,
-                        Settings.K_LOGO_SIZE     to 100,
-                        Settings.K_IDENTITY_SIZE to 100,
-                    )
-                    for ((key, def) in resets) {
-                        findPreference<androidx.preference.SeekBarPreference>(key)?.value = def
-                    }
-                    // Reset identity_position ListPreference back to "left"
-                    findPreference<androidx.preference.ListPreference>(Settings.K_IDENTITY_POSITION)?.value = "left"
-                    // Reset date_position ListPreference back to "auto"
-                    findPreference<androidx.preference.ListPreference>(Settings.K_DATE_POSITION)?.value = "auto"
-                    Toast.makeText(ctx, R.string.layout_reset_done, Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
+    // =========================================================================
+    // System Settings
+    // =========================================================================
+
+    class SystemSettingsFragment : PreferenceFragmentCompat() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.pref_system, rootKey)
+
+            findPreference<Preference>("activate_license")?.setOnPreferenceClickListener {
+                showLicenseInputDialog()
+                true
+            }
+            updateLicenseSummary()
         }
 
-        /**
-         * Show a dialog for the user to enter their license code.
-         * On OK, calls [LicenseManager.activate] and updates prefs on success.
-         */
         private fun showLicenseInputDialog() {
             val ctx = requireContext()
             val isPro = Settings.prefs(ctx).getBoolean(Settings.K_IS_PRO, false)
@@ -436,9 +490,6 @@ class SettingsActivity : AppCompatActivity() {
 
                     Toast.makeText(ctx, R.string.license_activating, Toast.LENGTH_SHORT).show()
 
-                    // Capture application context so callback works even
-                    // if the fragment/activity is gone by the time Firebase
-                    // responds (which explains the "stuck at validating" bug).
                     val appCtx = ctx.applicationContext
                     val handler = android.os.Handler(android.os.Looper.getMainLooper())
 
@@ -467,9 +518,6 @@ class SettingsActivity : AppCompatActivity() {
                 .show()
         }
 
-        /**
-         * Update the "Aktivasi Lisensi" summary to show current status.
-         */
         private fun updateLicenseSummary() {
             val ctx = context ?: return
             val isPro = Settings.prefs(ctx).getBoolean(Settings.K_IS_PRO, false)
