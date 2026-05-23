@@ -1163,19 +1163,11 @@
     }
 
     function renderCard(ayat) {
-        setAyatText(ayat);
-        reserveQuranSpace(document.getElementById('quranBar'));
+        lockQuranCardHeight(ayat);
     }
 
     function renderFullCard(ayat) {
-        setAyatText(ayat);
-        const arabEl  = document.querySelector('#quranBar .q-arab');
-        const transEl = document.querySelector('#quranBar .q-trans');
-        // Auto-fit guard: shrink font-size step by step until both lines
-        // fit inside the 2-line clamp box (no truncation visible).
-        autoFitToTwoLines(arabEl,  14);
-        autoFitToTwoLines(transEl, 10);
-        reserveQuranSpace(document.getElementById('quranBar'));
+        lockQuranCardHeight(ayat);
     }
 
     function autoFitToTwoLines(el, minPx) {
@@ -1192,17 +1184,62 @@
         }
     }
 
+    /**
+     * Pre-measure and lock the quran card to its full-content height.
+     * Prevents layout shift when ayat text changes or typewriter animates.
+     * Returns { arabFontSize, transFontSize } for modes that need them.
+     */
+    function lockQuranCardHeight(ayat) {
+        const arabEl  = document.querySelector('#quranBar .q-arab');
+        const transEl = document.querySelector('#quranBar .q-trans');
+        const refEl   = document.querySelector('#quranBar .q-ref');
+        if (!arabEl || !transEl || !refEl) return { arabFontSize: '', transFontSize: '' };
+
+        // Set full text to measure
+        arabEl.textContent = ayat.arab;
+        transEl.textContent = ayat.trans;
+        refEl.textContent = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
+
+        // Reset previous adjustments
+        arabEl.style.fontSize = '';
+        transEl.style.fontSize = '';
+        arabEl.style.minHeight = '';
+        transEl.style.minHeight = '';
+        refEl.style.minHeight = '';
+
+        // Auto-fit font sizes
+        autoFitToTwoLines(arabEl, 14);
+        autoFitToTwoLines(transEl, 10);
+        var arabFontSize = arabEl.style.fontSize || '';
+        var transFontSize = transEl.style.fontSize || '';
+
+        // Lock the entire card container height
+        var cardEl = arabEl.closest('.q-card');
+        if (cardEl) {
+            cardEl.style.minHeight = cardEl.getBoundingClientRect().height + 'px';
+        }
+
+        // Lock individual element heights
+        arabEl.style.minHeight = arabEl.getBoundingClientRect().height + 'px';
+        transEl.style.minHeight = transEl.getBoundingClientRect().height + 'px';
+        refEl.style.minHeight = refEl.getBoundingClientRect().height + 'px';
+
+        // Reserve space while at full measured size
+        reserveQuranSpace(document.getElementById('quranBar'));
+
+        return { arabFontSize: arabFontSize, transFontSize: transFontSize };
+    }
+
     function renderSlide(ayat) {
         const card = document.querySelector('#quranBar .q-card');
-        if (!card) { setAyatText(ayat); return; }
+        if (!card) { lockQuranCardHeight(ayat); return; }
         // Restart enter animation by re-toggling the class.
         card.classList.remove('q-enter');
         // Force reflow so the next add re-triggers the animation.
         // eslint-disable-next-line no-unused-expressions
         void card.offsetWidth;
-        setAyatText(ayat);
+        lockQuranCardHeight(ayat);
         card.classList.add('q-enter');
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderTypewriter(ayat) {
@@ -1213,14 +1250,19 @@
 
         if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
 
-        // Start blank and type Arabic first, then translation, then ref.
-        arabEl.innerHTML  = '<span class="quran-cursor">|</span>';
+        // Pre-measure and lock card height
+        var sizes = lockQuranCardHeight(ayat);
+
+        // Clear and start typewriter
+        arabEl.innerHTML = '<span class="quran-cursor">|</span>';
+        if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize;
         transEl.innerHTML = '';
+        if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
         refEl.textContent = '';
 
         const arabChars  = Array.from(ayat.arab);
         const transChars = Array.from(ayat.trans);
-        const refText    = `— QS. ${ayat.surah}: ${ayat.ayat}`;
+        const refText    = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
 
         // Per-character delay scaled to fit comfortably within the rotation
         // interval (we want typing to finish well before the next switch).
@@ -1228,31 +1270,35 @@
         const totalChars = arabChars.length + transChars.length + refText.length;
         const charDelay  = Math.max(15, Math.min(60, Math.floor(intervalMs * 0.6 / totalChars)));
 
-        let phase = 0;     // 0 = arab, 1 = trans, 2 = ref, 3 = done
-        let i = 0;
+        let phase = 0, idx = 0;
         let arabBuf = '', transBuf = '';
 
         quranTypingTimer = setInterval(() => {
             if (phase === 0) {
-                if (i < arabChars.length) {
-                    arabBuf += arabChars[i++];
+                if (idx < arabChars.length) {
+                    arabBuf += arabChars[idx++];
                     arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
+                    if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize;
                 } else {
                     arabEl.textContent = ayat.arab;
-                    transEl.innerHTML  = '<span class="quran-cursor">|</span>';
-                    phase = 1; i = 0;
+                    if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize;
+                    transEl.innerHTML = '<span class="quran-cursor">|</span>';
+                    if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
+                    phase = 1; idx = 0;
                 }
             } else if (phase === 1) {
-                if (i < transChars.length) {
-                    transBuf += transChars[i++];
+                if (idx < transChars.length) {
+                    transBuf += transChars[idx++];
                     transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
+                    if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
                 } else {
                     transEl.textContent = ayat.trans;
-                    phase = 2; i = 0;
+                    if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
+                    phase = 2; idx = 0;
                 }
             } else if (phase === 2) {
-                if (i < refText.length) {
-                    refEl.textContent = refText.slice(0, ++i);
+                if (idx < refText.length) {
+                    refEl.textContent = refText.slice(0, ++idx);
                 } else {
                     phase = 3;
                     clearInterval(quranTypingTimer);
@@ -1260,8 +1306,6 @@
                 }
             }
         }, charDelay);
-
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderMarquee() {
@@ -1297,59 +1341,53 @@
 
     function renderFade(ayat) {
         const card = document.querySelector('#quranBar .q-card');
-        if (!card) { setAyatText(ayat); return; }
+        if (!card) { lockQuranCardHeight(ayat); return; }
         // Fade out, swap text, fade in
         card.style.transition = 'opacity 0.4s ease';
         card.style.opacity = '0';
         setTimeout(() => {
-            setAyatText(ayat);
+            lockQuranCardHeight(ayat);
             card.style.opacity = '1';
         }, 400);
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderFlip(ayat) {
         const card = document.querySelector('#quranBar .q-card');
-        if (!card) { setAyatText(ayat); return; }
+        if (!card) { lockQuranCardHeight(ayat); return; }
         // Flip animation: rotate out on Y axis, swap text, rotate back
         card.style.transition = 'transform 0.3s ease';
         card.style.transform = 'rotateX(90deg)';
         setTimeout(() => {
-            setAyatText(ayat);
+            lockQuranCardHeight(ayat);
             card.style.transform = 'rotateX(0deg)';
         }, 300);
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderGlow(ayat) {
         const card = document.querySelector('#quranBar .q-card');
-        if (!card) { setAyatText(ayat); return; }
-        setAyatText(ayat);
+        if (!card) { lockQuranCardHeight(ayat); return; }
+        lockQuranCardHeight(ayat);
         // Pulse glow effect on the card
         card.style.transition = 'box-shadow 0.6s ease';
         card.style.boxShadow = '0 0 30px var(--accent), 0 0 60px var(--accent)';
         setTimeout(() => {
             card.style.boxShadow = '';
         }, 1200);
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderMinimalCard(ayat) {
-        setAyatText(ayat);
-        // Minimal mode: CSS handles the transparent look via data-mode attr.
-        // No inline style manipulation needed — keeps card tidy.
-        reserveQuranSpace(document.getElementById('quranBar'));
+        lockQuranCardHeight(ayat);
     }
 
     function renderScroll(ayat) {
         const card = document.querySelector('#quranBar .q-card');
-        if (!card) { setAyatText(ayat); return; }
+        if (!card) { lockQuranCardHeight(ayat); return; }
         // Scroll up out, then scroll up in from below
         card.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
         card.style.transform = 'translateY(-100%)';
         card.style.opacity = '0';
         setTimeout(() => {
-            setAyatText(ayat);
+            lockQuranCardHeight(ayat);
             card.style.transition = 'none';
             card.style.transform = 'translateY(100%)';
             // Force reflow
@@ -1358,7 +1396,6 @@
             card.style.transform = 'translateY(0)';
             card.style.opacity = '1';
         }, 350);
-        reserveQuranSpace(document.getElementById('quranBar'));
     }
 
     function renderAccentCard(ayat) {
@@ -1369,39 +1406,14 @@
 
         if (quranTypingTimer) { clearInterval(quranTypingTimer); quranTypingTimer = null; }
 
-        // Pre-measure: set ALL text (including ref) to compute full card size
-        arabEl.textContent = ayat.arab;
-        transEl.textContent = ayat.trans;
-        refEl.textContent = '\u2014 QS. ' + ayat.surah + ': ' + ayat.ayat;
-        arabEl.style.fontSize = '';
-        transEl.style.fontSize = '';
-        arabEl.style.minHeight = '';
-        transEl.style.minHeight = '';
-        autoFitToTwoLines(arabEl, 14);
-        autoFitToTwoLines(transEl, 10);
-        var arabFontSize = arabEl.style.fontSize || '';
-        var transFontSize = transEl.style.fontSize || '';
-
-        // Lock the ENTIRE card container height so nothing shifts
-        var cardEl = arabEl.closest('.q-card');
-        if (cardEl) {
-            cardEl.style.minHeight = cardEl.getBoundingClientRect().height + 'px';
-        }
-
-        // Also lock individual element heights for safety
-        arabEl.style.minHeight = arabEl.getBoundingClientRect().height + 'px';
-        transEl.style.minHeight = transEl.getBoundingClientRect().height + 'px';
-        refEl.style.minHeight = refEl.getBoundingClientRect().height + 'px';
-
-        // Reserve quran space NOW while card is at FULL measured size
-        // (includes arab + trans + ref heights)
-        reserveQuranSpace(document.getElementById('quranBar'));
+        // Pre-measure and lock card height
+        var sizes = lockQuranCardHeight(ayat);
 
         // Clear and start typewriter with the pre-computed sizes
         arabEl.innerHTML = '<span class="quran-cursor">|</span>';
-        if (arabFontSize) arabEl.style.fontSize = arabFontSize;
+        if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize;
         transEl.innerHTML = '';
-        if (transFontSize) transEl.style.fontSize = transFontSize;
+        if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
         refEl.textContent = '';
 
         const arabChars  = Array.from(ayat.arab);
@@ -1419,14 +1431,14 @@
                 if (idx < arabChars.length) {
                     arabBuf += arabChars[idx++];
                     arabEl.innerHTML = arabBuf + '<span class="quran-cursor">|</span>';
-                    if (arabFontSize) arabEl.style.fontSize = arabFontSize;
-                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; if (arabFontSize) arabEl.style.fontSize = arabFontSize; transEl.innerHTML = '<span class="quran-cursor">|</span>'; if (transFontSize) transEl.style.fontSize = transFontSize; }
+                    if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize;
+                } else { phase = 1; idx = 0; arabEl.textContent = ayat.arab; if (sizes.arabFontSize) arabEl.style.fontSize = sizes.arabFontSize; transEl.innerHTML = '<span class="quran-cursor">|</span>'; if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize; }
             } else if (phase === 1) {
                 if (idx < transChars.length) {
                     transBuf += transChars[idx++];
                     transEl.innerHTML = transBuf + '<span class="quran-cursor">|</span>';
-                    if (transFontSize) transEl.style.fontSize = transFontSize;
-                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; if (transFontSize) transEl.style.fontSize = transFontSize; }
+                    if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize;
+                } else { phase = 2; idx = 0; transEl.textContent = ayat.trans; if (sizes.transFontSize) transEl.style.fontSize = sizes.transFontSize; }
             } else if (phase === 2) {
                 if (idx < refText.length) {
                     refEl.textContent = refText.slice(0, ++idx);
