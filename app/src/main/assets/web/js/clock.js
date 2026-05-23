@@ -97,6 +97,7 @@
         masjid_addr_size: 100, masjid_addr_x_pct: 0, masjid_addr_y_pct: 0,
         logo_x_pct: 0, logo_y_pct: 0,
         header_size: 100, header_x_pct: 0, header_y_pct: 0,
+        header_height: 100, header_width: 100,
     };
 
     const PRAYER_LABEL_ID = {
@@ -409,16 +410,24 @@
         }
 
         // Granular name size + position. Falls back to identity_size for backward compat.
+        // NOTE: #masjidName is a <span> (inline element) so CSS transform does NOT work
+        // on it directly. We apply fontSize to the span but transform to its PARENT <div>
+        // which is a block-level element that supports transforms.
         const nameScale = Math.max(50, Math.min(200, parseInt(cfg.masjid_name_size, 10) || 100)) / 100;
         const nameFallbackScale = Math.max(50, Math.min(200, parseInt(cfg.identity_size, 10) || 100)) / 100;
         const effectiveNameScale = nameScale !== 1 ? nameScale : nameFallbackScale;
         if (nameEl) {
             nameEl.style.fontSize = effectiveNameScale !== 1 ? `${effectiveNameScale}em` : '';
-            const nx = parseInt(cfg.masjid_name_x_pct, 10) || 0;
-            const ny = parseInt(cfg.masjid_name_y_pct, 10) || 0;
-            nameEl.style.transform = (nx || ny) ? `translate(${nx}vw, ${ny}vh)` : '';
+            // Apply transform to the parent div (contains prefix + name spans)
+            const nameWrapper = nameEl.parentElement;
+            if (nameWrapper && nameWrapper.tagName !== 'HEADER') {
+                const nx = parseInt(cfg.masjid_name_x_pct, 10) || 0;
+                const ny = parseInt(cfg.masjid_name_y_pct, 10) || 0;
+                nameWrapper.style.transform = (nx || ny) ? `translate(${nx}vw, ${ny}vh)` : '';
+            }
         }
         // Granular address size + position. Falls back to identity_size for backward compat.
+        // #masjidAddress is a <div> (block element) so transform works directly.
         const addrScale = Math.max(50, Math.min(200, parseInt(cfg.masjid_addr_size, 10) || 100)) / 100;
         const effectiveAddrScale = addrScale !== 1 ? addrScale : nameFallbackScale;
         if (addrEl) {
@@ -619,6 +628,24 @@
         // Also set text-align on individual date elements for consistency
         if (gregDate) gregDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
         if (hijDate) hijDate.style.textAlign = datePos === 'center' ? 'center' : (datePos === 'right' ? 'right' : 'left');
+
+        // Re-apply logo transform AFTER all position logic, since center mode
+        // may have overwritten it with 'translateX(-50%)'. Combine position
+        // transforms with user's scale + translate preferences.
+        if (box) {
+            const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
+            const lx = parseInt(cfg.logo_x_pct, 10) || 0;
+            const ly = parseInt(cfg.logo_y_pct, 10) || 0;
+            const logoParts = [];
+            // If logo was positioned absolutely (center+center mode), keep the centering
+            if (box.style.position === 'absolute') {
+                logoParts.push('translateX(-50%)');
+            }
+            if (logoScale !== 1) logoParts.push(`scale(${logoScale})`);
+            if (lx || ly) logoParts.push(`translate(${lx}vw, ${ly}vh)`);
+            box.style.transform = logoParts.length ? logoParts.join(' ') : '';
+            box.style.transformOrigin = 'center center';
+        }
 
         // Friday label
         if (new Date().getDay() === 5) {
@@ -1577,28 +1604,48 @@
                   'top right');
         }
 
-        // Identity header block — translate the entire header (logo +
-        // name + address) using header_x_pct / header_y_pct and scale
-        // using header_size. The granular sub-element controls for
-        // name/address/logo are applied separately in applyConfigToDom.
+        // Identity header block — control dimensions via padding (height/width)
+        // instead of scale, which distorts text and child elements.
+        // header_height controls vertical padding, header_width controls horizontal.
+        // X/Y translate is kept for positioning.
         const identityHeader = (function () {
             const el = document.getElementById('logoBox') || document.getElementById('masjidName');
             return el ? el.closest('header') : null;
         })();
         if (identityHeader) {
+            // Vertical sizing via padding (header_height: 50-200, default 100)
+            const hh = Math.max(50, Math.min(200, parseInt(cfg.header_height, 10) || 100));
+            if (hh !== 100) {
+                identityHeader.style.paddingTop = `${(hh / 100) * 0.75}rem`;
+                identityHeader.style.paddingBottom = `${(hh / 100) * 0.75}rem`;
+            } else {
+                identityHeader.style.paddingTop = '';
+                identityHeader.style.paddingBottom = '';
+            }
+            // Horizontal sizing via padding (header_width: 50-200, default 100)
+            const hw = Math.max(50, Math.min(200, parseInt(cfg.header_width, 10) || 100));
+            if (hw !== 100) {
+                identityHeader.style.paddingLeft = `${(hw / 100) * 2}rem`;
+                identityHeader.style.paddingRight = `${(hw / 100) * 2}rem`;
+            } else {
+                identityHeader.style.paddingLeft = '';
+                identityHeader.style.paddingRight = '';
+            }
+            // X/Y translate for positioning
             const hx = Math.max(-50, Math.min(50, parseInt(cfg.header_x_pct, 10) || 0));
             const hy = Math.max(-50, Math.min(50, parseInt(cfg.header_y_pct, 10) || 0));
-            const hScale = Math.max(50, Math.min(200, parseInt(cfg.header_size, 10) || 100)) / 100;
             // Backward compat: if header keys are at defaults, fall back to old identity_x/y_pct
             const fallbackX = Math.max(-50, Math.min(50, parseInt(cfg.identity_x_pct, 10) || 0));
             const fallbackY = Math.max(-50, Math.min(50, parseInt(cfg.identity_y_pct, 10) || 0));
             const effectiveX = (hx !== 0) ? hx : fallbackX;
             const effectiveY = (hy !== 0) ? hy : fallbackY;
-            const parts = [];
-            if (hScale !== 1) parts.push(`scale(${hScale})`);
-            if (effectiveX || effectiveY) parts.push(`translate(${effectiveX}vw, ${effectiveY}vh)`);
-            identityHeader.style.transform = parts.length ? parts.join(' ') : '';
-            identityHeader.style.willChange = parts.length ? 'transform' : '';
+            if (effectiveX || effectiveY) {
+                identityHeader.style.transform = `translate(${effectiveX}vw, ${effectiveY}vh)`;
+                identityHeader.style.willChange = 'transform';
+            } else {
+                identityHeader.style.transform = '';
+                identityHeader.style.willChange = '';
+            }
         }
 
         // After all transforms are applied, schedule a collision check

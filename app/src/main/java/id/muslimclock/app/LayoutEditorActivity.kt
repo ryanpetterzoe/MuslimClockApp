@@ -146,8 +146,11 @@ class LayoutEditorActivity : AppCompatActivity() {
         allKeys.add(Settings.K_IDENTITY_SIZE)
         allKeys.add(Settings.K_IDENTITY_X_PCT)
         allKeys.add(Settings.K_IDENTITY_Y_PCT)
+        // Header uses separate height/width controls instead of single size
+        allKeys.add(Settings.K_HEADER_HEIGHT)
+        allKeys.add(Settings.K_HEADER_WIDTH)
         for (key in allKeys) {
-            val default = if (key.endsWith("_size")) 100 else 0
+            val default = if (key.endsWith("_size") || key.endsWith("_height") || key.endsWith("_width")) 100 else 0
             workingValues[key] = try {
                 p.getInt(key, default)
             } catch (_: Throwable) {
@@ -350,15 +353,35 @@ class LayoutEditorActivity : AppCompatActivity() {
             }
         }
 
-        // Size slider
-        addSlider(
-            label = getString(R.string.layout_editor_size_label),
-            key = elem.sizeKey,
-            min = elem.sizeMin,
-            max = elem.sizeMax,
-            step = elem.sizeStep,
-            suffix = "%"
-        )
+        // Size slider(s)
+        if (elem.label == "Header") {
+            // Header uses separate vertical and horizontal dimension controls
+            addSlider(
+                label = getString(R.string.layout_editor_header_height_label),
+                key = Settings.K_HEADER_HEIGHT,
+                min = elem.sizeMin,
+                max = elem.sizeMax,
+                step = elem.sizeStep,
+                suffix = "%"
+            )
+            addSlider(
+                label = getString(R.string.layout_editor_header_width_label),
+                key = Settings.K_HEADER_WIDTH,
+                min = elem.sizeMin,
+                max = elem.sizeMax,
+                step = elem.sizeStep,
+                suffix = "%"
+            )
+        } else {
+            addSlider(
+                label = getString(R.string.layout_editor_size_label),
+                key = elem.sizeKey,
+                min = elem.sizeMin,
+                max = elem.sizeMax,
+                step = elem.sizeStep,
+                suffix = "%"
+            )
+        }
 
         // X/Y sliders for all elements
         addSlider(
@@ -489,7 +512,7 @@ class LayoutEditorActivity : AppCompatActivity() {
     }
 
     private fun addSlider(label: String, key: String, min: Int, max: Int, step: Int, suffix: String) {
-        val currentValue = workingValues[key] ?: if (key.endsWith("_size")) 100 else 0
+        val currentValue = workingValues[key] ?: if (key.endsWith("_size") || key.endsWith("_height") || key.endsWith("_width")) 100 else 0
 
         // Container
         val container = LinearLayout(this).apply {
@@ -566,6 +589,9 @@ class LayoutEditorActivity : AppCompatActivity() {
                 workingValues[Settings.K_IDENTITY_Y_PCT] = 0
                 // Reset logo size
                 workingValues[Settings.K_LOGO_SIZE] = 100
+                // Reset header dimension controls
+                workingValues[Settings.K_HEADER_HEIGHT] = 100
+                workingValues[Settings.K_HEADER_WIDTH] = 100
                 // Reset string settings to defaults
                 workingStrings[Settings.K_IDENTITY_POSITION] = "left"
                 workingStrings[Settings.K_LOGO_POSITION] = "right"

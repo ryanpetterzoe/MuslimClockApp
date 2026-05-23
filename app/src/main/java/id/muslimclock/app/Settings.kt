@@ -136,6 +136,8 @@ object Settings {
     const val K_HEADER_SIZE       = "header_size"
     const val K_HEADER_X_PCT      = "header_x_pct"
     const val K_HEADER_Y_PCT      = "header_y_pct"
+    const val K_HEADER_HEIGHT     = "header_height"
+    const val K_HEADER_WIDTH      = "header_width"
 
     // System: auto-launch the app after the device finishes booting.
     // Default ON because the primary deployment is a TV permanently
@@ -274,6 +276,8 @@ object Settings {
             .putInt(K_HEADER_SIZE, 100)
             .putInt(K_HEADER_X_PCT, 0)
             .putInt(K_HEADER_Y_PCT, 0)
+            .putInt(K_HEADER_HEIGHT, 100)
+            .putInt(K_HEADER_WIDTH, 100)
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -388,6 +392,8 @@ object Settings {
             put("header_size", p.getInt(K_HEADER_SIZE, 100).coerceIn(50, 200))
             put("header_x_pct", p.getInt(K_HEADER_X_PCT, 0).coerceIn(-50, 50))
             put("header_y_pct", p.getInt(K_HEADER_Y_PCT, 0).coerceIn(-50, 50))
+            put("header_height", p.getInt(K_HEADER_HEIGHT, 100).coerceIn(50, 200))
+            put("header_width", p.getInt(K_HEADER_WIDTH, 100).coerceIn(50, 200))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))
