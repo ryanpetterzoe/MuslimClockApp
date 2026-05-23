@@ -185,6 +185,8 @@
     <string name="layout_editor_dropdown_logo_position">Posisi Logo</string>
     <string name="layout_editor_dropdown_quran_mode">Jenis Tampilan Ayat</string>
     <string name="layout_editor_hide_seconds">Sembunyikan Detik</string>
+    <string name="layout_editor_header_height_label">Ukuran Vertikal</string>
+    <string name="layout_editor_header_width_label">Ukuran Horizontal</string>
     <string name="layout_editor_tab_nama_masjid">Nama Masjid</string>
     <string name="layout_editor_tab_alamat_masjid">Alamat Masjid</string>
     <string name="layout_editor_tab_logo">Logo</string>
