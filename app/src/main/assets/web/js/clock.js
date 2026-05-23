@@ -92,6 +92,11 @@
         identity_y_pct: 0,
         logo_position: 'right',
         date_position: 'auto',
+        // Granular identity sub-element controls
+        masjid_name_size: 100, masjid_name_x_pct: 0, masjid_name_y_pct: 0,
+        masjid_addr_size: 100, masjid_addr_x_pct: 0, masjid_addr_y_pct: 0,
+        logo_x_pct: 0, logo_y_pct: 0,
+        header_size: 100, header_x_pct: 0, header_y_pct: 0,
     };
 
     const PRAYER_LABEL_ID = {
@@ -368,10 +373,16 @@
             }
         }
 
-        // Logo size — scale the #logoBox based on logo_size/100.
+        // Logo size + position — scale the #logoBox based on logo_size/100
+        // and apply granular logo_x_pct / logo_y_pct offset.
         if (box) {
             const logoScale = Math.max(50, Math.min(200, parseInt(cfg.logo_size, 10) || 100)) / 100;
-            box.style.transform = logoScale !== 1 ? `scale(${logoScale})` : '';
+            const lx = parseInt(cfg.logo_x_pct, 10) || 0;
+            const ly = parseInt(cfg.logo_y_pct, 10) || 0;
+            const logoParts = [];
+            if (logoScale !== 1) logoParts.push(`scale(${logoScale})`);
+            if (lx || ly) logoParts.push(`translate(${lx}vw, ${ly}vh)`);
+            box.style.transform = logoParts.length ? logoParts.join(' ') : '';
             box.style.transformOrigin = 'center center';
         }
 
@@ -397,10 +408,25 @@
             }
         }
 
-        // Identity text size — scale #masjidName and #masjidAddress font-size.
-        const identityScale = Math.max(50, Math.min(200, parseInt(cfg.identity_size, 10) || 100)) / 100;
-        if (nameEl) nameEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
-        if (addrEl) addrEl.style.fontSize = identityScale !== 1 ? `${identityScale}em` : '';
+        // Granular name size + position. Falls back to identity_size for backward compat.
+        const nameScale = Math.max(50, Math.min(200, parseInt(cfg.masjid_name_size, 10) || 100)) / 100;
+        const nameFallbackScale = Math.max(50, Math.min(200, parseInt(cfg.identity_size, 10) || 100)) / 100;
+        const effectiveNameScale = nameScale !== 1 ? nameScale : nameFallbackScale;
+        if (nameEl) {
+            nameEl.style.fontSize = effectiveNameScale !== 1 ? `${effectiveNameScale}em` : '';
+            const nx = parseInt(cfg.masjid_name_x_pct, 10) || 0;
+            const ny = parseInt(cfg.masjid_name_y_pct, 10) || 0;
+            nameEl.style.transform = (nx || ny) ? `translate(${nx}vw, ${ny}vh)` : '';
+        }
+        // Granular address size + position. Falls back to identity_size for backward compat.
+        const addrScale = Math.max(50, Math.min(200, parseInt(cfg.masjid_addr_size, 10) || 100)) / 100;
+        const effectiveAddrScale = addrScale !== 1 ? addrScale : nameFallbackScale;
+        if (addrEl) {
+            addrEl.style.fontSize = effectiveAddrScale !== 1 ? `${effectiveAddrScale}em` : '';
+            const ax = parseInt(cfg.masjid_addr_x_pct, 10) || 0;
+            const ay = parseInt(cfg.masjid_addr_y_pct, 10) || 0;
+            addrEl.style.transform = (ax || ay) ? `translate(${ax}vw, ${ay}vh)` : '';
+        }
 
         // Identity position — control alignment of the header identity block.
         const idPos = cfg.identity_position || 'left';
@@ -626,6 +652,16 @@
         if (gear) {
             const bridgeOk = !!(window.MCAndroid && window.MCAndroid.openSettings);
             gear.style.display = bridgeOk ? '' : 'none';
+            // Detect light layout and apply dark gear styling
+            const LIGHT_LAYOUTS = ['cinema', 'newspaper', 'andalusia'];
+            const isLightLayout = LIGHT_LAYOUTS.includes(state.mountedLayout);
+            if (isLightLayout) {
+                gear.classList.add('gear-dark');
+                gear.classList.remove('text-white');
+            } else {
+                gear.classList.remove('gear-dark');
+                gear.classList.add('text-white');
+            }
         }
 
         // Ticker (running text)
@@ -1542,19 +1578,27 @@
         }
 
         // Identity header block — translate the entire header (logo +
-        // name + address) using identity_x_pct / identity_y_pct. The
-        // identity_size scaling is handled separately in applyConfigToDom
-        // (per-text element), so here we only apply the translate offset.
+        // name + address) using header_x_pct / header_y_pct and scale
+        // using header_size. The granular sub-element controls for
+        // name/address/logo are applied separately in applyConfigToDom.
         const identityHeader = (function () {
             const el = document.getElementById('logoBox') || document.getElementById('masjidName');
             return el ? el.closest('header') : null;
         })();
         if (identityHeader) {
-            const ix = Math.max(-50, Math.min(50, parseInt(cfg.identity_x_pct, 10) || 0));
-            const iy = Math.max(-50, Math.min(50, parseInt(cfg.identity_y_pct, 10) || 0));
-            const isDefault = ix === 0 && iy === 0;
-            identityHeader.style.transform = isDefault ? '' : `translate(${ix}vw, ${iy}vh)`;
-            identityHeader.style.willChange = isDefault ? '' : 'transform';
+            const hx = Math.max(-50, Math.min(50, parseInt(cfg.header_x_pct, 10) || 0));
+            const hy = Math.max(-50, Math.min(50, parseInt(cfg.header_y_pct, 10) || 0));
+            const hScale = Math.max(50, Math.min(200, parseInt(cfg.header_size, 10) || 100)) / 100;
+            // Backward compat: if header keys are at defaults, fall back to old identity_x/y_pct
+            const fallbackX = Math.max(-50, Math.min(50, parseInt(cfg.identity_x_pct, 10) || 0));
+            const fallbackY = Math.max(-50, Math.min(50, parseInt(cfg.identity_y_pct, 10) || 0));
+            const effectiveX = (hx !== 0) ? hx : fallbackX;
+            const effectiveY = (hy !== 0) ? hy : fallbackY;
+            const parts = [];
+            if (hScale !== 1) parts.push(`scale(${hScale})`);
+            if (effectiveX || effectiveY) parts.push(`translate(${effectiveX}vw, ${effectiveY}vh)`);
+            identityHeader.style.transform = parts.length ? parts.join(' ') : '';
+            identityHeader.style.willChange = parts.length ? 'transform' : '';
         }
 
         // After all transforms are applied, schedule a collision check
@@ -2658,6 +2702,80 @@
      * doesn't, we drop the result and try the cache (which is the
      * common case once the prayer-time fetch completes).
      */
+    /**
+     * Pure JavaScript Umm al-Qura calendar conversion.
+     * Uses a lookup table of month-length bit patterns for Hijri years
+     * 1400-1500 AH (covering approximately 1979-2076 CE). Each entry
+     * is a 12-bit number where bit i (0=Muharram) being 1 means that
+     * month has 30 days, 0 means 29 days.
+     */
+    const UMM_AL_QURA_DATA = (function () {
+        // Hijri year 1400 starts on ~21 Nov 1979 (Gregorian).
+        // Julian Day Number for 1 Muharram 1400.
+        const epoch = 2444240; // JDN of 1 Muharram 1400 AH (21 Nov 1979)
+        // Month-length bit patterns for years 1400..1500 (101 entries).
+        // Bit 0 = Muharram, bit 11 = Dhul Hijjah. 1 = 30 days, 0 = 29 days.
+        const data = [
+            0x0EA4, 0x0D4A, 0x0A96, 0x0536, 0x0AB6, 0x0B5A, 0x0B52, 0x0AA4, 0x0D24, 0x0D4A, // 1400-1409
+            0x054E, 0x0A56, 0x0AD6, 0x05DA, 0x0B64, 0x0764, 0x0749, 0x0692, 0x06A6, 0x054B, // 1410-1419
+            0x0AB5, 0x06B5, 0x05B2, 0x0B64, 0x0B64, 0x06A5, 0x0952, 0x092B, 0x0556, 0x0AAD, // 1420-1429
+            0x0B55, 0x04D2, 0x0DA4, 0x0D92, 0x0D25, 0x0A4D, 0x02AD, 0x056D, 0x0B6A, 0x0B52, // 1430-1439
+            0x0B24, 0x0A49, 0x0A93, 0x052B, 0x0A5B, 0x0AAB, 0x0D4B, 0x0CA5, 0x0B49, 0x0A93, // 1440-1449
+            0x0D26, 0x0A55, 0x0AAD, 0x055A, 0x0AD5, 0x06A5, 0x06D2, 0x0EA2, 0x0D4A, 0x0A95, // 1450-1459
+            0x0536, 0x0AB5, 0x0DAA, 0x0BA4, 0x0B64, 0x0B4A, 0x0A95, 0x0A4B, 0x052B, 0x0A57, // 1460-1469
+            0x0536, 0x0D95, 0x0B52, 0x0D4A, 0x0DA5, 0x0D4A, 0x064B, 0x0A9B, 0x055A, 0x0AD6, // 1470-1479
+            0x0B69, 0x0B52, 0x0B24, 0x0B49, 0x0A93, 0x0527, 0x0A4E, 0x0B56, 0x06D5, 0x0B52, // 1480-1489
+            0x0D24, 0x0D92, 0x0A95, 0x052D, 0x0A5D, 0x055A, 0x0AD5, 0x0D25, 0x0D49, 0x0D4A, // 1490-1499
+            0x0A95  // 1500
+        ];
+        return { epoch: epoch, data: data, startYear: 1400 };
+    })();
+
+    /**
+     * Convert a Gregorian date to Hijri using the Umm al-Qura lookup table.
+     * Returns {day, month, year} where month is 1-based (1=Muharram..12=Dhul Hijjah).
+     * Returns null if the date is outside the supported range.
+     */
+    function gregorianToHijri(gYear, gMonth, gDay) {
+        // Convert Gregorian to Julian Day Number
+        var a = Math.floor((14 - gMonth) / 12);
+        var y = gYear + 4800 - a;
+        var m = gMonth + 12 * a - 3;
+        var jdn = gDay + Math.floor((153 * m + 2) / 5) + 365 * y +
+                  Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+
+        var tbl = UMM_AL_QURA_DATA;
+        if (jdn < tbl.epoch) return null;
+
+        // Walk through years from 1400 onward
+        var dayCount = jdn - tbl.epoch; // days since 1 Muharram 1400
+        var hYear = tbl.startYear;
+
+        for (var yi = 0; yi < tbl.data.length; yi++) {
+            var yearDays = 0;
+            var pattern = tbl.data[yi];
+            for (var mi = 0; mi < 12; mi++) {
+                yearDays += (pattern & (1 << mi)) ? 30 : 29;
+            }
+            if (dayCount < yearDays) {
+                // Found the year, now find the month
+                var hMonth = 0;
+                for (var mi2 = 0; mi2 < 12; mi2++) {
+                    var mLen = (pattern & (1 << mi2)) ? 30 : 29;
+                    if (dayCount < mLen) {
+                        return { day: dayCount + 1, month: mi2 + 1, year: hYear };
+                    }
+                    dayCount -= mLen;
+                }
+                // Should not reach here
+                return { day: dayCount + 1, month: 12, year: hYear };
+            }
+            dayCount -= yearDays;
+            hYear++;
+        }
+        return null; // Outside supported range
+    }
+
     function loadHijri() {
         const el = $('#hij-date');
         if (!el) return;
@@ -2669,7 +2787,16 @@
             return;
         }
 
-        // 2. Intl fallback. Guarded against the Gregorian-month-name
+        // 2. Pure JavaScript Umm al-Qura calculation — works fully offline,
+        //    no dependency on Intl.DateTimeFormat which is broken on many WebViews.
+        const now = new Date();
+        const hijri = gregorianToHijri(now.getFullYear(), now.getMonth() + 1, now.getDate());
+        if (hijri) {
+            el.textContent = `${hijri.day} ${HIJRI_MONTHS_ID[hijri.month - 1]} ${hijri.year} H`;
+            return;
+        }
+
+        // 3. Intl fallback (last resort). Guarded against the Gregorian-month-name
         //    fallback bug seen on some Android WebViews.
         try {
             const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
@@ -2683,15 +2810,12 @@
             }
             const idx = hijriMonthIndex(monthName);
             if (idx === undefined) {
-                // WebView returned a Gregorian month → unreliable.
-                // Leave the existing text alone (or blank if none yet)
-                // and wait for the calendar fetch to deliver real data.
-                if (!el.textContent || el.textContent === '—') el.textContent = '';
+                if (!el.textContent || el.textContent === '\u2014') el.textContent = '';
                 return;
             }
             el.textContent = `${day} ${HIJRI_MONTHS_ID[idx]} ${year} H`;
         } catch (e) {
-            if (!el.textContent || el.textContent === '—') el.textContent = '';
+            if (!el.textContent || el.textContent === '\u2014') el.textContent = '';
         }
     }
 
