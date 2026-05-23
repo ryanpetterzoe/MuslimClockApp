@@ -124,6 +124,19 @@ object Settings {
     // identity left => date right, identity center => date center, identity right => date left.
     const val K_DATE_POSITION      = "date_position"
 
+    // Granular identity sub-element controls
+    const val K_MASJID_NAME_SIZE  = "masjid_name_size"
+    const val K_MASJID_NAME_X_PCT = "masjid_name_x_pct"
+    const val K_MASJID_NAME_Y_PCT = "masjid_name_y_pct"
+    const val K_MASJID_ADDR_SIZE  = "masjid_addr_size"
+    const val K_MASJID_ADDR_X_PCT = "masjid_addr_x_pct"
+    const val K_MASJID_ADDR_Y_PCT = "masjid_addr_y_pct"
+    const val K_LOGO_X_PCT        = "logo_x_pct"
+    const val K_LOGO_Y_PCT        = "logo_y_pct"
+    const val K_HEADER_SIZE       = "header_size"
+    const val K_HEADER_X_PCT      = "header_x_pct"
+    const val K_HEADER_Y_PCT      = "header_y_pct"
+
     // System: auto-launch the app after the device finishes booting.
     // Default ON because the primary deployment is a TV permanently
     // mounted on a masjid wall — when power blinks the user expects
@@ -250,6 +263,17 @@ object Settings {
             .putInt(K_IDENTITY_Y_PCT, 0)
             .putString(K_LOGO_POSITION, "right")
             .putString(K_DATE_POSITION, "auto")
+            .putInt(K_MASJID_NAME_SIZE, 100)
+            .putInt(K_MASJID_NAME_X_PCT, 0)
+            .putInt(K_MASJID_NAME_Y_PCT, 0)
+            .putInt(K_MASJID_ADDR_SIZE, 100)
+            .putInt(K_MASJID_ADDR_X_PCT, 0)
+            .putInt(K_MASJID_ADDR_Y_PCT, 0)
+            .putInt(K_LOGO_X_PCT, 0)
+            .putInt(K_LOGO_Y_PCT, 0)
+            .putInt(K_HEADER_SIZE, 100)
+            .putInt(K_HEADER_X_PCT, 0)
+            .putInt(K_HEADER_Y_PCT, 0)
             .putBoolean(K_START_ON_BOOT, true)
             .putBoolean(K_LONGPRESS_THEME, true)
             .putBoolean(K_IS_PRO, false)
@@ -353,6 +377,17 @@ object Settings {
             put("identity_y_pct",  p.getInt(K_IDENTITY_Y_PCT, 0).coerceIn(-50, 50))
             put("logo_position",   str(K_LOGO_POSITION, "right"))
             put("date_position", str(K_DATE_POSITION, "auto"))
+            put("masjid_name_size", p.getInt(K_MASJID_NAME_SIZE, 100).coerceIn(50, 200))
+            put("masjid_name_x_pct", p.getInt(K_MASJID_NAME_X_PCT, 0).coerceIn(-50, 50))
+            put("masjid_name_y_pct", p.getInt(K_MASJID_NAME_Y_PCT, 0).coerceIn(-50, 50))
+            put("masjid_addr_size", p.getInt(K_MASJID_ADDR_SIZE, 100).coerceIn(50, 200))
+            put("masjid_addr_x_pct", p.getInt(K_MASJID_ADDR_X_PCT, 0).coerceIn(-50, 50))
+            put("masjid_addr_y_pct", p.getInt(K_MASJID_ADDR_Y_PCT, 0).coerceIn(-50, 50))
+            put("logo_x_pct", p.getInt(K_LOGO_X_PCT, 0).coerceIn(-50, 50))
+            put("logo_y_pct", p.getInt(K_LOGO_Y_PCT, 0).coerceIn(-50, 50))
+            put("header_size", p.getInt(K_HEADER_SIZE, 100).coerceIn(50, 200))
+            put("header_x_pct", p.getInt(K_HEADER_X_PCT, 0).coerceIn(-50, 50))
+            put("header_y_pct", p.getInt(K_HEADER_Y_PCT, 0).coerceIn(-50, 50))
             put("start_on_boot",   p.getBoolean(K_START_ON_BOOT, true))
             put("longpress_theme", p.getBoolean(K_LONGPRESS_THEME, true))
             put("is_pro",          p.getBoolean(K_IS_PRO, false))

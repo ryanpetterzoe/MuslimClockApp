@@ -369,6 +369,22 @@ video.slide { object-fit: cover; width: 100%; height: 100%; }
     transform: none;
 }
 
+/* Dark gear variant for light-background layouts */
+.gear-dark {
+    color: #333;
+    opacity: 0.15;
+}
+.gear-dark:hover,
+.gear-dark:focus,
+.gear-dark:focus-visible {
+    color: var(--primary, #0a4ea3);
+    opacity: 0.5;
+}
+.gear-dark:active {
+    color: var(--primary, #0a4ea3);
+    opacity: 0.6;
+}
+
 /* Hide scrollbars */
 ::-webkit-scrollbar { display: none; }
 

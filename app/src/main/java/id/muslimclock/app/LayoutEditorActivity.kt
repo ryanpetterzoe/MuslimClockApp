@@ -63,8 +63,10 @@ class LayoutEditorActivity : AppCompatActivity() {
         EditableElement("Menuju Sholat", Settings.K_NEXT_SIZE, Settings.K_NEXT_X_PCT, Settings.K_NEXT_Y_PCT),
         EditableElement("Tanggal", Settings.K_DATE_SIZE, Settings.K_DATE_X_PCT, Settings.K_DATE_Y_PCT),
         EditableElement("Qur'an", Settings.K_QURAN_SIZE, Settings.K_QURAN_X_PCT, Settings.K_QURAN_Y_PCT),
-        EditableElement("Identitas", Settings.K_IDENTITY_SIZE, Settings.K_IDENTITY_X_PCT, Settings.K_IDENTITY_Y_PCT,
-            sizeMin = 50, sizeMax = 200),
+        EditableElement("Nama Masjid", Settings.K_MASJID_NAME_SIZE, Settings.K_MASJID_NAME_X_PCT, Settings.K_MASJID_NAME_Y_PCT),
+        EditableElement("Alamat Masjid", Settings.K_MASJID_ADDR_SIZE, Settings.K_MASJID_ADDR_X_PCT, Settings.K_MASJID_ADDR_Y_PCT),
+        EditableElement("Logo", Settings.K_LOGO_SIZE, Settings.K_LOGO_X_PCT, Settings.K_LOGO_Y_PCT),
+        EditableElement("Header", Settings.K_HEADER_SIZE, Settings.K_HEADER_X_PCT, Settings.K_HEADER_Y_PCT),
     )
 
     private var selectedElementIdx = 0
@@ -139,8 +141,11 @@ class LayoutEditorActivity : AppCompatActivity() {
         val p = Settings.prefs(this)
         // Load all layout editor int keys
         val allKeys = elements.flatMap { listOf(it.sizeKey, it.xKey, it.yKey) }.distinct().toMutableList()
-        // Also load logo_size since it appears in the Identitas tab
+        // Also load legacy identity keys and logo_size for backward compat
         allKeys.add(Settings.K_LOGO_SIZE)
+        allKeys.add(Settings.K_IDENTITY_SIZE)
+        allKeys.add(Settings.K_IDENTITY_X_PCT)
+        allKeys.add(Settings.K_IDENTITY_Y_PCT)
         for (key in allKeys) {
             val default = if (key.endsWith("_size")) 100 else 0
             workingValues[key] = try {
@@ -374,9 +379,8 @@ class LayoutEditorActivity : AppCompatActivity() {
             suffix = "%"
         )
 
-        // Additional controls for Identitas tab
-        if (elem.label == "Identitas") {
-            // Identity position dropdown
+        // Additional controls for Nama Masjid tab (identity position dropdown)
+        if (elem.label == "Nama Masjid") {
             val idPosEntries = resources.getStringArray(R.array.identity_position_entries)
             val idPosValues = resources.getStringArray(R.array.identity_position_values)
             addDropdown(
@@ -385,18 +389,10 @@ class LayoutEditorActivity : AppCompatActivity() {
                 entries = idPosEntries,
                 values = idPosValues
             )
+        }
 
-            // Logo size slider
-            addSlider(
-                label = getString(R.string.pref_logo_size),
-                key = Settings.K_LOGO_SIZE,
-                min = 50,
-                max = 200,
-                step = 5,
-                suffix = "%"
-            )
-
-            // Logo position dropdown
+        // Additional controls for Logo tab (logo position dropdown)
+        if (elem.label == "Logo") {
             val logoPosEntries = resources.getStringArray(R.array.logo_position_entries)
             val logoPosValues = resources.getStringArray(R.array.logo_position_values)
             addDropdown(
@@ -564,6 +560,10 @@ class LayoutEditorActivity : AppCompatActivity() {
                     workingValues[elem.xKey] = 0
                     workingValues[elem.yKey] = 0
                 }
+                // Reset legacy identity keys
+                workingValues[Settings.K_IDENTITY_SIZE] = 100
+                workingValues[Settings.K_IDENTITY_X_PCT] = 0
+                workingValues[Settings.K_IDENTITY_Y_PCT] = 0
                 // Reset logo size
                 workingValues[Settings.K_LOGO_SIZE] = 100
                 // Reset string settings to defaults

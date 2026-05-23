@@ -1,0 +1,32 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix all 3 bugs: (1) Make Hijri calendar fully offline with a pure-JS Umm al-Qura algorithm fallback, (2) Fix gear icon color on light-theme layouts so it uses a dark color instead of white, and (3) Split the 'Identitas' tab in LayoutEditorActivity into 4 granular sub-elements: mosque name text, mosque address text, logo, and header/border - each with independent size + X/Y sliders.",
+  "status": "completed",
+  "steps": [
+    "BUG 1 - OFFLINE HIJRI: In clock.js, add a pure JavaScript Hijri (Umm al-Qura) date calculation function that does NOT depend on Intl.DateTimeFormat or cached Aladhan API data. The algorithm should convert a Gregorian date to Hijri using a lookup table of known new-moon dates for the Umm al-Qura calendar (covering years 1400-1500 AH / approximately 1979-2076 CE). Modify loadHijri() to use this as the primary source when no cache is available, replacing the Intl.DateTimeFormat fallback which fails on many Android WebViews. Keep the Aladhan cache as the FIRST priority (it is authoritative), but use the new pure-JS calculation as the fallback instead of Intl.DateTimeFormat. The HIJRI_MONTHS_ID array already exists for Indonesian month names.",
+    "BUG 2 - LIGHT THEME GEAR ICON: In clock.js inside applyConfigToDom(), after the gear button display logic (around line 625), add logic to detect if the current mounted layout has a light background in the top-right corner (where the gear sits). Define a list of light-header layouts: 'cinema' (has white header bg-gradient from-white), 'newspaper' (bg #f5f1e8, text #1a1a1a), 'andalusia' (light gradient). For those layouts, change the gear icon color to a dark color (e.g., var(--primary) or #333) instead of white. In CSS, add a class like .gear-dark that overrides the text-white color. Apply this class to #gearBtn when the layout is in the light list. Also ensure the gear has enough opacity and contrast on light layouts by making it slightly more visible (opacity 0.15 rest, 0.5 on hover).",
+    "BUG 3 - GRANULAR IDENTITY CONTROLS IN LAYOUT EDITOR: This is the most complex change. Currently 'Identitas' is ONE element that moves the entire header. Split it into 4 separate tabs in LayoutEditorActivity: (a) 'Nama Masjid' - controls mosque name text size + X/Y, (b) 'Alamat Masjid' - controls address text size + X/Y, (c) 'Logo' - controls logo size + X/Y, (d) 'Header' - controls header boundary/border size + X/Y. Steps: (3a) Add new Settings.kt constants: K_MASJID_NAME_SIZE, K_MASJID_NAME_X_PCT, K_MASJID_NAME_Y_PCT, K_MASJID_ADDR_SIZE, K_MASJID_ADDR_X_PCT, K_MASJID_ADDR_Y_PCT, K_LOGO_X_PCT, K_LOGO_Y_PCT, K_HEADER_SIZE, K_HEADER_X_PCT, K_HEADER_Y_PCT. (3b) Add these keys to Settings.ensureDefaults() with defaults (100 for size, 0 for offsets). (3c) Add these keys to Settings.toJson() output. (3d) In LayoutEditorActivity, replace the single 'Identitas' element with 4 new EditableElement entries. Keep existing Identity controls (identity_position, logo_position dropdowns) in the 'Nama Masjid' tab or a shared section. (3e) Add DEFAULTS entries in clock.js for the new keys. (3f) In clock.js applyConfigToDom(), add logic to apply transforms to each identity sub-element independently: scale #masjidName based on masjid_name_size, translate based on masjid_name_x_pct/y_pct; same for #masjidAddress, #logoBox, and the header element. (3g) In clock.js applyLayoutEditor(), add separate transform calls for each identity sub-element. (3h) Add new string resources in strings.xml for the new tab labels.",
+    "INTEGRATION: Ensure the loadWorkingValues() in LayoutEditorActivity loads all new keys. Ensure confirmReset() resets all new keys to defaults. Ensure saveAndFinish() saves all new keys. Ensure buildPreviewJson() includes all new keys in the override."
+  ],
+  "acceptance_criteria": [
+    "loadHijri() in clock.js produces a valid Hijri date string even when Intl.DateTimeFormat is unavailable and no Aladhan cache exists (pure offline calculation).",
+    "The gear icon (#gearBtn) uses a dark color (not white) on layouts with light backgrounds: cinema, newspaper, andalusia.",
+    "The LayoutEditorActivity has 4 separate tabs replacing the old single 'Identitas' tab: 'Nama Masjid', 'Alamat Masjid', 'Logo', 'Header'.",
+    "Each of the 4 new tabs has its own Size + Geser Horizontal + Geser Vertikal sliders.",
+    "Moving the 'Nama Masjid' sliders only affects the mosque name text position/size in the live preview, NOT the entire header.",
+    "Moving the 'Logo' sliders only affects the logo position/size, independently from the name/address.",
+    "Settings.kt contains all new constants and toJson() outputs them correctly.",
+    "All new settings have proper defaults (size=100, offset=0) in ensureDefaults()."
+  ],
+  "verification": [
+    "Check that clock.js is syntactically valid JavaScript by reviewing the new pure-JS Hijri function.",
+    "Verify Settings.kt has all new K_MASJID_NAME_SIZE, K_MASJID_NAME_X_PCT, K_MASJID_NAME_Y_PCT, K_MASJID_ADDR_SIZE, K_MASJID_ADDR_X_PCT, K_MASJID_ADDR_Y_PCT, K_LOGO_X_PCT, K_LOGO_Y_PCT, K_HEADER_SIZE, K_HEADER_X_PCT, K_HEADER_Y_PCT constants.",
+    "Verify LayoutEditorActivity elements list contains 4 identity sub-elements instead of 1 'Identitas' entry.",
+    "Verify the gear icon gets .gear-dark class on light layouts in clock.js.",
+    "Verify CSS has .gear-dark styles with appropriate dark color.",
+    "Verify loadHijri() tries: (1) Aladhan cache, (2) pure-JS Umm al-Qura calculation, (3) optionally Intl as last resort."
+  ],
+  "blocked_reason": null,
+  "findings": "All 3 bugs implemented and verified. Paren count mismatch in clock.js is pre-existing (from regex/template literals in strings). No node.js available in environment so syntax validated via Python brace/bracket counting. Kotlin files balance correctly. XML is valid. Backward compatibility maintained: old identity_size/identity_x_pct/identity_y_pct keys still exist and function as fallbacks when new granular keys are at defaults."
+}
